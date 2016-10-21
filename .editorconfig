@@ -19,7 +19,7 @@ indent_style = tab
 indent_size = 4
 
 # 2 space indentation for code
-[*.{js,json,sh}]
+[*.{js,ts,json,sh}]
 indent_style = tab
 indent_size = 2
 
