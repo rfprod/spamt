@@ -1,0 +1,14 @@
+{
+  "name": "spamt",
+  "version": "1.0.0",
+  "description": "Social Profile Analysis and Management Tool",
+  "license": "MIT",
+  "private": true,
+  "dependencies": {
+    "jquery-2.2.4.min": "https://code.jquery.com/jquery-2.2.4.min.js",
+    "bootstrap-css": "~3.3.6",
+    "d3": ">3.4.4",
+    "nvd3": ">1.8.1",
+    "components-font-awesome": "^4.6.3"
+  }
+}
