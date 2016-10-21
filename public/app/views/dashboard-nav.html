@@ -1,0 +1,11 @@
+<div id="flex-nav">
+  <a (click)="switchNavButtons($event, true);" class="flex-nav-item" [ngClass]="{selected: navButtonsState[0], inactive: !navButtonsState[0]}">
+    <i class="fa fa-question-circle-o"></i> Help
+  </a>
+  <a [routerLink]="['Intro']" (click)="switchNavButtons($event, true)" class="flex-nav-item" [ngClass]="{selected: navButtonsState[1], inactive: !navButtonsState[1]}">
+    <i class="fa fa-tachometer"></i> Intro
+  </a>
+  <a [routerLink]="['Data']" (click)="switchNavButtons($event, true)" class="flex-nav-item" [ngClass]="{selected: navButtonsState[2], inactive: !navButtonsState[2]}">
+    <i class="fa fa-database"></i> Data
+  </a>
+</div>

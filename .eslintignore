@@ -1,0 +1,8 @@
+node_modules/**
+public/bower_components/**
+public/js/soundcloud.player.api.js
+*.svg
+*.css
+*.scss
+*.html
+*.min.js
