@@ -1,7 +1,8 @@
 if [[ -n $OPENSHIFT_DATA_DIR ]]; then
   echo "openshift env, data dir: $OPENSHIFT_DATA_DIR"
-  node server.js
+  #node server.js
+  npm run production-start
 else
   echo "development env"
-  gulp
+  npm run development-start
 fi
