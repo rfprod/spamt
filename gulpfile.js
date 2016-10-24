@@ -5,6 +5,7 @@ const gulp = require('gulp'),
 	concat = require('gulp-concat'),
 	rename = require('gulp-rename'),
 	eslint = require('gulp-eslint'),
+	tslint = require('gulp-tslint'),
 	plumber = require('gulp-plumber'),
 	uglify = require('gulp-uglify'),
 	mocha = require('gulp-mocha'),
@@ -18,14 +19,14 @@ let node,
 	mongo;
 
 function killProcessByName(name){
-	exec('ps -e | grep '+name, function(error, stdout, stderr) {
+	exec('ps -e | grep '+name, (error, stdout, stderr) => {
 		if (error) throw error;
 		if (stderr) console.log('stderr: ',stderr);
 		if (stdout) {
 			//console.log('killing running processes:', stdout);
 			const runningProcessesIDs = stdout.match(/\d{3,6}/);
 			runningProcessesIDs.forEach((id) => {
-				exec('kill '+id, function(error, stdout, stderr) {
+				exec('kill '+id, (error, stdout, stderr) => {
 					if (error) throw error;
 					if (stderr) console.log('stdout: ', stdout);
 					if (stdout) console.log('stderr: ', stderr);
@@ -35,43 +36,43 @@ function killProcessByName(name){
 	});
 }
 
-gulp.task('database', function() {
+gulp.task('database', () => {
 	if (mongo) mongo.kill();
 	mongo = spawn('mongod', ['--smallfiles'], {stdio: 'inherit'});
-	mongo.on('close', function (code) {
+	mongo.on('close', (code) => {
 		if (code === 8) {
 			gulp.log('Error detected, waiting for changes...');
 		}
 	});
 });
 
-gulp.task('server', function() {
+gulp.task('server', () => {
 	if (node) node.kill();
 	node = spawn('node', ['server.js'], {stdio: 'inherit'});
-	node.on('close', function (code) {
+	node.on('close', (code) => {
 		if (code === 8) {
 			gulp.log('Error detected, waiting for changes...');
 		}
 	});
 });
 
-gulp.task('server-test', function () {
+gulp.task('server-test', () => {
 	return gulp.src(['./test/server/*.js'], { read: false })
 		.pipe(mocha({ reporter: 'spec' }))
 		.on('error', util.log);
 });
 
-gulp.task('client-unit-test', function (done) {
+gulp.task('client-unit-test', (done) => {
 	new karmaServer({
 		configFile: require('path').resolve('test/karma.conf.js'),
 		singleRun: true
-	}, function () {
+	}, () => {
 		console.log('done');
 		done();
 	}).start();
 });
 
-gulp.task('concat-and-uglify-js', function(){
+gulp.task('concat-and-uglify-js', () => {
 	return gulp.src('./public/app/**/*.js')
 		.pipe(plumber())
 		.pipe(concat('packed-app.js'))
@@ -81,7 +82,7 @@ gulp.task('concat-and-uglify-js', function(){
 		.pipe(gulp.dest('./public/js'));
 });
 
-gulp.task('sass-autoprefix-minify-css', function(){
+gulp.task('sass-autoprefix-minify-css', () => {
 	return gulp.src('./public/app/scss/*.scss')
 		.pipe(plumber())
 		.pipe(concat('packed-app.css'))
@@ -95,13 +96,25 @@ gulp.task('sass-autoprefix-minify-css', function(){
 		.pipe(gulp.dest('./public/css'));
 });
 
-gulp.task('lint', function() {
-	return gulp.src(['./app/**', './public/**/*.js', './*.js']) // uses ignore list from .eslintignore
+gulp.task('eslint', () => {
+	return gulp.src(['./app/**', './public/js/*.js', './*.js']) // uses ignore list from .eslintignore
 		.pipe(eslint('./.eslintrc.json'))
 		.pipe(eslint.format());
 });
 
-gulp.task('watch', function(){
+gulp.task('tslint', () => {
+	return gulp.src(['./public/app/*.ts', './public/app/**/*.ts'])
+		.pipe(tslint({
+			formatter: 'verbose' // 'verbose' - extended info | 'prose' - brief info
+		}))
+		.pipe(tslint.report({
+			emitError: false
+		}));
+});
+
+gulp.task('lint', ['eslint','tslint']);
+
+gulp.task('watch', () => {
 	gulp.watch(['./server.js', './app/config/*.js', './app/routes/*.js', './app/utils/*.js'], ['server']); // watch server and database changes and restart server
 	gulp.watch(['./server.js', './app/models/*.js'], ['database']); // watch database changes and restart database
 	gulp.watch('./public/app/*.js', ['concat-and-uglify-js']); // watch app js changes, pack js, minify and put in respective folder
@@ -110,17 +123,18 @@ gulp.task('watch', function(){
 	gulp.watch(['./test/server/test.js'], ['server-test']); // watch server changes and run tests
 });
 
-gulp.task('watch-and-lint', function () {
-	gulp.watch(['./app/**', './public/**', './*.js', './.eslintignore', './.eslintrc.json'], ['lint']); // watch files to be linted or eslint config files and lint on change
+gulp.task('watch-and-lint', () => {
+	gulp.watch(['./app/**', './public/js/*.js', './*.js', './.eslintignore', './.eslintrc.json'], ['eslint']); // watch files to be linted or eslint config files and lint on change
+	gulp.watch(['./public/app/*.ts', './public/app/**/*.ts', './tslint.json'], ['tslint']); // watch files to be linted or eslint config files and lint on change
 });
 
 gulp.task('default', ['database','server','lint','watch']);
 
-process.on('exit', function() {
+process.on('exit', () => {
 	if (node) node.kill();
 	if (mongo) mongo.kill();
 });
 
-process.on('SIGINT', function() {
+process.on('SIGINT', () => {
 	killProcessByName('gulp');
 });

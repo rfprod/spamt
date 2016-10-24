@@ -22,10 +22,10 @@ module.exports = function (app, passport) { // eslint-disable-line no-unused-var
 		});
 	});
 	
-	app.get('/stats', (req, res) => {
-		Log.find({}, (err,doc) => {
+	app.get('/users', (req, res) => {
+		User.find({}, (err,doc) => {
 			if (err) { throw err; }
-			console.log('all logs',doc);
+			console.log('users list',doc);
 			res.setHeader('Cache-Control', 'no-cache, no-store');
 			res.format({
 				'application/json': function(){
