@@ -17,7 +17,7 @@ if (!process.env.OPENSHIFT_MONGODB_DB_HOST) {
 }
 require('./app/config/passport')(passport);
 
-const mongo_uri = process.env.MONGO_URI || 'mongodb://'+process.env.MONGO_USR+':'+process.env.MONGO_PASS+process.env.OPENSHIFT_MONGODB_DB_HOST+':'+process.env.OPENSHIFT_MONGODB_DB_PORT+'/whoami';
+const mongo_uri = process.env.MONGO_URI || process.env.OPENSHIFT_MONGODB_DB_URL;
 mongoose.connect(mongo_uri);
 
 app.use('/public', express.static(process.cwd() + '/public'));
