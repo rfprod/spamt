@@ -13,7 +13,7 @@ module.exports = function (app, passport) { // eslint-disable-line no-unused-var
 	app.get('/dummy', (req, res) => {
 		const headers = req.headers;
 		console.log('headers',headers);
-		const output = '{\"success\":true}';
+		const output = [{key: 'Success', y:1}];
 
 		res.format({
 			'application/json': function(){
