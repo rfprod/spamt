@@ -38,7 +38,7 @@ function killProcessByName(name){
 
 gulp.task('database', () => {
 	if (mongo) mongo.kill();
-	mongo = spawn('mongod', ['--smallfiles'], {stdio: 'inherit'});
+	mongo = spawn('mongod', ['--smallfiles', '--nojournal'], {stdio: 'inherit'});
 	mongo.on('close', (code) => {
 		if (code === 8) {
 			gulp.log('Error detected, waiting for changes...');
@@ -119,8 +119,8 @@ gulp.task('watch', () => {
 	gulp.watch(['./server.js', './app/models/*.js'], ['database']); // watch database changes and restart database
 	gulp.watch('./public/app/*.js', ['concat-and-uglify-js']); // watch app js changes, pack js, minify and put in respective folder
 	gulp.watch('./public/app/scss/*.scss', ['sass-autoprefix-minify-css']); // watch app css changes, pack css, minify and put in respective folder
-	gulp.watch(['./public/app/*.js','./test/client/unit/*.js','./test/karma.conf.js'], ['client-unit-test']); //watch unit test changes and run tests
-	gulp.watch(['./test/server/test.js'], ['server-test']); // watch server changes and run tests
+	//gulp.watch(['./public/app/*.js','./test/client/unit/*.js','./test/karma.conf.js'], ['client-unit-test']); //watch unit test changes and run tests
+	//gulp.watch(['./test/server/test.js'], ['server-test']); // watch server changes and run tests
 });
 
 gulp.task('watch-and-lint', () => {
