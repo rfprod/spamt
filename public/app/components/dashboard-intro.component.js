@@ -23,8 +23,6 @@ var DashboardIntroComponent = (function () {
         this.title = 'SPAMT';
         this.description = 'Social Profile Analysis and Management Tool';
         this.wsUrl = 'ws://localhost:8080/app-diag/dynamic';
-        this.countDown = 60;
-        this.timerArr = [];
         this.chartOptions = {
             chart: {
                 type: 'pieChart',
@@ -75,6 +73,7 @@ var DashboardIntroComponent = (function () {
             dynamic: []
         };
         this.ws = new angular2_websocket_1.$WebSocket(this.wsUrl);
+        this.showModal = false;
         console.log('this.el.nativeElement:', this.el.nativeElement);
     }
     DashboardIntroComponent.prototype.getServerStaticData = function (callback) {
@@ -99,6 +98,10 @@ var DashboardIntroComponent = (function () {
         console.log('root spinner stop event emitted');
         this.emitter.emitEvent({ sys: 'stop spinner' });
     };
+    DashboardIntroComponent.prototype.toggleModal = function () {
+        this.showModal = (!this.showModal) ? true : false;
+    };
+    ;
     DashboardIntroComponent.prototype.ngOnInit = function () {
         var _this = this;
         console.log('ngOnInit: DashboardIntroComponent initialized');

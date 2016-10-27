@@ -27,8 +27,6 @@ export class DashboardIntroComponent implements OnInit, OnDestroy {
 	public title: string = 'SPAMT';
 	public description: string = 'Social Profile Analysis and Management Tool';
 	public wsUrl: string = 'ws://localhost:8080/app-diag/dynamic';
-	public countDown: number = 60;
-	public timerArr: any[] = [];
 	public chartOptions: Object = {
 		chart: {
 			type: 'pieChart',
@@ -100,6 +98,7 @@ export class DashboardIntroComponent implements OnInit, OnDestroy {
 			}
 		);
 	}
+
 	private emitSpinnerStartEvent() {
 		console.log('root spinner start event emitted');
 		this.emitter.emitEvent({sys: 'start spinner'});
@@ -108,6 +107,12 @@ export class DashboardIntroComponent implements OnInit, OnDestroy {
 		console.log('root spinner stop event emitted');
 		this.emitter.emitEvent({sys: 'stop spinner'});
 	}
+
+	private showModal: boolean = false;
+	private toggleModal() {
+		this.showModal = (!this.showModal) ? true : false;
+	};
+
 	public ngOnInit() {
 		console.log('ngOnInit: DashboardIntroComponent initialized');
 		this.emitSpinnerStartEvent();
