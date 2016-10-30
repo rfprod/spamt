@@ -28,10 +28,10 @@ In order to run your own copy of SPAMT, you must have the following installed:
 To install SPAMT execute the below command in the terminal window while in your projects folder:
 
 ```
-$ git clone https://github.com/rfprod/whoami.git
+git clone https://github.com/rfprod/spamt.git
 ```
 
-This will install the WhiAmI microservice components into the `whoami` directory in your projects folder.
+This will install the SPAMT components into the `spamt` directory in your projects folder.
 
 ### Local Environment Variables
 
