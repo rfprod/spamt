@@ -23,7 +23,7 @@ var DashboardIntroComponent = (function () {
         this.title = 'SPAMT';
         this.description = 'Social Profile Analysis and Management Tool';
         this.host = window.location.host;
-        this.wsUrl = (this.host.indexOf('localhost') !== -1) ? 'ws://' + this.host + '/app-diag/dynamic' : 'wss://' + this.host + '/app-diag/dynamic';
+        this.wsUrl = (this.host.indexOf('localhost') !== -1) ? 'ws://' + this.host + '/app-diag/dynamic' : 'ws://' + this.host + ':8000/app-diag/dynamic';
         this.chartOptions = {
             chart: {
                 type: 'pieChart',
