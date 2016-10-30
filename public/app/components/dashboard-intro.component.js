@@ -22,7 +22,8 @@ var DashboardIntroComponent = (function () {
         this.publicDataService = publicDataService;
         this.title = 'SPAMT';
         this.description = 'Social Profile Analysis and Management Tool';
-        this.wsUrl = 'ws://localhost:8080/app-diag/dynamic';
+        this.host = window.location.host;
+        this.wsUrl = (this.host.indexOf('localhost') !== -1) ? 'ws://' + this.host + '/app-diag/dynamic' : 'wss://' + this.host + '/app-diag/dynamic';
         this.chartOptions = {
             chart: {
                 type: 'pieChart',
@@ -70,7 +71,7 @@ var DashboardIntroComponent = (function () {
         ];
         this.serverData = {
             static: [],
-            dynamic: []
+            dynamic: [],
         };
         this.ws = new angular2_websocket_1.$WebSocket(this.wsUrl);
         this.showModal = false;

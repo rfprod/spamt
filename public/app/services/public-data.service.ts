@@ -6,7 +6,7 @@ import 'rxjs/Rx';
 
 @Injectable()
 export class PublicDataService {
-	public appDataUrl: string = 'http://localhost:8080/dummy';
+	public appDataUrl: string = window.location.origin + '/dummy';
 	constructor (private http: Http) {}
 
 	public extractData(res: Response) {

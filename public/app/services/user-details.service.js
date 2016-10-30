@@ -15,7 +15,7 @@ require('rxjs/Rx');
 var UserDetailsService = (function () {
     function UserDetailsService(http) {
         this.http = http;
-        this.appDataUrl = 'http://localhost:8080/dummy';
+        this.appDataUrl = window.location.origin + '/dummy';
     }
     UserDetailsService.prototype.extractData = function (res) {
         var body = res.json();

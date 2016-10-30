@@ -15,7 +15,9 @@ require('rxjs/Rx');
 var ServerStaticDataService = (function () {
     function ServerStaticDataService(http) {
         this.http = http;
-        this.appDataUrl = 'http://localhost:8080/app-diag/static';
+        this.appDataUrl = window.location.origin + '/app-diag/static';
+        console.log('window.location:', window.location);
+        console.log('window.location.origin:', window.location.origin);
     }
     ServerStaticDataService.prototype.extractData = function (res) {
         var body = res.json();

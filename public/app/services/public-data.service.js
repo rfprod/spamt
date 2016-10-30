@@ -15,7 +15,7 @@ require('rxjs/Rx');
 var PublicDataService = (function () {
     function PublicDataService(http) {
         this.http = http;
-        this.appDataUrl = 'http://localhost:8080/dummy';
+        this.appDataUrl = window.location.origin + '/dummy';
     }
     PublicDataService.prototype.extractData = function (res) {
         var body = res.json();

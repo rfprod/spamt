@@ -13,10 +13,10 @@ var common_1 = require('@angular/common');
 var event_emitter_service_1 = require('../services/event-emitter.service');
 var user_details_service_1 = require('../services/user-details.service');
 var DashboardDetailsComponent = (function () {
-    function DashboardDetailsComponent(el, emitter, UserDetailsService) {
+    function DashboardDetailsComponent(el, emitter, userDetailsService) {
         this.el = el;
         this.emitter = emitter;
-        this.UserDetailsService = UserDetailsService;
+        this.userDetailsService = userDetailsService;
         this.publicData = [{ users: [] }, { labels: [] }];
         this.labelDetails = [];
         this.orderProp = 'timestamp';
@@ -24,7 +24,7 @@ var DashboardDetailsComponent = (function () {
     }
     DashboardDetailsComponent.prototype.getUserDetails = function (userId, callback) {
         var _this = this;
-        this.UserDetailsService.getUserDetails().subscribe(function (data) { return _this.labelDetails = data; }, function (error) { return _this.errorMessage = error; }, function () {
+        this.userDetailsService.getUserDetails().subscribe(function (data) { return _this.labelDetails = data; }, function (error) { return _this.errorMessage = error; }, function () {
             console.log('getUserDetails done');
             callback(_this.labelDetails);
         });

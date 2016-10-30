@@ -2,7 +2,7 @@
 var core_1 = require('@angular/core');
 var EventEmitterService = (function () {
     function EventEmitterService() {
-        //constructor () {}
+        // constructor () {}
         this.emitter = new core_1.EventEmitter();
     }
     EventEmitterService.prototype.emitEvent = function (object) {

@@ -26,7 +26,8 @@ export class DashboardIntroComponent implements OnInit, OnDestroy {
 	private subscription: any;
 	public title: string = 'SPAMT';
 	public description: string = 'Social Profile Analysis and Management Tool';
-	public wsUrl: string = 'ws://localhost:8080/app-diag/dynamic';
+	public host: string = window.location.host;
+	public wsUrl: string = (this.host.indexOf('localhost') !== -1) ? 'ws://' + this.host + '/app-diag/dynamic' : 'wss://' + this.host + '/app-diag/dynamic';
 	public chartOptions: Object = {
 		chart: {
 			type: 'pieChart',
@@ -74,7 +75,7 @@ export class DashboardIntroComponent implements OnInit, OnDestroy {
 	];
 	public serverData: Object = {
 		static: [],
-		dynamic: []
+		dynamic: [],
 	};
 	public ws = new $WebSocket(this.wsUrl);
 	public errorMessage: string;

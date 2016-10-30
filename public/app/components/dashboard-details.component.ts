@@ -15,7 +15,7 @@ export class DashboardDetailsComponent implements OnInit, OnDestroy {
 	constructor(
 		public el: ElementRef,
 		private emitter: EventEmitterService,
-		private UserDetailsService: UserDetailsService
+		private userDetailsService: UserDetailsService
 	) {
 		console.log('this.el.nativeElement:', this.el.nativeElement);
 	}
@@ -24,7 +24,7 @@ export class DashboardDetailsComponent implements OnInit, OnDestroy {
 	public labelDetails = [];
 	public errorMessage: string;
 	private getUserDetails(userId, callback) {
-		this.UserDetailsService.getUserDetails().subscribe(
+		this.userDetailsService.getUserDetails().subscribe(
 			data => this.labelDetails = data,
 			error => this.errorMessage = <any> error,
 			() => {

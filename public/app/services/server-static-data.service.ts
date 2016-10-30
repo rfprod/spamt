@@ -6,8 +6,11 @@ import 'rxjs/Rx';
 
 @Injectable()
 export class ServerStaticDataService {
-	public appDataUrl: string = 'http://localhost:8080/app-diag/static';
-	constructor (private http: Http) {}
+	public appDataUrl: string = window.location.origin + '/app-diag/static';
+	constructor( private http: Http ) {
+		console.log('window.location:', window.location);
+		console.log('window.location.origin:', window.location.origin);
+	}
 
 	public extractData(res: Response) {
 		let body = res.json();
