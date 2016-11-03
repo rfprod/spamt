@@ -3,6 +3,7 @@
 	<head>
 		<meta charset="utf-8">
 		<title>SPAMT</title>
+		
 		<!-- bower components start -->
 		<script src="/public/bower_components/jquery-2.2.4.min/index.js"></script>
 		<link href="/public/bower_components/bootstrap-css/css/bootstrap.min.css" rel="stylesheet">
@@ -12,17 +13,29 @@
 		<link href="/public/bower_components/nvd3/build/nv.d3.min.css" rel="stylesheet">
 		<link href="/public/bower_components/components-font-awesome/css/font-awesome.min.css" rel="stylesheet">
 		<!-- bower components end -->
+		
 		<!-- Angular 2.0 start -->
 		<script src="/node_modules/es6-shim/es6-shim.min.js"></script>
 		<script src="/node_modules/zone.js/dist/zone.min.js"></script>
 		<script src="/node_modules/reflect-metadata/Reflect.js"></script>
-		<script src="/node_modules/systemjs/dist/system.src.js"></script>
-		<script src="/public/js/systemjs.config.js"></script>
 		<!-- Angular 2.0 end -->
+		
 		<!-- external libraries start -->
 		<script src="/public/js/soundcloud.player.api.js"></script>
 		<!-- external libraries end -->
+
+		<!-- load app in dev mode start -->
+		<!--
+		<script src="/node_modules/systemjs/dist/system.src.js"></script>
+		<script src="/public/js/systemjs.config.js"></script>
 		<script>System.import('app').catch(function(err){console.error(err);});</script>
+		-->
+		<!-- load app in dev mode end -->
+		
+		<!-- load app in production mode start -->
+		<script src="/public/js/bundle.min.js"></script>
+		<!-- load app in production mode end -->
+
 		<link href="/public/css/packed-app.min.css" rel="stylesheet">
 	</head>
 	<body>
