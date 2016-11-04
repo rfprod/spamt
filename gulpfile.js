@@ -119,7 +119,7 @@ gulp.task('watch', () => {
 	gulp.watch('./public/app/*.js', ['build-system-js']); // watch app js changes and build system
 	gulp.watch('./public/app/scss/*.scss', ['sass-autoprefix-minify-css']); // watch app css changes, pack css, minify and put in respective folder
 	//gulp.watch(['./public/app/*.js','./test/client/unit/*.js','./test/karma.conf.js'], ['client-unit-test']); //watch unit test changes and run tests
-	//gulp.watch(['./test/server/test.js'], ['server-test']); // watch server changes and run tests
+	gulp.watch(['./test/server/test.js'], ['server-test']); // watch server tests changes and run tests
 });
 
 gulp.task('watch-and-lint', () => {
@@ -128,6 +128,8 @@ gulp.task('watch-and-lint', () => {
 });
 
 gulp.task('default', ['build-system-js','sass-autoprefix-minify-css','database','server','lint','watch']);
+
+gulp.task('production-start', ['database','server']);
 
 process.on('exit', () => {
 	if (node) node.kill();
