@@ -1,5 +1,4 @@
-import { Component, ElementRef, OnInit, /*SimpleChange,*/ OnDestroy } from '@angular/core';
-import { NgFor } from '@angular/common';
+import { Component, ElementRef, OnInit, OnDestroy } from '@angular/core';
 import { EventEmitterService } from '../services/event-emitter.service';
 import { UserDetailsService } from '../services/user-details.service';
 
@@ -8,8 +7,6 @@ declare var $: JQueryStatic;
 @Component({
 	selector: 'dashboard-details',
 	templateUrl: `/public/app/views/dashboard-details.html`,
-	providers: [UserDetailsService],
-	directives: [NgFor],
 })
 export class DashboardDetailsComponent implements OnInit, OnDestroy {
 	constructor(

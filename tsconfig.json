@@ -14,8 +14,9 @@
 		".git",
 		"app",
 		"node_modules",
-		"test",
 		"public/bower_components",
+		"test/server",
+		"test/e2e",
 		"typings/main",
 		"typings/main.d.ts"
 	]

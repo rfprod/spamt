@@ -59,7 +59,6 @@ var AppInfoComponent = (function () {
         core_1.Component({
             selector: 'app-info',
             template: "\n\t\t<a class=\"flex-item\" [hidden]=\"hideInfo\" *ngFor=\"let badge of badges\" href=\"{{badge.link}}\" data-toggle=\"tooltip\" target=_blank title=\"{{badge.title}}\">\n\t\t\t<img src=\"{{badge.img}}\"/>\n\t\t</a>\n\t",
-            providers: [],
         }), 
         __metadata('design:paramtypes', [event_emitter_service_1.EventEmitterService])
     ], AppInfoComponent);

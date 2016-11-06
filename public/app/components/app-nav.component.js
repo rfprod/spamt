@@ -9,11 +9,10 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 var core_1 = require('@angular/core');
-var common_1 = require('@angular/common');
-var router_deprecated_1 = require('@angular/router-deprecated');
+// import { ActivatedRoute } from '@angular/router';
 var event_emitter_service_1 = require('../services/event-emitter.service');
 var AppNavComponent = (function () {
-    function AppNavComponent(emitter) {
+    function AppNavComponent(emitter /*, private route: ActivatedRoute*/) {
         this.emitter = emitter;
         this.navButtonsState = [false, false, false];
     }
@@ -79,8 +78,6 @@ var AppNavComponent = (function () {
         core_1.Component({
             selector: 'app-nav',
             templateUrl: "/public/app/views/dashboard-nav.html",
-            providers: [],
-            directives: [router_deprecated_1.ROUTER_DIRECTIVES, common_1.NgClass],
         }), 
         __metadata('design:paramtypes', [event_emitter_service_1.EventEmitterService])
     ], AppNavComponent);

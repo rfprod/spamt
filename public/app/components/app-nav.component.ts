@@ -1,6 +1,5 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { NgClass } from '@angular/common';
-import { ROUTER_DIRECTIVES } from '@angular/router-deprecated';
+// import { ActivatedRoute } from '@angular/router';
 import { EventEmitterService } from '../services/event-emitter.service';
 
 declare var $: JQueryStatic;
@@ -8,11 +7,9 @@ declare var $: JQueryStatic;
 @Component({
 	selector: 'app-nav',
 	templateUrl: `/public/app/views/dashboard-nav.html`,
-	providers: [],
-	directives: [ROUTER_DIRECTIVES, NgClass],
 })
 export class AppNavComponent implements OnInit, OnDestroy {
-	constructor( private emitter: EventEmitterService ) {}
+	constructor( private emitter: EventEmitterService/*, private route: ActivatedRoute*/ ) {}
 	private subscription: any;
 	public navButtonsState: boolean[] = [false, false, false];
 	public switchNavButtons(event, isClick: boolean) {

@@ -9,14 +9,6 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 var core_1 = require('@angular/core');
-var http_1 = require('@angular/http');
-var common_1 = require('@angular/common');
-var router_deprecated_1 = require('@angular/router-deprecated');
-var app_routes_1 = require('./app.routes');
-var app_nav_component_1 = require('./components/app-nav.component');
-var app_info_component_1 = require('./components/app-info.component');
-var dashboard_intro_component_1 = require('./components/dashboard-intro.component');
-var dashboard_details_component_1 = require('./components/dashboard-details.component');
 var event_emitter_service_1 = require('./services/event-emitter.service');
 var AppComponent = (function () {
     function AppComponent(el, emitter) {
@@ -54,14 +46,7 @@ var AppComponent = (function () {
         core_1.Component({
             selector: 'spamt',
             template: "\n\t\t<app-nav></app-nav>\n\t\t<router-outlet></router-outlet>\n\t\t<app-info></app-info>\n\t",
-            providers: [
-                router_deprecated_1.ROUTER_PROVIDERS, core_1.provide(common_1.LocationStrategy, { useClass: common_1.HashLocationStrategy }),
-                event_emitter_service_1.EventEmitterService,
-                http_1.HTTP_PROVIDERS, http_1.ConnectionBackend,
-            ],
-            directives: [app_nav_component_1.AppNavComponent, app_info_component_1.AppInfoComponent, dashboard_intro_component_1.DashboardIntroComponent, dashboard_details_component_1.DashboardDetailsComponent, router_deprecated_1.ROUTER_DIRECTIVES],
-        }),
-        router_deprecated_1.RouteConfig(app_routes_1.APP_ROUTES), 
+        }), 
         __metadata('design:paramtypes', [core_1.ElementRef, event_emitter_service_1.EventEmitterService])
     ], AppComponent);
     return AppComponent;
