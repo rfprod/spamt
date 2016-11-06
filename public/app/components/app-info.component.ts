@@ -8,7 +8,6 @@ import { EventEmitterService } from '../services/event-emitter.service';
 			<img src="{{badge.img}}"/>
 		</a>
 	`,
-	providers: [],
 })
 export class AppInfoComponent implements OnInit, OnDestroy {
 	constructor( private emitter: EventEmitterService ) {}

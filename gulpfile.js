@@ -63,17 +63,29 @@ gulp.task('server-test', () => {
 });
 
 gulp.task('client-unit-test', (done) => {
-	new karmaServer({
+	const server = new karmaServer({
 		configFile: require('path').resolve('test/karma.conf.js'),
 		singleRun: true
-	}, () => {
-		console.log('done');
+	});
+
+	server.on('browser_error', (browser, err) => {
+		console.log('=====\nKarma > Run Failed\n=====\n', err);
+		throw err;
+	});
+
+	server.on('run_complete', (browsers, results) => {
+		if (results.failed) {
+			throw new Error('=====\nKarma > Tests Failed\n=====\n', results);
+		}
+		console.log('=====\nKarma > Complete With No Failures\n=====\n', results);
 		done();
-	}).start();
+	});
+
+	server.start();
 });
 
 gulp.task('build-system-js', () => {
-	const builder = systemjsBuilder('/','public/js/systemjs.config.js');
+	const builder = systemjsBuilder('/','./systemjs.config.js');
 	builder.buildStatic('app', 'bundle.min.js', {
 		minify: true,
 		mangle: true

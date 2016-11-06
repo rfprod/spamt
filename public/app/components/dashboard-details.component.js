@@ -9,7 +9,6 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 var core_1 = require('@angular/core');
-var common_1 = require('@angular/common');
 var event_emitter_service_1 = require('../services/event-emitter.service');
 var user_details_service_1 = require('../services/user-details.service');
 var DashboardDetailsComponent = (function () {
@@ -148,8 +147,6 @@ var DashboardDetailsComponent = (function () {
         core_1.Component({
             selector: 'dashboard-details',
             templateUrl: "/public/app/views/dashboard-details.html",
-            providers: [user_details_service_1.UserDetailsService],
-            directives: [common_1.NgFor],
         }), 
         __metadata('design:paramtypes', [core_1.ElementRef, event_emitter_service_1.EventEmitterService, user_details_service_1.UserDetailsService])
     ], DashboardDetailsComponent);

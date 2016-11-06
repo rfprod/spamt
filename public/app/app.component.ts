@@ -1,12 +1,4 @@
-import { Component, OnInit, OnDestroy, ElementRef, provide } from '@angular/core';
-import { HTTP_PROVIDERS, ConnectionBackend } from '@angular/http';
-import { LocationStrategy, /*Location,*/ HashLocationStrategy } from '@angular/common';
-import { ROUTER_DIRECTIVES, ROUTER_PROVIDERS, RouteConfig } from '@angular/router-deprecated';
-import { APP_ROUTES } from './app.routes';
-import { AppNavComponent } from './components/app-nav.component';
-import { AppInfoComponent } from './components/app-info.component';
-import { DashboardIntroComponent } from './components/dashboard-intro.component';
-import { DashboardDetailsComponent } from './components/dashboard-details.component';
+import { Component, OnInit, OnDestroy, ElementRef } from '@angular/core';
 import { EventEmitterService } from './services/event-emitter.service';
 
 declare let $: JQueryStatic;
@@ -18,14 +10,7 @@ declare let $: JQueryStatic;
 		<router-outlet></router-outlet>
 		<app-info></app-info>
 	`,
-	providers: [
-		ROUTER_PROVIDERS, provide(LocationStrategy, {useClass : HashLocationStrategy}),
-		EventEmitterService,
-		HTTP_PROVIDERS, ConnectionBackend,
-	],
-	directives: [AppNavComponent, AppInfoComponent, DashboardIntroComponent, DashboardDetailsComponent, ROUTER_DIRECTIVES],
 })
-@RouteConfig(APP_ROUTES)
 export class AppComponent implements OnInit, OnDestroy {
 	private subscription: any;
 	constructor( public el: ElementRef, private emitter: EventEmitterService ) {

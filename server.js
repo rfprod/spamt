@@ -22,6 +22,8 @@ mongoose.connect(mongo_uri);
 
 app.use('/public', express.static(process.cwd() + '/public'));
 app.use('/node_modules', express.static(process.cwd() + '/node_modules'));
+app.use('/systemjs.config.js', express.static(process.cwd() + '/systemjs.config.js'));
+app.use('/systemjs.config.extras.js', express.static(process.cwd() + '/systemjs.config.extras.js'));
 
 if (process.env.OPENSHIFT_MONGODB_DB_HOST) {
 	const store = new MongoStore({

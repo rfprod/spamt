@@ -11,8 +11,6 @@ declare let $: JQueryStatic;
 @Component({
 	selector: 'dashboard-intro',
 	templateUrl: '/public/app/views/dashboard-intro.html',
-	providers: [ServerStaticDataService, PublicDataService],
-	directives: [nvD3],
 })
 export class DashboardIntroComponent implements OnInit, OnDestroy {
 	constructor(
@@ -73,7 +71,7 @@ export class DashboardIntroComponent implements OnInit, OnDestroy {
 			y: 1,
 		},
 	];
-	public serverData: Object = {
+	public serverData: any = {
 		static: [],
 		dynamic: [],
 	};
@@ -81,10 +79,10 @@ export class DashboardIntroComponent implements OnInit, OnDestroy {
 	public errorMessage: string;
 	private getServerStaticData(callback) {
 		this.serverStaticDataService.getData().subscribe(
-			data => this.serverData['static'] = data,
+			data => this.serverData.static = data,
 			error => this.errorMessage = <any> error,
 			() => {
-				console.log('getServerStaticData done, data:', this.serverData['static']);
+				console.log('getServerStaticData done, data:', this.serverData.static);
 				callback(this);
 			}
 		);
@@ -126,12 +124,12 @@ export class DashboardIntroComponent implements OnInit, OnDestroy {
 		this.ws.onMessage((message) => {
 			console.log('ws incoming message');
 			console.log(message);
-			this.serverData['dynamic'] = [];
+			this.serverData.dynamic = [];
 			let data = JSON.parse(message.data);
 			for (let d in data) {
-				if (data[d]) { this.serverData['dynamic'].push(data[d]); }
+				if (data[d]) { this.serverData.dynamic.push(data[d]); }
 			}
-			console.log('this.serverData[\'dynamic\']:', this.serverData['dynamic']);
+			console.log('this.serverData[\'dynamic\']:', this.serverData.dynamic);
 		}, {});
 		this.ws.onError((event) => {
 			console.log('ws connection error, state:', this.ws.getReadyState());

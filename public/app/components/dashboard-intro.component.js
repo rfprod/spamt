@@ -9,7 +9,6 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 var core_1 = require('@angular/core');
-var ng2_nvd3_1 = require('ng2-nvd3');
 var angular2_websocket_1 = require('angular2-websocket/angular2-websocket');
 var event_emitter_service_1 = require('../services/event-emitter.service');
 var server_static_data_service_1 = require('../services/server-static-data.service');
@@ -79,8 +78,8 @@ var DashboardIntroComponent = (function () {
     }
     DashboardIntroComponent.prototype.getServerStaticData = function (callback) {
         var _this = this;
-        this.serverStaticDataService.getData().subscribe(function (data) { return _this.serverData['static'] = data; }, function (error) { return _this.errorMessage = error; }, function () {
-            console.log('getServerStaticData done, data:', _this.serverData['static']);
+        this.serverStaticDataService.getData().subscribe(function (data) { return _this.serverData.static = data; }, function (error) { return _this.errorMessage = error; }, function () {
+            console.log('getServerStaticData done, data:', _this.serverData.static);
             callback(_this);
         });
     };
@@ -116,14 +115,14 @@ var DashboardIntroComponent = (function () {
         this.ws.onMessage(function (message) {
             console.log('ws incoming message');
             console.log(message);
-            _this.serverData['dynamic'] = [];
+            _this.serverData.dynamic = [];
             var data = JSON.parse(message.data);
             for (var d in data) {
                 if (data[d]) {
-                    _this.serverData['dynamic'].push(data[d]);
+                    _this.serverData.dynamic.push(data[d]);
                 }
             }
-            console.log('this.serverData[\'dynamic\']:', _this.serverData['dynamic']);
+            console.log('this.serverData[\'dynamic\']:', _this.serverData.dynamic);
         }, {});
         this.ws.onError(function (event) {
             console.log('ws connection error, state:', _this.ws.getReadyState());
@@ -158,8 +157,6 @@ var DashboardIntroComponent = (function () {
         core_1.Component({
             selector: 'dashboard-intro',
             templateUrl: '/public/app/views/dashboard-intro.html',
-            providers: [server_static_data_service_1.ServerStaticDataService, public_data_service_1.PublicDataService],
-            directives: [ng2_nvd3_1.nvD3],
         }), 
         __metadata('design:paramtypes', [core_1.ElementRef, event_emitter_service_1.EventEmitterService, server_static_data_service_1.ServerStaticDataService, public_data_service_1.PublicDataService])
     ], DashboardIntroComponent);
