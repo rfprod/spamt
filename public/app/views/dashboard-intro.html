@@ -6,7 +6,7 @@
 
 			<nvd3 [options]="chartOptions" [data]="appUsageData"></nvd3>
 
-			<modal *ngIf="showModal">
+			<span id="modal" *ngIf="showModal">
 				<button type="button" class="close" (click)="toggleModal()"><span>&times;</span></button>
 				<h4>Platform Diagnostics</h4>
 				<table class="table table-condensed table-responsive">
@@ -23,7 +23,7 @@
 						</tr>
 					</tbody>
 				</table>
-			</modal>
+			</span>
 		</div>
 	</div>
 </div>

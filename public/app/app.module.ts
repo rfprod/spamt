@@ -1,4 +1,4 @@
-import { NgModule } from '@angular/core';
+import { NgModule, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 
 import { LocationStrategy, HashLocationStrategy } from '@angular/common';
 import { BrowserModule } from '@angular/platform-browser';
@@ -17,14 +17,15 @@ import { UserDetailsService } from './services/user-details.service';
 import { ServerStaticDataService } from './services/server-static-data.service';
 import { PublicDataService } from './services/public-data.service';
 import { nvD3 } from 'ng2-nvd3';
-import { $WebSocket } from 'angular2-websocket/angular2-websocket';
+//import { $WebSocket } from 'angular2-websocket/angular2-websocket';
 
 declare let $: JQueryStatic;
 
 @NgModule({
-	declarations: [ AppComponent, AppNavComponent, AppInfoComponent, DashboardIntroComponent, DashboardDetailsComponent ],
-	imports 		: [ BrowserModule, FormsModule, HttpModule, RouterModule.forRoot(APP_ROUTES), nvD3 ],
-	providers 	: [ {provide: LocationStrategy, useClass: HashLocationStrategy}, EventEmitterService, UserDetailsService, ServerStaticDataService, PublicDataService, $WebSocket ],
+	declarations: [ AppComponent, AppNavComponent, AppInfoComponent, DashboardIntroComponent, DashboardDetailsComponent, nvD3 ],
+	imports 		: [ BrowserModule, FormsModule, HttpModule, RouterModule.forRoot(APP_ROUTES) ],
+	providers 	: [ {provide: LocationStrategy, useClass: HashLocationStrategy}, EventEmitterService, UserDetailsService, ServerStaticDataService, PublicDataService ],
+	schemas 		: [ CUSTOM_ELEMENTS_SCHEMA ],
 	bootstrap 	: [ AppComponent ],
 })
 export class AppModule {}

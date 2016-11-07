@@ -25,15 +25,15 @@ var user_details_service_1 = require('./services/user-details.service');
 var server_static_data_service_1 = require('./services/server-static-data.service');
 var public_data_service_1 = require('./services/public-data.service');
 var ng2_nvd3_1 = require('ng2-nvd3');
-var angular2_websocket_1 = require('angular2-websocket/angular2-websocket');
 var AppModule = (function () {
     function AppModule() {
     }
     AppModule = __decorate([
         core_1.NgModule({
-            declarations: [app_component_1.AppComponent, app_nav_component_1.AppNavComponent, app_info_component_1.AppInfoComponent, dashboard_intro_component_1.DashboardIntroComponent, dashboard_details_component_1.DashboardDetailsComponent],
-            imports: [platform_browser_1.BrowserModule, forms_1.FormsModule, http_1.HttpModule, router_1.RouterModule.forRoot(app_routes_1.APP_ROUTES), ng2_nvd3_1.nvD3],
-            providers: [{ provide: common_1.LocationStrategy, useClass: common_1.HashLocationStrategy }, event_emitter_service_1.EventEmitterService, user_details_service_1.UserDetailsService, server_static_data_service_1.ServerStaticDataService, public_data_service_1.PublicDataService, angular2_websocket_1.$WebSocket],
+            declarations: [app_component_1.AppComponent, app_nav_component_1.AppNavComponent, app_info_component_1.AppInfoComponent, dashboard_intro_component_1.DashboardIntroComponent, dashboard_details_component_1.DashboardDetailsComponent, ng2_nvd3_1.nvD3],
+            imports: [platform_browser_1.BrowserModule, forms_1.FormsModule, http_1.HttpModule, router_1.RouterModule.forRoot(app_routes_1.APP_ROUTES)],
+            providers: [{ provide: common_1.LocationStrategy, useClass: common_1.HashLocationStrategy }, event_emitter_service_1.EventEmitterService, user_details_service_1.UserDetailsService, server_static_data_service_1.ServerStaticDataService, public_data_service_1.PublicDataService],
+            schemas: [core_1.CUSTOM_ELEMENTS_SCHEMA],
             bootstrap: [app_component_1.AppComponent],
         }), 
         __metadata('design:paramtypes', [])
