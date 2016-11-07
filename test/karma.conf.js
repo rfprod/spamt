@@ -8,14 +8,6 @@ module.exports = function(config){
 			'public/bower_components/d3/d3.js',
 			'public/bower_components/nvd3/build/nv.d3.js',
 
-			'node_modules/es6-shim/es6-shim.js',
-			'node_modules/reflect-metadata/Reflect.js',
-			{ pattern: 'node_modules/reflect-metadata/Reflect.js.map', included: false, watched: false },
-
-			'node_modules/systemjs/dist/system.src.js',
-			'node_modules/systemjs/dist/system-polyfills.js',
-			{ pattern: 'node_modules/systemjs/dist/system-polyfills.js.map', included: false, watched: false },
-
 			'node_modules/zone.js/dist/zone.js',
 			'node_modules/zone.js/dist/proxy.js',
 			'node_modules/zone.js/dist/sync-test.js',
@@ -23,16 +15,26 @@ module.exports = function(config){
 			'node_modules/zone.js/dist/async-test.js',
 			'node_modules/zone.js/dist/fake-async-test.js',
 
-			//'systemjs.config.js',
-			//'systemjs.config.extras.js',
-			{ pattern: 'systemjs.config.js', included: false, watched: false },
-			{ pattern: 'systemjs.config.extras.js', included: false, watched: false },
-			'test/karma.test-shim.js'
-		],
+			'node_modules/reflect-metadata/Reflect.js',
+			{ pattern: 'node_modules/reflect-metadata/Reflect.js.map', included: false, watched: false },
 
-		proxies: {
-			'public/app/': 'base/public/app/'
-		},
+			'node_modules/systemjs/dist/system.src.js',
+			'node_modules/systemjs/dist/system-polyfills.js',
+			{ pattern: 'node_modules/systemjs/dist/system-polyfills.js.map', included: false, watched: false },
+
+			//'node_modules/traceur/bin/traceur.js',
+
+			{ pattern: 'systemjs.config.js', included: false, watched: false },
+			{ pattern: 'systemjs.karma.config.js', included: false, watched: false },
+			{ pattern: 'systemjs.config.extras.js', included: false, watched: false },
+			{ pattern: 'node_modules/traceur/bin/traceur.js', included: false, watched: false },
+			{ pattern: 'node_modules/@angular/**', included: false, watched: false },
+			{ pattern: 'node_modules/rxjs/**', included: false, watched: false },
+			'test/karma.test-shim.js',
+			{ pattern: 'test/client/*.js', included: false, watched: false },
+
+			{ pattern: 'public/app/**', included: false, watched: false }
+		],
 
 		// exclude: [],
 
@@ -40,6 +42,7 @@ module.exports = function(config){
 
 		// preprocessors: {},
 
+		browserNoActivityTimeout: 20000,
 		browsers: ['PhantomJS'],
 		// browsers: ['Chrome'],
 		// browsers : ['Firefox'],

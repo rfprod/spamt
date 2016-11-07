@@ -6,12 +6,12 @@
 
 	// external packages locations
 	var map = {
-		'app':                        './public/app',
-		'ng2-nvd3':                   './node_modules/ng2-nvd3/build/lib',
-		'rxjs':                       './node_modules/rxjs',
-		'angular-in-memory-web-api': 	'./node_modules/angular-in-memory-web-api',
-		'traceur': 										'./node_modules/traceur/bin',
-		'@angular':                   './node_modules/@angular'
+		'app':                        './base/public/app',
+		'ng2-nvd3':                   './base/node_modules/ng2-nvd3/build/lib',
+		'rxjs':                       './base/node_modules/rxjs',
+		'angular-in-memory-web-api': 	'./base/node_modules/angular-in-memory-web-api',
+		'traceur': 										'./base/node_modules/traceur/bin',
+		'@angular':                   './base/node_modules/@angular'
 	};
 	// how to load external packages when no filename and/or no extension is provided
 	var packages = {

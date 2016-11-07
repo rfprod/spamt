@@ -146,7 +146,7 @@ var DashboardDetailsComponent = (function () {
     DashboardDetailsComponent = __decorate([
         core_1.Component({
             selector: 'dashboard-details',
-            templateUrl: "/public/app/views/dashboard-details.html",
+            templateUrl: '/public/app/views/dashboard-details.html',
         }), 
         __metadata('design:paramtypes', [core_1.ElementRef, event_emitter_service_1.EventEmitterService, user_details_service_1.UserDetailsService])
     ], DashboardDetailsComponent);

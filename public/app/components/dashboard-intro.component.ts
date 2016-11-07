@@ -2,7 +2,6 @@ import { Component, OnInit, OnDestroy, ElementRef } from '@angular/core';
 import { EventEmitterService } from '../services/event-emitter.service';
 import { ServerStaticDataService } from '../services/server-static-data.service';
 import { PublicDataService } from '../services/public-data.service';
-import { Observable } from 'rxjs/Observable';
 
 declare let d3: any;
 declare let $: JQueryStatic;
@@ -107,9 +106,10 @@ export class DashboardIntroComponent implements OnInit, OnDestroy {
 	}
 
 	private showModal: boolean = false;
-	private toggleModal() {
-		if (this.showModal) { this.ws.send(JSON.stringify({action: 'pause'})); }
-		else { this.ws.send(JSON.stringify({action: 'get'})); }
+	private toggleModal() { /* tslint:disable-line */
+		if (this.showModal) {
+			this.ws.send(JSON.stringify({action: 'pause'}));
+		} else { this.ws.send(JSON.stringify({action: 'get'})); }
 		this.showModal = (!this.showModal) ? true : false;
 	};
 
@@ -154,11 +154,11 @@ export class DashboardIntroComponent implements OnInit, OnDestroy {
 			}
 		});
 
-		this.getServerStaticData((scope) => {
-			scope.emitSpinnerStopEvent();
+		this.getServerStaticData((/*scope*/) => {
+			this.emitSpinnerStopEvent();
 		});
-		this.getPublicData((scope) => {
-			scope.emitSpinnerStopEvent();
+		this.getPublicData((/*scope*/) => {
+			this.emitSpinnerStopEvent();
 		});
 	}
 	public ngOnDestroy() {
