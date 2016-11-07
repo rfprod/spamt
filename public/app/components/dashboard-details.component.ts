@@ -6,7 +6,7 @@ declare var $: JQueryStatic;
 
 @Component({
 	selector: 'dashboard-details',
-	templateUrl: `/public/app/views/dashboard-details.html`,
+	templateUrl: '/public/app/views/dashboard-details.html',
 })
 export class DashboardDetailsComponent implements OnInit, OnDestroy {
 	constructor(

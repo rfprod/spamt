@@ -1,5 +1,3 @@
-
-import { NgClass } from '@angular/common';
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { EventEmitterService } from '../services/event-emitter.service';
 
@@ -7,7 +5,7 @@ declare var $: JQueryStatic;
 
 @Component({
 	selector: 'app-nav',
-	templateUrl: `/public/app/views/dashboard-nav.html`,
+	templateUrl: '/public/app/views/dashboard-nav.html',
 })
 export class AppNavComponent implements OnInit, OnDestroy {
 	constructor( private emitter: EventEmitterService ) {}
@@ -21,7 +19,7 @@ export class AppNavComponent implements OnInit, OnDestroy {
 				route = event.target.parentElement.href;
 			} else { route = event.target.href; }
 		} else { route = event.route; }
-		const path = route.substring(route.lastIndexOf('/')+1,route.length);
+		const path = route.substring(route.lastIndexOf('/') + 1, route.length);
 		if (path === 'intro') {
 			index = '1';
 		} else {
@@ -30,7 +28,7 @@ export class AppNavComponent implements OnInit, OnDestroy {
 		for (let b in this.navButtonsState) {
 			if (b === index) { this.navButtonsState[b] = true; } else { this.navButtonsState[b] = false; }
 		}
-		console.log('navButtonsState:',this.navButtonsState);
+		console.log('navButtonsState:', this.navButtonsState);
 	}
 	public stopWS() {
 		/*

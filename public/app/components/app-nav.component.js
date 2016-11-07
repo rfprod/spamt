@@ -78,7 +78,7 @@ var AppNavComponent = (function () {
     AppNavComponent = __decorate([
         core_1.Component({
             selector: 'app-nav',
-            templateUrl: "/public/app/views/dashboard-nav.html",
+            templateUrl: '/public/app/views/dashboard-nav.html',
         }), 
         __metadata('design:paramtypes', [event_emitter_service_1.EventEmitterService])
     ], AppNavComponent);
