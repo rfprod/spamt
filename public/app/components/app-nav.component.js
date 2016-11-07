@@ -9,10 +9,9 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 var core_1 = require('@angular/core');
-// import { ActivatedRoute } from '@angular/router';
 var event_emitter_service_1 = require('../services/event-emitter.service');
 var AppNavComponent = (function () {
-    function AppNavComponent(emitter /*, private route: ActivatedRoute*/) {
+    function AppNavComponent(emitter) {
         this.emitter = emitter;
         this.navButtonsState = [false, false, false];
     }
@@ -30,15 +29,16 @@ var AppNavComponent = (function () {
         else {
             route = event.route;
         }
-        if (route.indexOf('/intro') !== -1) {
-            index = 1;
+        var path = route.substring(route.lastIndexOf('/') + 1, route.length);
+        if (path === 'intro') {
+            index = '1';
         }
         else {
-            if (route.indexOf('/data') !== -1) {
-                index = 2;
+            if (path === 'data') {
+                index = '2';
             }
             else {
-                index = 0;
+                index = '0';
             }
         }
         for (var b in this.navButtonsState) {
@@ -49,6 +49,7 @@ var AppNavComponent = (function () {
                 this.navButtonsState[b] = false;
             }
         }
+        console.log('navButtonsState:', this.navButtonsState);
     };
     AppNavComponent.prototype.stopWS = function () {
         /*

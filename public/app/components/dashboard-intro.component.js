@@ -9,7 +9,6 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 var core_1 = require('@angular/core');
-var angular2_websocket_1 = require('angular2-websocket/angular2-websocket');
 var event_emitter_service_1 = require('../services/event-emitter.service');
 var server_static_data_service_1 = require('../services/server-static-data.service');
 var public_data_service_1 = require('../services/public-data.service');
@@ -72,7 +71,7 @@ var DashboardIntroComponent = (function () {
             static: [],
             dynamic: [],
         };
-        this.ws = new angular2_websocket_1.$WebSocket(this.wsUrl);
+        this.ws = new WebSocket(this.wsUrl);
         this.showModal = false;
         console.log('this.el.nativeElement:', this.el.nativeElement);
     }
@@ -99,6 +98,12 @@ var DashboardIntroComponent = (function () {
         this.emitter.emitEvent({ sys: 'stop spinner' });
     };
     DashboardIntroComponent.prototype.toggleModal = function () {
+        if (this.showModal) {
+            this.ws.send(JSON.stringify({ action: 'pause' }));
+        }
+        else {
+            this.ws.send(JSON.stringify({ action: 'get' }));
+        }
         this.showModal = (!this.showModal) ? true : false;
     };
     ;
@@ -108,13 +113,17 @@ var DashboardIntroComponent = (function () {
         this.emitSpinnerStartEvent();
         this.emitter.emitEvent({ route: '/intro' });
         this.emitter.emitEvent({ appInfo: 'show' });
-        this.ws.send(JSON.stringify({ action: 'get' }));
-        this.ws.onOpen(function (event) {
-            console.log('ws connection opened, state:', _this.ws.getReadyState(), ' | event:', event);
-        });
-        this.ws.onMessage(function (message) {
-            console.log('ws incoming message');
-            console.log(message);
+        this.ws.onopen = function (evt) {
+            console.log('websocket opened:', evt);
+            /*
+            *	ws connection is established, but data is requested
+            *	only when this.showModal switches to true, i.e.
+            *	app diagnostics modal is visible to a user
+            */
+            // this.ws.send(JSON.stringify({action: 'get'}));
+        };
+        this.ws.onmessage = function (message) {
+            console.log('websocket incoming message:', message);
             _this.serverData.dynamic = [];
             var data = JSON.parse(message.data);
             for (var d in data) {
@@ -122,23 +131,21 @@ var DashboardIntroComponent = (function () {
                     _this.serverData.dynamic.push(data[d]);
                 }
             }
-            console.log('this.serverData[\'dynamic\']:', _this.serverData.dynamic);
-        }, {});
-        this.ws.onError(function (event) {
-            console.log('ws connection error, state:', _this.ws.getReadyState());
-            console.log(event);
-            _this.ws.close(true);
-        });
-        this.ws.onClose(function (event) {
-            console.log('ws connection closed, state:', _this.ws.getReadyState());
-            console.log(event);
-        });
+            console.log('this.serverData.dynamic:', _this.serverData.dynamic);
+        };
+        this.ws.onerror = function (evt) {
+            console.log('websocket error:', evt);
+            _this.ws.close();
+        };
+        this.ws.onclose = function (evt) {
+            console.log('websocket closed:', evt);
+        };
         this.subscription = this.emitter.getEmitter().subscribe(function (message) {
             console.log('/intro consuming event:', message);
             if (message.sys === 'close websocket') {
                 console.log('closing webcosket');
                 _this.subscription.unsubscribe();
-                _this.ws.close(true);
+                _this.ws.close();
             }
         });
         this.getServerStaticData(function (scope) {
@@ -151,7 +158,7 @@ var DashboardIntroComponent = (function () {
     DashboardIntroComponent.prototype.ngOnDestroy = function () {
         console.log('ngOnDestroy: DashboardIntroComponent destroyed');
         this.subscription.unsubscribe();
-        this.ws.close(true);
+        this.ws.close();
     };
     DashboardIntroComponent = __decorate([
         core_1.Component({
