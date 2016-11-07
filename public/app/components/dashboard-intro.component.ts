@@ -1,9 +1,8 @@
 import { Component, OnInit, OnDestroy, ElementRef } from '@angular/core';
-import { nvD3 } from 'ng2-nvd3';
-import { $WebSocket } from 'angular2-websocket/angular2-websocket';
 import { EventEmitterService } from '../services/event-emitter.service';
 import { ServerStaticDataService } from '../services/server-static-data.service';
 import { PublicDataService } from '../services/public-data.service';
+import { Observable } from 'rxjs/Observable';
 
 declare let d3: any;
 declare let $: JQueryStatic;
@@ -75,7 +74,7 @@ export class DashboardIntroComponent implements OnInit, OnDestroy {
 		static: [],
 		dynamic: [],
 	};
-	public ws = new $WebSocket(this.wsUrl);
+	public ws = new WebSocket(this.wsUrl);
 	public errorMessage: string;
 	private getServerStaticData(callback) {
 		this.serverStaticDataService.getData().subscribe(
@@ -109,6 +108,8 @@ export class DashboardIntroComponent implements OnInit, OnDestroy {
 
 	private showModal: boolean = false;
 	private toggleModal() {
+		if (this.showModal) { this.ws.send(JSON.stringify({action: 'pause'})); }
+		else { this.ws.send(JSON.stringify({action: 'get'})); }
 		this.showModal = (!this.showModal) ? true : false;
 	};
 
@@ -117,36 +118,39 @@ export class DashboardIntroComponent implements OnInit, OnDestroy {
 		this.emitSpinnerStartEvent();
 		this.emitter.emitEvent({route: '/intro'});
 		this.emitter.emitEvent({appInfo: 'show'});
-		this.ws.send(JSON.stringify({action: 'get'}));
-		this.ws.onOpen((event) => {
-			console.log('ws connection opened, state:', this.ws.getReadyState(), ' | event:', event);
-		});
-		this.ws.onMessage((message) => {
-			console.log('ws incoming message');
-			console.log(message);
+
+		this.ws.onopen = (evt) => {
+			console.log('websocket opened:', evt);
+			/*
+			*	ws connection is established, but data is requested
+			*	only when this.showModal switches to true, i.e.
+			*	app diagnostics modal is visible to a user
+			*/
+			// this.ws.send(JSON.stringify({action: 'get'}));
+		};
+		this.ws.onmessage = (message) => {
+			console.log('websocket incoming message:', message);
 			this.serverData.dynamic = [];
 			let data = JSON.parse(message.data);
 			for (let d in data) {
 				if (data[d]) { this.serverData.dynamic.push(data[d]); }
 			}
-			console.log('this.serverData[\'dynamic\']:', this.serverData.dynamic);
-		}, {});
-		this.ws.onError((event) => {
-			console.log('ws connection error, state:', this.ws.getReadyState());
-			console.log(event);
-			this.ws.close(true);
-		});
-		this.ws.onClose((event) => {
-			console.log('ws connection closed, state:', this.ws.getReadyState());
-			console.log(event);
-		});
+			console.log('this.serverData.dynamic:', this.serverData.dynamic);
+		};
+		this.ws.onerror = (evt) => {
+			console.log('websocket error:', evt);
+			this.ws.close();
+		};
+		this.ws.onclose = (evt) => {
+			console.log('websocket closed:', evt);
+		};
 
 		this.subscription = this.emitter.getEmitter().subscribe((message) => {
 			console.log('/intro consuming event:', message);
 			if (message.sys === 'close websocket') {
 				console.log('closing webcosket');
 				this.subscription.unsubscribe();
-				this.ws.close(true);
+				this.ws.close();
 			}
 		});
 
@@ -160,6 +164,6 @@ export class DashboardIntroComponent implements OnInit, OnDestroy {
 	public ngOnDestroy() {
 		console.log('ngOnDestroy: DashboardIntroComponent destroyed');
 		this.subscription.unsubscribe();
-		this.ws.close(true);
+		this.ws.close();
 	}
 }

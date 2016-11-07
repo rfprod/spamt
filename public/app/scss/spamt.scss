@@ -13,6 +13,12 @@ body {
 
 	a:hover, a:focus {outline: none;}
 	a:hover {cursor: pointer}
+	.selected {
+		background: $lightgrey;
+	}
+	.inactive {
+		background: none;
+	}
 
 	h3:hover, h4:hover, p:hover {cursor: default;}
 

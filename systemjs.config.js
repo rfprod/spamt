@@ -13,7 +13,6 @@
 		'app':                        './public/app',
 		'ng2-nvd3':                   './node_modules/ng2-nvd3/build/lib',
 		'rxjs':                       './node_modules/rxjs',
-		'angular2-websocket':         './node_modules/angular2-websocket',
 		'angular-in-memory-web-api': 	'./node_modules/angular-in-memory-web-api',
 		'traceur': 										'./node_modules/traceur/bin',
 		'@angular':                   './node_modules/@angular'
@@ -23,7 +22,6 @@
 		'app':                        { main: 'app', defaultExtension: 'js' },
 		'ng2-nvd3':                   { main: 'ng2-nvd3', defaultExtension: 'js' },
 		'rxjs':                       { defaultExtension: 'js' },
-		'angular2-websocket':         { defaultExtension: 'js' },
 		'traceur':                    { main: 'traceur' },
 		'angular-in-memory-web-api': 	{ main: './index', defaultExtension: 'js' }
 	};

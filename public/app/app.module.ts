@@ -17,7 +17,6 @@ import { UserDetailsService } from './services/user-details.service';
 import { ServerStaticDataService } from './services/server-static-data.service';
 import { PublicDataService } from './services/public-data.service';
 import { nvD3 } from 'ng2-nvd3';
-//import { $WebSocket } from 'angular2-websocket/angular2-websocket';
 
 declare let $: JQueryStatic;
 

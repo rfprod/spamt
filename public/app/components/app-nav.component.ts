@@ -1,5 +1,6 @@
+
+import { NgClass } from '@angular/common';
 import { Component, OnInit, OnDestroy } from '@angular/core';
-// import { ActivatedRoute } from '@angular/router';
 import { EventEmitterService } from '../services/event-emitter.service';
 
 declare var $: JQueryStatic;
@@ -9,7 +10,7 @@ declare var $: JQueryStatic;
 	templateUrl: `/public/app/views/dashboard-nav.html`,
 })
 export class AppNavComponent implements OnInit, OnDestroy {
-	constructor( private emitter: EventEmitterService/*, private route: ActivatedRoute*/ ) {}
+	constructor( private emitter: EventEmitterService ) {}
 	private subscription: any;
 	public navButtonsState: boolean[] = [false, false, false];
 	public switchNavButtons(event, isClick: boolean) {
@@ -20,14 +21,16 @@ export class AppNavComponent implements OnInit, OnDestroy {
 				route = event.target.parentElement.href;
 			} else { route = event.target.href; }
 		} else { route = event.route; }
-		if (route.indexOf('/intro') !== -1) {
-			index = 1;
+		const path = route.substring(route.lastIndexOf('/')+1,route.length);
+		if (path === 'intro') {
+			index = '1';
 		} else {
-			if (route.indexOf('/data') !== -1) { index = 2; } else { index = 0; }
+			if (path === 'data') { index = '2'; } else { index = '0'; }
 		}
 		for (let b in this.navButtonsState) {
 			if (b === index) { this.navButtonsState[b] = true; } else { this.navButtonsState[b] = false; }
 		}
+		console.log('navButtonsState:',this.navButtonsState);
 	}
 	public stopWS() {
 		/*
