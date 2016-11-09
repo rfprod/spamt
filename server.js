@@ -20,6 +20,8 @@ require('./app/config/passport')(passport);
 const mongo_uri = process.env.MONGO_URI || process.env.OPENSHIFT_MONGODB_DB_URL;
 mongoose.connect(mongo_uri);
 
+process.title = 'spamt';
+
 app.use('/public', express.static(process.cwd() + '/public'));
 app.use('/node_modules', express.static(process.cwd() + '/node_modules'));
 app.use('/systemjs.config.js', express.static(process.cwd() + '/systemjs.config.js'));
@@ -34,7 +36,7 @@ if (process.env.OPENSHIFT_MONGODB_DB_HOST) {
 		maxAge: 1000 * 60 * 60 * 24 * 1 // 1 day 
 	} }));
 }else{
-	app.use(session({secret:'secretWhoami', resave:false, saveUninitialized:true}));
+	app.use(session({secret:'secretSPAMT', resave:false, saveUninitialized:true}));
 }
 app.use(passport.initialize());
 app.use(passport.session());
