@@ -77,5 +77,14 @@ describe('DashboardIntroComponent', function () {
         console.log(_this.component);
         expect(_this.component).toBeDefined();
     });
+    it('should have variables defined', function () {
+        expect(_this.component.title).toBeDefined();
+        expect(_this.component.title === 'SPAMT').toBeTruthy();
+        expect(_this.component.description).toBeDefined();
+        expect(_this.component.description === 'Social Profile Analysis and Management Tool').toBeTruthy();
+        expect(_this.component.host).toBeDefined();
+        expect(_this.component.host).toEqual(window.location.host);
+        expect(_this.component.wsUrl).toEqual('ws://' + _this.component.host + '/app-diag/dynamic');
+    });
 });
 //# sourceMappingURL=dashboard-intro.component.spec.js.map

@@ -91,10 +91,18 @@ To test the server execute the following command in the terminal window while in
 $ npm run server-test
 ```
 
-To test the client execute the following command in the terminal window while in your project's folder (buggy in single run mode):
+To test the client execute the following command in the terminal window while in your project's folder:
+
+for continuous testing
 
 ```
 $ npm run client-test
+```
+
+for single test
+
+```
+$ npm run client-test-single-run
 ```
 
 To lint the code execute the following command in the terminal window while in your project's folder:

@@ -74,5 +74,15 @@ describe('DashboardIntroComponent', () => {
 			expect(this.component).toBeDefined();
 		});
 
+		it('should have variables defined', () => {
+			expect(this.component.title).toBeDefined();
+			expect(this.component.title === 'SPAMT').toBeTruthy();
+			expect(this.component.description).toBeDefined();
+			expect(this.component.description === 'Social Profile Analysis and Management Tool').toBeTruthy();
+			expect(this.component.host).toBeDefined();
+			expect(this.component.host).toEqual(window.location.host);
+			expect(this.component.wsUrl).toEqual('ws://'+this.component.host+'/app-diag/dynamic');
+		});
+
 });
 
