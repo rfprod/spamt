@@ -22,8 +22,6 @@ module.exports = function(config){
 			'node_modules/systemjs/dist/system-polyfills.js',
 			{ pattern: 'node_modules/systemjs/dist/system-polyfills.js.map', included: false, watched: false },
 
-			//'node_modules/traceur/bin/traceur.js',
-
 			{ pattern: 'systemjs.config.js', included: false, watched: false },
 			{ pattern: 'systemjs.karma.config.js', included: false, watched: false },
 			{ pattern: 'systemjs.config.extras.js', included: false, watched: false },
