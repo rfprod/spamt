@@ -1,5 +1,10 @@
 node_modules/
 public/bower_components/
-.env
-.*.env
+public/app/*.js
+public/app/*.js.map
+public/app/**/*.js
+public/app/**/*.js.map
+test/client/*.js
+test/client/*.js.map
+*.env
 *.log
