@@ -13,7 +13,8 @@ import { AppInfoComponent } from './components/app-info.component';
 import { DashboardIntroComponent } from './components/dashboard-intro.component';
 import { DashboardDetailsComponent } from './components/dashboard-details.component';
 import { EventEmitterService } from './services/event-emitter.service';
-import { UserDetailsService } from './services/user-details.service';
+import { UsersListService } from './services/users-list.service';
+import { SCgetUserService } from './services/sc-get-user.service';
 import { ServerStaticDataService } from './services/server-static-data.service';
 import { PublicDataService } from './services/public-data.service';
 import { nvD3 } from 'ng2-nvd3';
@@ -23,7 +24,7 @@ declare let $: JQueryStatic;
 @NgModule({
 	declarations: [ AppComponent, AppNavComponent, AppInfoComponent, DashboardIntroComponent, DashboardDetailsComponent, nvD3 ],
 	imports 		: [ BrowserModule, FormsModule, HttpModule, RouterModule.forRoot(APP_ROUTES) ],
-	providers 	: [ {provide: LocationStrategy, useClass: HashLocationStrategy}, EventEmitterService, UserDetailsService, ServerStaticDataService, PublicDataService ],
+	providers 	: [ {provide: LocationStrategy, useClass: HashLocationStrategy}, EventEmitterService, UsersListService, ServerStaticDataService, PublicDataService, SCgetUserService ],
 	schemas 		: [ CUSTOM_ELEMENTS_SCHEMA ],
 	bootstrap 	: [ AppComponent ],
 })

@@ -5,8 +5,8 @@ import { Observable } from 'rxjs/Observable';
 import 'rxjs/Rx';
 
 @Injectable()
-export class UserDetailsService {
-	public appDataUrl: string = window.location.origin + '/dummy';
+export class SCgetUserService {
+	public appDataUrl: string = window.location.origin + '/sc/get/user';
 	constructor (private http: Http) {}
 
 	public extractData(res: Response) {

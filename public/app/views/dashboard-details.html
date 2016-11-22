@@ -1,39 +1,22 @@
-<div id="filters">
-  <span class="flex-item">
-    <span class="input-label"><i class="fa fa-search" aria-hidden="true"></i> Search labels:</span> <input [(ngModel)]="labelSearchQuery">
-  </span>
-  <span class="flex-item">
-    <span class="input-label"><i class="fa fa-sort" aria-hidden="true"></i> Sort labels by:</span>
-    <select [(ngModel)]="sortLabelsByCriterion">
-      <option value="username">Alphabetical</option>
-      <option value="timestamp">Timestamp</option>
-    </select>
-  </span>
-</div>
 <div id="dashboard-data">
-  <div class="col-xs-12 col-sm-4 col-md-4 col-lg-4">
-    <legend>Users</legend>
-    <ul class="users">
-      <li *ngFor="let user of publicData[0].users; let i = index">
-        <h3>{{user.userFullName}}</h3>
-        <div>last login: {{user.lastLogin | date}}</div>
-      </li>
-    </ul>
-  </div>
-  <div class="col-xs-12 col-sm-8 col-md-8 col-lg-8">
-    <legend>Labels</legend>
-    <ul class="labels">
-      <li *ngFor="let label of publicData[1].labels; let j = index" class="label-listing">
-        <h3><span id="label-username">{{label.username}}</span> <span class="badge">added {{label.timestamp | date}}</span></h3>
-        <span class="label-item">
-          <a href="{{label.url}}" id="{{label.userId}}" class="thumb" target=_blank (mouseenter)="showLabelDetailsPreview($event)" (mouseleave)="hideLabelDetailsPreview($event)">
-            <img src="{{label.img}}" alt="{{label.permalink}}" title="{{label.username}}">
-          </a>
-          <span class="label-details">
-            <span></span><span></span><span></span><span></span>
-          </span>
-        </span>
-      </li>
-    </ul>
-  </div>
+	<div class="col-xs-12 col-sm-4 col-md-4 col-lg-4">
+		<legend>User</legend>
+		sc user details
+	</div>
+	<div class="col-xs-12 col-sm-8 col-md-8 col-lg-8">
+		<legend>Data</legend>
+		<div id="filters">
+			<span class="flex-item">
+				<span class="input-label"><i class="fa fa-search" aria-hidden="true"></i> Search:</span> <input [(ngModel)]="filterSearchQuery">
+			</span>
+			<span class="flex-item">
+				<span class="input-label"><i class="fa fa-sort" aria-hidden="true"></i> Sort by:</span>
+				<select [(ngModel)]="sortByCriterion">
+					<option value="name">Alphabetical</option>
+					<option value="timestamp">Timestamp</option>
+				</select>
+			</span>
+		</div>
+		data tabs
+	</div>
 </div>

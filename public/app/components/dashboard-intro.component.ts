@@ -154,12 +154,12 @@ export class DashboardIntroComponent implements OnInit, OnDestroy {
 			}
 		});
 
-		this.getServerStaticData((/*scope*/) => {
-			this.emitSpinnerStopEvent();
-		});
 		this.getPublicData((/*scope*/) => {
-			this.emitSpinnerStopEvent();
+			this.getServerStaticData((/*scope*/) => {
+				this.emitSpinnerStopEvent();
+			});
 		});
+		
 	}
 	public ngOnDestroy() {
 		console.log('ngOnDestroy: DashboardIntroComponent destroyed');
