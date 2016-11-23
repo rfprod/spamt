@@ -8,6 +8,7 @@ const express = require('express'),
 	MongoStore = require('connect-mongodb-session')(session),
 	app = express(),
 	expressWs = require('express-ws')(app), // eslint-disable-line no-unused-vars
+	syncReq = require('sync-request'),
 	cluster = require('cluster'),
 	os = require('os');
 let clusterStop = false;
@@ -47,7 +48,7 @@ if (process.env.OPENSHIFT_MONGODB_DB_HOST) {
 app.use(passport.initialize());
 app.use(passport.session());
 
-routes(app, passport, User, SrvInfo, DataInit);
+routes(app, passport, User, SrvInfo, DataInit, syncReq);
 
 const port = process.env.PORT || process.env.OPENSHIFT_NODEJS_PORT || 8080,
 	ip = process.env.OPENSHIFT_NODEJS_IP; // "127.0.0.1" is not specified here on purpose, this env var should be included in .openshift.env
