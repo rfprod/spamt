@@ -85,10 +85,12 @@ module.exports = function(app, passport, User, SrvInfo, DataInit, syncRec) { // 
 		});
 	});
 	
-	app.get('/users', (req, res) => {
+	app.get('/users/list', (req, res) => {
 		/*
 		*	TODO
-		* should require admin rights
+		* should return data depending on access privileges, i.e.
+		*	- no auth: id, firstName, registered
+		* - auth: id, firstName, lastName, role, registered, lastLogin, city, country
 		*/
 		User.find({}, (err, docs) => {
 			if (err) { throw err; }
