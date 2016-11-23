@@ -6,7 +6,7 @@ import 'rxjs/Rx';
 
 @Injectable()
 export class UsersListService {
-	public appDataUrl: string = window.location.origin + '/users';
+	public appDataUrl: string = window.location.origin + '/users/list';
 	constructor (private http: Http) {}
 
 	public extractData(res: Response) {
