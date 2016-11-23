@@ -40,7 +40,6 @@ Create a file named `.env` in the root directory. This file should contain:
 ```
 TWITTER_KEY=twitter-key
 TWITTER_SECRET=twitter-secret
-SOUNDCLOUD_KEY=soundcloud-key
 SOUNDCLOUD_SECRET=soundcloud-secret
 SOUNDCLOUD_CLIENT_ID=soundcloud-client-id
 MONGO_URI=mongodb://localhost:27017/spamt
@@ -59,7 +58,6 @@ required vars
 ```
 TWITTER_KEY=twitter-key
 TWITTER_SECRET=twitter-secret
-SOUNDCLOUD_KEY=soundcloud-key
 SOUNDCLOUD_SECRET=soundcloud-secret
 SOUNDCLOUD_CLIENT_ID=soundcloud-client-id
 APP_URL=application-url

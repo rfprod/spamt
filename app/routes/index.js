@@ -2,7 +2,7 @@
 
 const path = process.cwd();
 
-module.exports = function (app, passport, User, SrvInfo, DataInit) { // eslint-disable-line no-unused-vars
+module.exports = function(app, passport, User, SrvInfo, DataInit, syncRec) { // eslint-disable-line no-unused-vars
 
 /*
 *	check if data init is needed
@@ -10,6 +10,26 @@ module.exports = function (app, passport, User, SrvInfo, DataInit) { // eslint-d
 */
 
 	DataInit.initData();
+
+/*
+*	Soundcloud API wrapper
+*/
+	class SC {
+		constructor() {
+			this.apiUrl = 'https://api.soundcloud.com/';
+			this.endpoints = { resolve: 'resolve' };
+			this.clientID = process.env.SOUNDCLOUD_CLIENT_ID;
+			this.clientIDparam = '&client_id=' + this.clientID;
+		}
+
+		resolve(path) {
+			console.log('resolving path: ', path);
+			const url = this.apiUrl + this.endpoints.resolve + '?url=' + path + this.clientIDparam;
+			return syncRec('GET', url);
+		}
+	}
+
+	const SCapi = new SC();
 
 /*
 *	routes
@@ -32,18 +52,31 @@ module.exports = function (app, passport, User, SrvInfo, DataInit) { // eslint-d
 	});
 
 	app.get('/sc/get/user', (req, res) => {
-		const headers = req.headers;
-		console.log('headers',headers);
-		const scUserName = req.query.name;
-
 		/*
-		*	TODO
-		*	configure the following:
-		*	- resolve sc user by name > /resolve endpoint
-		*	- request sc user data > /users endpoint
-		*	- return sc user data to client
+		*	Resolves soundcloud resource to get user data,
+		*	return response if user
 		*/
-		const output = [{key: 'Success', y:1}];
+		let scUserName = req.query.name;
+
+		if (scUserName.indexOf('/')) {
+			/*
+			*	if provided param contains at least one slash,
+			*	split and take only first part
+			*/
+			scUserName = scUserName.split('/')[0];
+		}
+
+		const resolveRequest = SCapi.resolve('https://soundcloud.com/' + scUserName);
+
+		let output = undefined;
+		if (resolveRequest.statusCode === 200) {
+			output = JSON.parse(resolveRequest.getBody());
+		} else {
+			/*
+			*	proxy resolve errors from soundcloud API
+			*/
+			output = resolveRequest.body;
+		}
 
 		res.format({
 			'application/json': function(){
