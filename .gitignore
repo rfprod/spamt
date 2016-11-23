@@ -4,6 +4,8 @@ public/app/*.js
 public/app/*.js.map
 public/app/**/*.js
 public/app/**/*.js.map
+public/css/bundle.min.css
+public/js/bundle.min.js
 test/client/*.js
 test/client/*.js.map
 *.env
