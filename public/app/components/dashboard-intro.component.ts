@@ -159,7 +159,6 @@ export class DashboardIntroComponent implements OnInit, OnDestroy {
 				this.emitSpinnerStopEvent();
 			});
 		});
-		
 	}
 	public ngOnDestroy() {
 		console.log('ngOnDestroy: DashboardIntroComponent destroyed');

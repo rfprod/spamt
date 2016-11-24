@@ -6,7 +6,7 @@ import 'rxjs/Rx';
 
 @Injectable()
 export class SCgetUserService {
-	public appDataUrl: string = window.location.origin + '/sc/get/user';
+	public appDataUrl: string = window.location.origin + '/sc/get/user?name=';
 	constructor (private http: Http) {}
 
 	public extractData(res: Response) {
@@ -21,9 +21,9 @@ export class SCgetUserService {
 		return Observable.throw(errMsg);
 	}
 
-	public getUserDetails(): Observable<any[]> { // tslint:disable-line
+	public getUserDetails(userName): Observable<any[]> { // tslint:disable-line
 		// had to disable all tslint rules for previous line, disabling no-unused-variable is buggy
-		return this.http.get(this.appDataUrl)
+		return this.http.get(this.appDataUrl + userName)
 			.map(this.extractData)
 			.catch(this.handleError);
 	}

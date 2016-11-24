@@ -9,15 +9,29 @@
 		"removeComments": false,
 		"noImplicitAny": false
 	},
+	"include": [
+		"public/app",
+		"test/client"
+	],
 	"exclude": [
-		".c9",
 		".git",
 		"app",
 		"node_modules",
 		"public/bower_components",
+		"public/css",
+		"public/img",
+		"public/js",
+		"test/*",
 		"test/server",
 		"test/e2e",
 		"typings/main",
 		"typings/main.d.ts"
-	]
+	],
+
+	"atom": {
+		"rewriteTsconfig": false,
+		"formatOnSave": false
+	},
+	"compileOnSave": false,
+	"buildOnSave": false
 }

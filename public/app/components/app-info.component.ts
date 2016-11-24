@@ -13,8 +13,7 @@ export class AppInfoComponent implements OnInit, OnDestroy {
 	constructor( private emitter: EventEmitterService ) {}
 	private subscription: any;
 	private hideInfo: boolean = true;
-	private badges = [ // tslint:disable-line
-		// had to disable all tslint rules for previous line, disabling no-unused-variable is buggy
+	private badges: any[] = [ // tslint:disable-line
 		{
 			title: 'Node.js - an open-source, cross-platform runtime environment for developing server-side Web applications.',
 			link: 'https://en.wikipedia.org/wiki/Node.js',
