@@ -6,3 +6,5 @@ public/js/soundcloud.player.api.js
 *.scss
 *.html
 *.min.js
+*.md
+*.ts

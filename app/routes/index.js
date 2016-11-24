@@ -56,35 +56,40 @@ module.exports = function(app, passport, User, SrvInfo, DataInit, syncRec) { // 
 		*	Resolves soundcloud resource to get user data,
 		*	return response if user
 		*/
-		let scUserName = req.query.name;
+		let scUserName = req.query.name,
+			output = undefined;
 
-		if (scUserName.indexOf('/')) {
-			/*
-			*	if provided param contains at least one slash,
-			*	split and take only first part
-			*/
-			scUserName = scUserName.split('/')[0];
-		}
+		if (scUserName) {
+			if (scUserName.indexOf('/')) {
+				/*
+				*	if provided param contains at least one slash,
+				*	split and take only first part
+				*/
+				scUserName = scUserName.split('/')[0];
+			}
 
-		const resolveRequest = SCapi.resolve('https://soundcloud.com/' + scUserName);
+			const resolveRequest = SCapi.resolve('https://soundcloud.com/' + scUserName);
 
-		let output = undefined;
-		if (resolveRequest.statusCode === 200) {
-			output = JSON.parse(resolveRequest.getBody());
+			if (resolveRequest.statusCode === 200) {
+				output = JSON.parse(resolveRequest.getBody());
+			} else {
+				/*
+				*	proxy resolve errors from soundcloud API
+				*/
+				output = resolveRequest.body;
+			}
 		} else {
-			/*
-			*	proxy resolve errors from soundcloud API
-			*/
-			output = resolveRequest.body;
+			output = { error: 'Missing mandatory request parameter - name.' };
 		}
 
 		res.format({
 			'application/json': function(){
+				if (output.error) res.status(400);
 				res.send(output);
 			}
 		});
 	});
-	
+
 	app.get('/users/list', (req, res) => {
 		/*
 		*	TODO

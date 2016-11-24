@@ -141,21 +141,20 @@ gulp.task('watch', () => {
 	gulp.watch(['./server.js', './app/models/*.js'], ['database']); // watch database changes and restart database
 	gulp.watch('./public/app/*.js', ['build-system-js']); // watch app js changes and build system
 	gulp.watch('./public/app/scss/*.scss', ['sass-autoprefix-minify-css']); // watch app css changes, pack css, minify and put in respective folder
-	//gulp.watch(['./public/app/*.js','./test/client/*.js','./test/karma.conf.js','./test/karma.test-shim.js'], ['client-unit-test']); //watch unit test changes and run tests
 	gulp.watch(['./test/server/test.js'], ['server-test']); // watch server tests changes and run tests
 });
 
 gulp.task('watch-and-lint', () => {
-	gulp.watch(['./app/**', './public/js/*.js', './*.js', './.eslintignore', './.eslintrc.json'], ['eslint']); // watch files to be linted or eslint config files and lint on change
-	gulp.watch(['./public/app/*.ts', './public/app/**/*.ts', './tslint.json'], ['tslint']); // watch files to be linted or eslint config files and lint on change
+	gulp.watch(['./app/**', './public/js/*.js', './*.js', './.eslintignore', './.eslintrc.json'], ['eslint']); // watch js files to be linted or eslint config and lint on change
+	gulp.watch(['./public/app/*.ts', './public/app/**/*.ts', './tslint.json'], ['tslint']); // watch ts files to be linted or tslint config and lint on change
 });
 
 gulp.task('watch-client-and-test', () => {
-	gulp.watch(['./public/app/*.ts','./test/client/*.ts'], ['tsc']); //watch unit test changes and run tests
+	gulp.watch(['./public/app/*.ts','./test/client/*.ts'], ['tsc']);
 	gulp.watch(['./public/app/*.js','./test/client/*.js','./test/karma.conf.js','./test/karma.test-shim.js'], ['client-unit-test']); //watch unit test changes and run tests
 });
 
-gulp.task('default', ['build-system-js','sass-autoprefix-minify-css','database','server','lint','watch']);
+gulp.task('default', ['database','build-system-js','sass-autoprefix-minify-css','lint','server','watch','watch-and-lint']);
 
 gulp.task('production-start', ['database','server']);
 

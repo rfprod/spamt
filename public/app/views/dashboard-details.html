@@ -1,7 +1,30 @@
 <div id="dashboard-data">
+	<div *ngIf="displayError" class="alert alert-danger alert-dismissible" role="alert">
+		<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+		{{displayError}}
+	</div>
 	<div class="col-xs-12 col-sm-4 col-md-4 col-lg-4">
 		<legend>User</legend>
-		sc user details
+		<div *ngIf="!userSelected()">
+			<div class="input-group" [ngClass]="{ 'has-error': (!scUserName || scUserName.length < 3) }">
+				<span class="input-group-addon">http://soundcloud.com/</span>
+				<input type="text" class="form-control" [(ngModel)]="scUserName" pattern="scUserNamePattern" (keyup)="scUserNameKey($event)">
+				<span class="input-group-btn">
+					<button class="btn btn-default" (click)="getUserDetails()" [disabled]="!scUserName || scUserName.length < 3 ">get</button>
+				</span>
+			</div>
+		</div>
+		<div *ngIf="userSelected()">
+			user selected
+			<div class="input-group">
+				<span class="input-group-addon">http://soundcloud.com/{{scUserName}}</span>
+				<span class="input-group-btn">
+					<button class="btn btn-default" (click)="resetSelection()">
+						<i class="glyphicon glyphicon-remove"></i>
+					</button>
+				</span>
+			</div>
+		</div>
 	</div>
 	<div class="col-xs-12 col-sm-8 col-md-8 col-lg-8">
 		<legend>Data</legend>
