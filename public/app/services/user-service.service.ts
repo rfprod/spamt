@@ -3,9 +3,11 @@ import { Injectable } from '@angular/core';
 @Injectable()
 export class UserService {
 	constructor (public window: Window) {}
-	
+
 	public model: any = {
-		analyser_query: ''
+		analyser_query: '',
+		analyser_user_id: '',
+		analyser_user_uri: '',
 	};
 
 	public modelKeys(): any[] {
@@ -23,7 +25,7 @@ export class UserService {
 			*	this.window.localStorage.getItem('SPAMT') returns null as a string when SPAMT does not exist in localStorage
 			*/
 			console.log('this.window.localStorage.getItem(\'SPAMT\'): ', this.window.localStorage.getItem('SPAMT'));
-			if (callback) callback();
+			if (callback) { callback(); }
 		}
 	}
 

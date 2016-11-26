@@ -39,52 +39,48 @@
 					<table class="table table-condensed table-hover">
 						<tbody>
 							<tr>
-								<td class="hidden-xs hidden-sm">id</td>
-								<td>{{publicData.user.id}}</td>
+								<td class="hidden-xs hidden-sm">Id</td>
+								<td><i class="glyphicon glyphicon-info-sign hidden-md hidden-lg" title="Id"></i> {{publicData.user.id}}</td>
 							</tr>
 							<tr>
-								<td class="hidden-xs hidden-sm">last&nbsp;modified</td>
-								<td>{{publicData.user.last_modified}}</td>
+								<td class="hidden-xs hidden-sm">Last&nbsp;modified</td>
+								<td><i class="glyphicon glyphicon-time hidden-md hidden-lg" title="Last modified"></i> {{publicData.user.last_modified}}</td>
 							</tr>
 							<tr>
-								<td class="hidden-xs hidden-sm">uri</td>
-								<td>{{publicData.user.uri}}</td>
-							</tr>
-							<tr>
-								<td class="hidden-xs hidden-sm">country / city</td>
-								<td>{{publicData.user.country}} / {{publicData.user.city}}</td>
+								<td class="hidden-xs hidden-sm">Country / City</td>
+								<td><i class="glyphicon glyphicon-globe hidden-md hidden-lg" title="Country / City"></i> {{publicData.user.country}} / {{publicData.user.city}}</td>
 							</tr>
 							<tr *ngIf="publicData.user.discogs_name">
-								<td class="hidden-xs hidden-sm">discogs&nbsp;name</td>
-								<td>{{publicData.user.discogs_name}}</td>
+								<td class="hidden-xs hidden-sm">Discogs&nbsp;name</td>
+								<td><i class="glyphicon glyphicon-link hidden-md hidden-lg" title="Discogs name"></i> {{publicData.user.discogs_name}}</td>
 							</tr>
 							<tr *ngIf="publicData.user.myspace_name">
-								<td class="hidden-xs hidden-sm">myspace&nbsp;name</td>
-								<td>{{publicData.user.myspace_name}}</td>
+								<td class="hidden-xs hidden-sm">Myspace&nbsp;name</td>
+								<td><i class="glyphicon glyphicon-link hidden-md hidden-lg" title="Myspace name"></i> {{publicData.user.myspace_name}}</td>
 							</tr>
 							<tr>
-								<td class="hidden-xs hidden-sm">website</td>
-								<td><a [href]="publicData.user.website" target=_blank>{{publicData.user.website_title}}</a></td>
+								<td class="hidden-xs hidden-sm">Website</td>
+								<td><a [href]="publicData.user.website" target=_blank><i class="glyphicon glyphicon-home" title="Website"></i> {{publicData.user.website_title}}</a></td>
 							</tr>
 							<tr>
-								<td class="hidden-xs hidden-sm">tracks</td>
-								<td>{{publicData.user.track_count}}</td>
+								<td class="hidden-xs hidden-sm">Tracks</td>
+								<td><i class="glyphicon glyphicon-music hidden-md hidden-lg" title="Tracks"></i> {{publicData.user.track_count}}</td>
 							</tr>
 							<tr>
-								<td class="hidden-xs hidden-sm">playlists</td>
-								<td>{{publicData.user.playlist_count}}</td>
+								<td class="hidden-xs hidden-sm">Playlists</td>
+								<td><i class="glyphicon glyphicon-list-alt hidden-md hidden-lg" title="Playlists"></i> {{publicData.user.playlist_count}}</td>
 							</tr>
 							<tr>
-								<td class="hidden-xs hidden-sm">public&nbsp;favorites</td>
-								<td>{{publicData.user.public_favorites_count}}</td>
+								<td class="hidden-xs hidden-sm">Public&nbsp;favorites</td>
+								<td><i class="glyphicon glyphicon-heart hidden-md hidden-lg" title="Public favorites"></i> {{publicData.user.public_favorites_count}}</td>
 							</tr>
 							<tr>
-								<td class="hidden-xs hidden-sm">followers</td>
-								<td>{{publicData.user.followers_count}}</td>
+								<td class="hidden-xs hidden-sm">Followers</td>
+								<td><i class="glyphicon glyphicon-user hidden-md hidden-lg" title="Followers"></i> {{publicData.user.followers_count}}</td>
 							</tr>
 							<tr>
-								<td class="hidden-xs hidden-sm">followings</td>
-								<td>{{publicData.user.followings_count}}</td>
+								<td class="hidden-xs hidden-sm">Followings</td>
+								<td><i class="glyphicon glyphicon-user hidden-md hidden-lg" title="Followings"></i> {{publicData.user.followings_count}}</td>
 							</tr>
 						</tbody>
 					</table>

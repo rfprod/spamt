@@ -28,64 +28,70 @@ export class DashboardDetailsComponent implements OnInit, OnDestroy {
 	private userSelected() { // tslint:disable-line
 		return (this.publicData.user) ? true : false;
 	}
-	private resetSelection() { // tslint:disable-line
+	private resetSelection(): void { // tslint:disable-line
 		this.publicData.user = null;
 		this.scUserName = '';
 		this.userService.model.analyser_query = this.scUserName;
+		this.userService.model.analyser_user_id = '';
+		this.userService.model.analyser_user_uri = '';
 		this.userService.saveUser();
 	}
 	public scUserName: string = '';
-	private scUserNamePattern: any = /[*]{3,}/;
-	private scUserNameKey(event) {
+	private scUserNamePattern: any = /[*]{3,}/; // tslint:disable-line
+	private scUserNameKey(event): void { // tslint:disable-line
 		if (event.which === 13 || event.keyCode === 13 || event.key === 'Enter' || event.code === 'Enter') {
 			this.getUserDetails();
 		}
 	}
-	private getUserDetails() { // tslint:disable-line
+	private getUserDetails(): void { // tslint:disable-line
+		this.emitSpinnerStartEvent();
 		this.scGetUserService.getUserDetails(this.scUserName).subscribe(
 			data => {
 				this.publicData.user = data;
 				this.displayError = undefined;
 				console.log('this.userService: ', this.userService);
 				this.userService.model.analyser_query = this.scUserName;
+				this.userService.model.analyser_user_id = this.publicData.user.id;
+				this.userService.model.analyser_user_uri = this.publicData.user.uri;
 				this.userService.saveUser();
 			},
 			error => this.displayError = <any> error,
 			() => {
 				console.log('getUserDetails done');
+				this.emitSpinnerStopEvent();
 			}
 		);
 	}
 
 	private filterSearchValue: string;
-	get filterSearchQuery() {
+	get filterSearchQuery(): string {
 		return this.filterSearchValue;
 	}
 	set filterSearchQuery(val) {
 		this.emitFilterSearchValueChangeEvent(val);
 	}
-	private emitFilterSearchValueChangeEvent(val) {
+	private emitFilterSearchValueChangeEvent(val): void {
 		console.log('labelSearchValue changed to:', val);
 		this.emitter.emitEvent({search: val});
 	}
 
 	private orderProp = 'timestamp';
-	get sortByCriterion() {
+	get sortByCriterion(): string {
 		return this.orderProp;
 	}
 	set sortByCriterion(val) {
 		this.emitOrderPropChangeEvent(val);
 	}
-	private emitOrderPropChangeEvent(val) {
+	private emitOrderPropChangeEvent(val): void {
 		console.log('orderProp changed to:', val);
 		this.emitter.emitEvent({sort: val});
 	}
 
-	private emitSpinnerStartEvent() {
+	private emitSpinnerStartEvent(): void {
 		console.log('root spinner start event emitted');
 		this.emitter.emitEvent({sys: 'start spinner'});
 	}
-	private emitSpinnerStopEvent() {
+	private emitSpinnerStopEvent(): void {
 		console.log('root spinner stop event emitted');
 		this.emitter.emitEvent({sys: 'stop spinner'});
 	}
@@ -96,7 +102,7 @@ export class DashboardDetailsComponent implements OnInit, OnDestroy {
 		this.emitter.emitEvent({appInfo: 'hide'});
 		this.userService.restoreUser(() => {
 			this.scUserName = this.userService.model.analyser_query;
-			this.getUserDetails();
+			if (this.scUserName !== '') { this.getUserDetails(); }
 		});
 		this.emitSpinnerStopEvent();
 		this.subscription = this.emitter.getEmitter().subscribe((message) => {
