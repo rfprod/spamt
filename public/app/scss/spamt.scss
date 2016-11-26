@@ -12,7 +12,10 @@ body {
 	textarea {resize: vertical;}
 
 	a:hover, a:focus {outline: none;}
-	a:hover {cursor: pointer}
+	a:hover {
+		cursor: pointer;
+		text-decoration: none;
+	}
 	.selected {
 		background: $lightgrey;
 	}
@@ -108,6 +111,10 @@ body {
 				flex: 1;
 				text-align: center;
 			}
+		}
+
+		#sc-user {
+			font-size: 0.9em;
 		}
 	}
 }

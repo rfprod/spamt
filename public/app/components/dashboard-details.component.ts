@@ -1,6 +1,7 @@
 import { Component, ElementRef, OnInit, OnDestroy } from '@angular/core';
 import { EventEmitterService } from '../services/event-emitter.service';
 import { SCgetUserService } from '../services/sc-get-user.service';
+import { UserService } from '../services/user-service.service';
 
 declare var $: JQueryStatic;
 
@@ -13,6 +14,7 @@ export class DashboardDetailsComponent implements OnInit, OnDestroy {
 		public el: ElementRef,
 		private emitter: EventEmitterService,
 		private scGetUserService: SCgetUserService,
+		private userService: UserService
 	) {
 		console.log('this.el.nativeElement:', this.el.nativeElement);
 	}
@@ -28,9 +30,11 @@ export class DashboardDetailsComponent implements OnInit, OnDestroy {
 	}
 	private resetSelection() { // tslint:disable-line
 		this.publicData.user = null;
-		this.scUserName = undefined;
+		this.scUserName = '';
+		this.userService.model.analyser_query = this.scUserName;
+		this.userService.saveUser();
 	}
-	public scUserName: string;
+	public scUserName: string = '';
 	private scUserNamePattern: any = /[*]{3,}/;
 	private scUserNameKey(event) {
 		if (event.which === 13 || event.keyCode === 13 || event.key === 'Enter' || event.code === 'Enter') {
@@ -42,6 +46,9 @@ export class DashboardDetailsComponent implements OnInit, OnDestroy {
 			data => {
 				this.publicData.user = data;
 				this.displayError = undefined;
+				console.log('this.userService: ', this.userService);
+				this.userService.model.analyser_query = this.scUserName;
+				this.userService.saveUser();
 			},
 			error => this.displayError = <any> error,
 			() => {
@@ -62,7 +69,7 @@ export class DashboardDetailsComponent implements OnInit, OnDestroy {
 		this.emitter.emitEvent({search: val});
 	}
 
-	public orderProp = 'timestamp';
+	private orderProp = 'timestamp';
 	get sortByCriterion() {
 		return this.orderProp;
 	}
@@ -87,6 +94,10 @@ export class DashboardDetailsComponent implements OnInit, OnDestroy {
 		console.log('ngOnInit: DashboardDetailsComponent initialized');
 		this.emitter.emitEvent({route: '/data'});
 		this.emitter.emitEvent({appInfo: 'hide'});
+		this.userService.restoreUser(() => {
+			this.scUserName = this.userService.model.analyser_query;
+			this.getUserDetails();
+		});
 		this.emitSpinnerStopEvent();
 		this.subscription = this.emitter.getEmitter().subscribe((message) => {
 			console.log('/details consuming event:', JSON.stringify(message));

@@ -22,7 +22,6 @@ export class SCgetUserService {
 	}
 
 	public getUserDetails(userName): Observable<any[]> { // tslint:disable-line
-		// had to disable all tslint rules for previous line, disabling no-unused-variable is buggy
 		return this.http.get(this.appDataUrl + userName)
 			.map(this.extractData)
 			.catch(this.handleError);

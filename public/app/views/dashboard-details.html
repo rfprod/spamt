@@ -10,7 +10,7 @@
 				<span class="input-group-addon">http://soundcloud.com/</span>
 				<input type="text" class="form-control" [(ngModel)]="scUserName" pattern="scUserNamePattern" (keyup)="scUserNameKey($event)">
 				<span class="input-group-btn">
-					<button class="btn btn-default" (click)="getUserDetails()" [disabled]="!scUserName || scUserName.length < 3 ">get</button>
+					<button class="btn" [ngClass]="{ 'btn-danger': (!scUserName || scUserName.length < 3), 'btn-success': (scUserName && scUserName.length >= 3) }" (click)="getUserDetails()" [disabled]="!scUserName || scUserName.length < 3 ">get</button>
 				</span>
 			</div>
 		</div>
@@ -19,10 +19,76 @@
 			<div class="input-group">
 				<span class="input-group-addon">http://soundcloud.com/{{scUserName}}</span>
 				<span class="input-group-btn">
-					<button class="btn btn-default" (click)="resetSelection()">
+					<button class="btn btn-danger" (click)="resetSelection()">
 						<i class="glyphicon glyphicon-remove"></i>
 					</button>
 				</span>
+			</div>
+			<div class="thumbnail" id="sc-user">
+				<a [href]="publicData.user.permalink_url" target=_blank>
+					<img [src]="publicData.user.avatar_url" alt="{{publicData.user.permalink}}">
+				</a>
+				<div class="caption">
+					<h3>{{publicData.user.username}}</h3>
+					<h4>{{publicData.user.full_name}}</h4>
+					<h4>
+						<span class="label label-default">{{publicData.user.plan}}</span>
+						<span class="label label-default">{{publicData.user.kind}}</span>
+						<span class="label" [ngClass]="{ 'label-success': publicData.user.online, 'label-danger': !publicData.user.online }">{{ (publicData.user.online) ? 'online' : 'offline' }}</span>
+					</h4>
+					<table class="table table-condensed table-hover">
+						<tbody>
+							<tr>
+								<td class="hidden-xs hidden-sm">id</td>
+								<td>{{publicData.user.id}}</td>
+							</tr>
+							<tr>
+								<td class="hidden-xs hidden-sm">last&nbsp;modified</td>
+								<td>{{publicData.user.last_modified}}</td>
+							</tr>
+							<tr>
+								<td class="hidden-xs hidden-sm">uri</td>
+								<td>{{publicData.user.uri}}</td>
+							</tr>
+							<tr>
+								<td class="hidden-xs hidden-sm">country / city</td>
+								<td>{{publicData.user.country}} / {{publicData.user.city}}</td>
+							</tr>
+							<tr *ngIf="publicData.user.discogs_name">
+								<td class="hidden-xs hidden-sm">discogs&nbsp;name</td>
+								<td>{{publicData.user.discogs_name}}</td>
+							</tr>
+							<tr *ngIf="publicData.user.myspace_name">
+								<td class="hidden-xs hidden-sm">myspace&nbsp;name</td>
+								<td>{{publicData.user.myspace_name}}</td>
+							</tr>
+							<tr>
+								<td class="hidden-xs hidden-sm">website</td>
+								<td><a [href]="publicData.user.website" target=_blank>{{publicData.user.website_title}}</a></td>
+							</tr>
+							<tr>
+								<td class="hidden-xs hidden-sm">tracks</td>
+								<td>{{publicData.user.track_count}}</td>
+							</tr>
+							<tr>
+								<td class="hidden-xs hidden-sm">playlists</td>
+								<td>{{publicData.user.playlist_count}}</td>
+							</tr>
+							<tr>
+								<td class="hidden-xs hidden-sm">public&nbsp;favorites</td>
+								<td>{{publicData.user.public_favorites_count}}</td>
+							</tr>
+							<tr>
+								<td class="hidden-xs hidden-sm">followers</td>
+								<td>{{publicData.user.followers_count}}</td>
+							</tr>
+							<tr>
+								<td class="hidden-xs hidden-sm">followings</td>
+								<td>{{publicData.user.followings_count}}</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
 			</div>
 		</div>
 	</div>

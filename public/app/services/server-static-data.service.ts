@@ -25,7 +25,6 @@ export class ServerStaticDataService {
 	}
 
 	public getData(): Observable<any[]> { // tslint:disable-line
-		// had to disable all tslint rules for previous line, disabling no-unused-variable is buggy
 		return this.http.get(this.appDataUrl)
 			.map(this.extractData)
 			.catch(this.handleError);

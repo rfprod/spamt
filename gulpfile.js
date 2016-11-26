@@ -139,7 +139,7 @@ gulp.task('lint', ['eslint','tslint']);
 gulp.task('watch', () => {
 	gulp.watch(['./server.js', './app/config/*.js', './app/routes/*.js', './app/utils/*.js'], ['server']); // watch server and database changes and restart server
 	gulp.watch(['./server.js', './app/models/*.js'], ['database']); // watch database changes and restart database
-	gulp.watch('./public/app/*.js', ['build-system-js']); // watch app js changes and build system
+	gulp.watch(['./public/app/*.js', './public/app/**/*.js'], ['build-system-js']); // watch app js changes and build system
 	gulp.watch('./public/app/scss/*.scss', ['sass-autoprefix-minify-css']); // watch app css changes, pack css, minify and put in respective folder
 	gulp.watch(['./test/server/test.js'], ['server-test']); // watch server tests changes and run tests
 });
@@ -156,7 +156,7 @@ gulp.task('watch-client-and-test', () => {
 
 gulp.task('default', ['database','build-system-js','sass-autoprefix-minify-css','lint','server','watch','watch-and-lint']);
 
-gulp.task('production-start', ['database','server']);
+gulp.task('production-start', ['database','tsc','build-system-js','sass-autoprefix-minify-css','server']);
 
 process.on('exit', () => {
 	if (node) node.kill();
