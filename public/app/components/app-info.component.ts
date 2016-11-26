@@ -4,9 +4,11 @@ import { EventEmitterService } from '../services/event-emitter.service';
 @Component({
 	selector: 'app-info',
 	template: `
-		<a class="flex-item" [hidden]="hideInfo" *ngFor="let badge of badges" href="{{badge.link}}" data-toggle="tooltip" target=_blank title="{{badge.title}}">
-			<img src="{{badge.img}}"/>
-		</a>
+		<span class="app-info" *ngIf="!hideInfo">
+			<a class="flex-item" *ngFor="let badge of badges" href="{{badge.link}}" data-toggle="tooltip" target=_blank title="{{badge.title}}">
+				<img src="{{badge.img}}"/>
+			</a>
+		</span>
 	`,
 })
 export class AppInfoComponent implements OnInit, OnDestroy {
