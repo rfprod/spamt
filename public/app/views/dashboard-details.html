@@ -6,7 +6,7 @@
 	<div class="col-xs-12 col-sm-4 col-md-4 col-lg-4">
 		<legend>User</legend>
 		<div *ngIf="!userSelected()">
-			<div class="input-group" [ngClass]="{ 'has-error': (!scUserName || scUserName.length < 3) }">
+			<div class="input-group row" [ngClass]="{ 'has-error': (!scUserName || scUserName.length < 3) }">
 				<span class="input-group-addon">http://soundcloud.com/</span>
 				<input type="text" class="form-control" [(ngModel)]="scUserName" pattern="scUserNamePattern" (keyup)="scUserNameKey($event)">
 				<span class="input-group-btn">
@@ -15,8 +15,7 @@
 			</div>
 		</div>
 		<div *ngIf="userSelected()">
-			user selected
-			<div class="input-group">
+			<div class="input-group row">
 				<span class="input-group-addon">http://soundcloud.com/{{scUserName}}</span>
 				<span class="input-group-btn">
 					<button class="btn btn-danger" (click)="resetSelection()">
@@ -44,11 +43,11 @@
 							</tr>
 							<tr>
 								<td class="hidden-xs hidden-sm">Last&nbsp;modified</td>
-								<td><i class="glyphicon glyphicon-time hidden-md hidden-lg" title="Last modified"></i> {{publicData.user.last_modified}}</td>
+								<td><i class="glyphicon glyphicon-time hidden-md hidden-lg" title="Last modified"></i> {{publicData.user.last_modified | date: 'yyyy-MM-dd hh:mm'}}</td>
 							</tr>
 							<tr>
-								<td class="hidden-xs hidden-sm">Country / City</td>
-								<td><i class="glyphicon glyphicon-globe hidden-md hidden-lg" title="Country / City"></i> {{publicData.user.country}} / {{publicData.user.city}}</td>
+								<td class="hidden-xs hidden-sm">Location</td>
+								<td><i class="glyphicon glyphicon-globe hidden-md hidden-lg" title="Location"></i> {{publicData.user.country}} / {{publicData.user.city}}</td>
 							</tr>
 							<tr *ngIf="publicData.user.discogs_name">
 								<td class="hidden-xs hidden-sm">Discogs&nbsp;name</td>
@@ -62,23 +61,23 @@
 								<td class="hidden-xs hidden-sm">Website</td>
 								<td><a [href]="publicData.user.website" target=_blank><i class="glyphicon glyphicon-home" title="Website"></i> {{publicData.user.website_title}}</a></td>
 							</tr>
-							<tr>
+							<tr [ngClass]="{ 'info': selectedTab === 'Tracks' }">
 								<td class="hidden-xs hidden-sm">Tracks</td>
 								<td><i class="glyphicon glyphicon-music hidden-md hidden-lg" title="Tracks"></i> {{publicData.user.track_count}}</td>
 							</tr>
-							<tr>
+							<tr [ngClass]="{ 'info': selectedTab === 'Playlists' }">
 								<td class="hidden-xs hidden-sm">Playlists</td>
 								<td><i class="glyphicon glyphicon-list-alt hidden-md hidden-lg" title="Playlists"></i> {{publicData.user.playlist_count}}</td>
 							</tr>
-							<tr>
-								<td class="hidden-xs hidden-sm">Public&nbsp;favorites</td>
+							<tr [ngClass]="{ 'info': selectedTab === 'Favorites' }">
+								<td class="hidden-xs hidden-sm">Favorites</td>
 								<td><i class="glyphicon glyphicon-heart hidden-md hidden-lg" title="Public favorites"></i> {{publicData.user.public_favorites_count}}</td>
 							</tr>
-							<tr>
+							<tr [ngClass]="{ 'info': selectedTab === 'Followers' }">
 								<td class="hidden-xs hidden-sm">Followers</td>
 								<td><i class="glyphicon glyphicon-user hidden-md hidden-lg" title="Followers"></i> {{publicData.user.followers_count}}</td>
 							</tr>
-							<tr>
+							<tr [ngClass]="{ 'info': selectedTab === 'Followings' }">
 								<td class="hidden-xs hidden-sm">Followings</td>
 								<td><i class="glyphicon glyphicon-user hidden-md hidden-lg" title="Followings"></i> {{publicData.user.followings_count}}</td>
 							</tr>
@@ -90,18 +89,30 @@
 	</div>
 	<div class="col-xs-12 col-sm-8 col-md-8 col-lg-8">
 		<legend>Data</legend>
+		<span role="navigation">
+			<ul class="nav nav-tabs nav-justified">
+				<li role="presentation" *ngFor="let tab of dataTabs" [ngClass]="{ 'active': tab === selectedTab }">
+					<a (click)="selectTab(tab)">{{tab}}</a>
+				</li>
+			</ul>
+		</span>
 		<div id="filters">
 			<span class="flex-item">
-				<span class="input-label"><i class="fa fa-search" aria-hidden="true"></i> Search:</span> <input [(ngModel)]="filterSearchQuery">
+				<span class="input-label"><i class="fa fa-search" aria-hidden="true"></i> Search:</span>
+				<input [(ngModel)]="filterSearchQuery" class="form-control">
 			</span>
 			<span class="flex-item">
 				<span class="input-label"><i class="fa fa-sort" aria-hidden="true"></i> Sort by:</span>
-				<select [(ngModel)]="sortByCriterion">
+				<select [(ngModel)]="sortByCriterion" class="form-control">
 					<option value="name">Alphabetical</option>
 					<option value="timestamp">Timestamp</option>
 				</select>
 			</span>
 		</div>
-		data tabs
+		<div class="panel panel-default" *ngFor="let tab of dataTabs" [hidden]="tab !== selectedTab">
+			<div class="panel-body">
+				{{tab}}
+			</div>
+		</div>
 	</div>
 </div>

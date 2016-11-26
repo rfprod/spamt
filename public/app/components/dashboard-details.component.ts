@@ -63,6 +63,15 @@ export class DashboardDetailsComponent implements OnInit, OnDestroy {
 		);
 	}
 
+// Data tabs
+	private dataTabs: string[] = ['Tracks', 'Playlists', 'Favorites', 'Followers', 'Followings'];
+	private selectedTab: string = 'Tracks';
+	private selectTab(tab): void {
+		console.log('selectTab, tab: ', tab);
+		this.selectedTab = tab;
+	}
+
+// Filters
 	private filterSearchValue: string;
 	get filterSearchQuery(): string {
 		return this.filterSearchValue;
@@ -74,7 +83,6 @@ export class DashboardDetailsComponent implements OnInit, OnDestroy {
 		console.log('labelSearchValue changed to:', val);
 		this.emitter.emitEvent({search: val});
 	}
-
 	private orderProp = 'timestamp';
 	get sortByCriterion(): string {
 		return this.orderProp;
@@ -87,6 +95,7 @@ export class DashboardDetailsComponent implements OnInit, OnDestroy {
 		this.emitter.emitEvent({sort: val});
 	}
 
+// Spinner
 	private emitSpinnerStartEvent(): void {
 		console.log('root spinner start event emitted');
 		this.emitter.emitEvent({sys: 'start spinner'});
