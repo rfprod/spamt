@@ -89,30 +89,73 @@
 	</div>
 	<div class="col-xs-12 col-sm-8 col-md-8 col-lg-8">
 		<legend>Data</legend>
-		<span role="navigation">
-			<ul class="nav nav-tabs nav-justified">
-				<li role="presentation" *ngFor="let tab of dataTabs" [ngClass]="{ 'active': tab === selectedTab }">
-					<a (click)="selectTab(tab)">{{tab}}</a>
-				</li>
-			</ul>
-		</span>
-		<div id="filters">
-			<span class="flex-item">
-				<span class="input-label"><i class="fa fa-search" aria-hidden="true"></i> Search:</span>
-				<input [(ngModel)]="filterSearchQuery" class="form-control">
+		<span *ngIf="userSelected()">
+			<span role="navigation">
+				<ul class="nav nav-tabs nav-justified">
+					<li role="presentation" *ngFor="let tab of dataTabs" [ngClass]="{ 'active': tab === selectedTab }">
+						<a (click)="selectTab(tab)">{{tab}}</a>
+					</li>
+				</ul>
 			</span>
-			<span class="flex-item">
-				<span class="input-label"><i class="fa fa-sort" aria-hidden="true"></i> Sort by:</span>
-				<select [(ngModel)]="sortByCriterion" class="form-control">
-					<option value="name">Alphabetical</option>
-					<option value="timestamp">Timestamp</option>
-				</select>
-			</span>
-		</div>
-		<div class="panel panel-default" *ngFor="let tab of dataTabs" [hidden]="tab !== selectedTab">
-			<div class="panel-body">
-				{{tab}}
+			<div *ngIf="selectedTab === ''">
+				<ul class="nav nav-tabs nav-justified">
+					<li role="presentation" *ngFor="let tab of dataTabs" class="text-center">
+						<i class="glyphicon glyphicon-chevron-up"></i>
+					</li>
+				</ul>
+				<p class="text-center">select tab</p>
 			</div>
-		</div>
+			<div id="filters" *ngIf="selectedTab !== ''">
+				<span class="flex-item">
+					<span class="input-label"><i class="fa fa-search" aria-hidden="true"></i> Search:</span>
+					<input [(ngModel)]="filterSearchQuery" class="form-control">
+				</span>
+				<span class="flex-item">
+					<span class="input-label"><i class="fa fa-sort" aria-hidden="true"></i> Sort by:</span>
+					<select [(ngModel)]="sortByCriterion" class="form-control">
+						<option value="name">Alphabetical</option>
+						<option value="timestamp">Timestamp</option>
+					</select>
+				</span>
+			</div>
+			<div id="data" class="panel panel-default" *ngFor="let tab of dataTabs" [hidden]="tab !== selectedTab">
+				<div class="panel-body">
+					<div class="media" *ngFor="let track of publicData.tracks">
+						<div class="media-left">
+							<a (click)="playTrack(track.stream_url)">
+								<img class="media-object" [src]="track.artwork_url">
+							</a>
+							<div class="label label-default">{{track.genre}}</div>
+							<div class="label label-default">{{track.license}}</div>
+						</div>
+						<div class="media-body">
+							<div class="label label-default pull-right">{{track.created_at | date:'yyyy-MM-dd'}}</div>
+							<h4 class="media-heading">{{track.title}}</h4>
+							<img class="waveform" [src]="track.waveform_url">
+							<span class="controls">
+								<a (click)="playTrack(track.stream_url)" class="flex-item">
+									<i class="glyphicon glyphicon-play"></i>
+								</a>
+								<a (click)="downloadTrack(track.download_url)" class="flex-item" *ngIf="track.downloadable">
+									<i class="glyphicon glyphicon-save"></i>
+								</a>
+								<a [href]="track.purchase_url" target=_blank class="flex-item" *ngIf="track.purchase_url">
+									<i class="glyphicon glyphicon-shopping-cart"></i>
+								</a>
+								<span class="flex-item">
+									<i class="glyphicon glyphicon-heart"></i> {{track.favoritings_count}}
+								</span>
+								<span class="flex-item">
+									<i class="glyphicon glyphicon-comment"></i> {{track.comment_count}}
+								</span>
+							</span>
+						</div>
+					</div>
+				</div>
+			</div>
+		</span>
+		<span *ngIf="!userSelected()">
+			select a user to be able to request data
+		</span>
 	</div>
 </div>

@@ -22,7 +22,7 @@ export class DashboardDetailsComponent implements OnInit, OnDestroy {
 	}
 	private subscription: any;
 
-	public publicData: any = {
+	private publicData: any = {
 		user: null,
 		tracks: [],
 		playlists: [],
@@ -30,14 +30,17 @@ export class DashboardDetailsComponent implements OnInit, OnDestroy {
 		followers: [],
 		followings: [],
 	};
-	public displayError: string;
+	private publicDataKeys = Object.keys(this.publicData);
+	private displayError: string;
 
 // User
 	private userSelected() { // tslint:disable-line
 		return (this.publicData.user) ? true : false;
 	}
 	private resetSelection(): void { // tslint:disable-line
-		this.publicData.user = null;
+		for (let key of this.publicDataKeys) {
+			this.publicData[key] = '';
+		}
 		this.scUserName = '';
 		this.selectedTab = '';
 		this.selectedEndpoint = '';
@@ -46,7 +49,7 @@ export class DashboardDetailsComponent implements OnInit, OnDestroy {
 		this.userService.model.analyser_user_uri = '';
 		this.userService.saveUser();
 	}
-	public scUserName: string = '';
+	private scUserName: string = '';
 	private scUserNamePattern: any = /[*]{3,}/; // tslint:disable-line
 	private scUserNameKey(event): void { // tslint:disable-line
 		if (event.which === 13 || event.keyCode === 13 || event.key === 'Enter' || event.code === 'Enter') {
@@ -133,6 +136,22 @@ export class DashboardDetailsComponent implements OnInit, OnDestroy {
 		this.emitter.emitEvent({sys: 'stop spinner'});
 	}
 
+// Data tabs controls: Tracks
+	private playTrack(uri): void {
+		console.log('playTrack, uri: ', uri);
+		/*
+		*	TODO
+		*	add respective server method to fullfill the request
+		*/
+	}
+	private downloadTrack(uri): void {
+		console.log('downloadTrack, uri: ', uri);
+		/*
+		*	TODO
+		*	add respective server method to fullfill the request
+		*/
+	}
+
 	public ngOnInit() {
 		console.log('ngOnInit: DashboardDetailsComponent initialized');
 		this.emitter.emitEvent({route: '/data'});
@@ -146,26 +165,26 @@ export class DashboardDetailsComponent implements OnInit, OnDestroy {
 			console.log('/details consuming event:', JSON.stringify(message));
 			if (message.search || message.search === '') {
 				console.log('searching:', message.search);
-				let domElsUsername = this.el.nativeElement.querySelector('ul.labels').querySelectorAll('#label-username');
-				for (let usernameObj of domElsUsername) {
-					if (usernameObj.innerHTML.toLowerCase().indexOf(message.search.toLowerCase()) !== -1) {
-						usernameObj.parentElement.parentElement.style.display = 'block';
+				let domElsUsername = this.el.nativeElement.querySelector('div#data').querySelectorAll('div.media-heading');
+				for (let nameObj of domElsUsername) {
+					if (nameObj.innerHTML.toLowerCase().indexOf(message.search.toLowerCase()) !== -1) {
+						nameObj.parentElement.parentElement.style.display = 'block';
 					} else {
-						usernameObj.parentElement.parentElement.style.display = 'none';
+						nameObj.parentElement.parentElement.style.display = 'none';
 					}
 				}
 			}
 			if (message.sort) {
 				console.log('sorting by:', message.sort);
 				if (message.sort === 'timestamp') {
-					this.publicData.tracks.sort((a, b) => {
-						return b.timestamp - a.timestamp;
+					this.publicData[this.selectedEndpoint].sort((a, b) => {
+						return b.created_at - a.created_at;
 					});
 				}
 				if (message.sort === 'name') {
-					this.publicData.tracks.sort((a, b) => {
-						if (a.permalink < b.permalink) { return -1; }
-						if (a.permalink > b.permalink) { return 1; }
+					this.publicData[this.selectedEndpoint].sort((a, b) => {
+						if (a.title < b.title) { return -1; }
+						if (a.title > b.title) { return 1; }
 						return 0;
 					});
 				}
