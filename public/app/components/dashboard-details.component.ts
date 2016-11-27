@@ -2,6 +2,7 @@ import { Component, ElementRef, OnInit, OnDestroy } from '@angular/core';
 import { EventEmitterService } from '../services/event-emitter.service';
 import { SCgetUserService } from '../services/sc-get-user.service';
 import { SCgetUserDetailsService } from '../services/sc-get-user-details.service';
+import { SCgetUserTrackDownloadService } from '../services/sc-get-user-track-download.service';
 import { UserService } from '../services/user-service.service';
 
 declare var $: JQueryStatic;
@@ -16,6 +17,7 @@ export class DashboardDetailsComponent implements OnInit, OnDestroy {
 		private emitter: EventEmitterService,
 		private scGetUserService: SCgetUserService,
 		private scGetUserDetailsService: SCgetUserDetailsService,
+		private scGetUserTrackDownloadService: SCgetUserTrackDownloadService,
 		private userService: UserService
 	) {
 		console.log('this.el.nativeElement:', this.el.nativeElement);
@@ -138,18 +140,15 @@ export class DashboardDetailsComponent implements OnInit, OnDestroy {
 
 // Data tabs controls: Tracks
 	private playTrack(uri): void {
-		console.log('playTrack, uri: ', uri);
+		console.log('playTrack, sc api uri: ', uri);
 		/*
 		*	TODO
 		*	add respective server method to fullfill the request
 		*/
 	}
 	private downloadTrack(uri): void {
-		console.log('downloadTrack, uri: ', uri);
-		/*
-		*	TODO
-		*	add respective server method to fullfill the request
-		*/
+		console.log('downloadTrack, sc api uri: ', uri);
+		this.scGetUserTrackDownloadService.openInNewWindow(uri);
 	}
 
 	public ngOnInit() {
