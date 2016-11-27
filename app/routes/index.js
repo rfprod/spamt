@@ -17,14 +17,23 @@ module.exports = function(app, passport, User, SrvInfo, DataInit, syncRec) { // 
 	class SC {
 		constructor() {
 			this.apiUrl = 'https://api.soundcloud.com/';
+			this.regExp = {
+				userDetails: /http(s)?\:\/\/api\.soundcloud\.com\/users\/[0-9]+\/(tracks|playlists|favorites|followers|followings)/
+			};
 			this.endpoints = { resolve: 'resolve' };
 			this.clientID = process.env.SOUNDCLOUD_CLIENT_ID;
-			this.clientIDparam = '&client_id=' + this.clientID;
+			this.clientIDparam = 'client_id=' + this.clientID;
 		}
 
 		resolve(path) {
 			console.log('resolving path: ', path);
-			const url = this.apiUrl + this.endpoints.resolve + '?url=' + path + this.clientIDparam;
+			const url = this.apiUrl + this.endpoints.resolve + '?url=' + path + '&' + this.clientIDparam;
+			return syncRec('GET', url);
+		}
+
+		getUserDetails(apiUri) {
+			console.log('getting sc user details, apiUri: ', apiUri);
+			const url = apiUri + '?' + this.clientIDparam;
 			return syncRec('GET', url);
 		}
 	}
@@ -37,18 +46,6 @@ module.exports = function(app, passport, User, SrvInfo, DataInit, syncRec) { // 
 
 	app.get('/', (req, res) => {
 		res.sendFile(path + '/public/index.html');
-	});
-
-	app.get('/dummy', (req, res) => {
-		const headers = req.headers;
-		console.log('headers',headers);
-		const output = [{key: 'Success', y:1}];
-
-		res.format({
-			'application/json': function(){
-				res.send(output);
-			}
-		});
 	});
 
 	app.get('/sc/get/user', (req, res) => {
@@ -74,7 +71,7 @@ module.exports = function(app, passport, User, SrvInfo, DataInit, syncRec) { // 
 				output = JSON.parse(resolveRequest.getBody());
 			} else {
 				/*
-				*	proxy resolve errors from soundcloud API
+				*	proxy errors from soundcloud API
 				*/
 				output = resolveRequest.body;
 			}
@@ -82,6 +79,44 @@ module.exports = function(app, passport, User, SrvInfo, DataInit, syncRec) { // 
 			output = { error: 'Missing mandatory request parameter - name.' };
 		}
 
+		res.setHeader('Cache-Control', 'no-cache, no-store');
+		res.format({
+			'application/json': function(){
+				if (output.error) res.status(400);
+				res.send(output);
+			}
+		});
+	});
+
+	app.get('/sc/get/user/details', (req, res) => {
+		/*
+		*	Requests and returns soundcloud users details by type:
+		* 'tracks', 'playlists', 'favorites', 'followers', 'followings'
+		*/
+		const scUserDetailsEndpointUri = req.query.endpoint_uri;
+		let output = undefined;
+
+		if (scUserDetailsEndpointUri) {
+
+			if (SCapi.regExp.userDetails.test(scUserDetailsEndpointUri)) {
+				const resolveRequest = SCapi.getUserDetails(scUserDetailsEndpointUri);
+
+				if (resolveRequest.statusCode === 200) {
+					output = JSON.parse(resolveRequest.getBody());
+				} else {
+					/*
+					*	proxy errors from soundcloud API
+					*/
+					output = resolveRequest.body;
+				}
+			} else {
+				output = { error: 'Wrong mandatory request parameter - endpoint_uri.' };
+			}
+		} else {
+			output = { error: 'Missing mandatory request parameter - endpoint_uri.' };
+		}
+
+		res.setHeader('Cache-Control', 'no-cache, no-store');
 		res.format({
 			'application/json': function(){
 				if (output.error) res.status(400);

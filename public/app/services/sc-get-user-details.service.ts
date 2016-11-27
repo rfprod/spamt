@@ -5,8 +5,8 @@ import { Observable } from 'rxjs/Observable';
 import 'rxjs/Rx';
 
 @Injectable()
-export class SCgetUserService {
-	public appDataUrl: string = window.location.origin + '/sc/get/user?name=';
+export class SCgetUserDetailsService {
+	public appDataUrl: string = window.location.origin + '/sc/get/user/details?endpoint_uri=';
 	constructor (private http: Http) {}
 
 	public extractData(res: Response) {
@@ -21,8 +21,8 @@ export class SCgetUserService {
 		return Observable.throw(errMsg);
 	}
 
-	public getData(userName): Observable<any[]> { // tslint:disable-line
-		return this.http.get(this.appDataUrl + userName)
+	public getData(endpointUri): Observable<any[]> { // tslint:disable-line
+		return this.http.get(this.appDataUrl + endpointUri)
 			.map(this.extractData)
 			.catch(this.handleError);
 	}

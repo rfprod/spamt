@@ -1,6 +1,7 @@
 import { Component, ElementRef, OnInit, OnDestroy } from '@angular/core';
 import { EventEmitterService } from '../services/event-emitter.service';
 import { SCgetUserService } from '../services/sc-get-user.service';
+import { SCgetUserDetailsService } from '../services/sc-get-user-details.service';
 import { UserService } from '../services/user-service.service';
 
 declare var $: JQueryStatic;
@@ -14,6 +15,7 @@ export class DashboardDetailsComponent implements OnInit, OnDestroy {
 		public el: ElementRef,
 		private emitter: EventEmitterService,
 		private scGetUserService: SCgetUserService,
+		private scGetUserDetailsService: SCgetUserDetailsService,
 		private userService: UserService
 	) {
 		console.log('this.el.nativeElement:', this.el.nativeElement);
@@ -23,14 +25,22 @@ export class DashboardDetailsComponent implements OnInit, OnDestroy {
 	public publicData: any = {
 		user: null,
 		tracks: [],
+		playlists: [],
+		favorites: [],
+		followers: [],
+		followings: [],
 	};
 	public displayError: string;
+
+// User
 	private userSelected() { // tslint:disable-line
 		return (this.publicData.user) ? true : false;
 	}
 	private resetSelection(): void { // tslint:disable-line
 		this.publicData.user = null;
 		this.scUserName = '';
+		this.selectedTab = '';
+		this.selectedEndpoint = '';
 		this.userService.model.analyser_query = this.scUserName;
 		this.userService.model.analyser_user_id = '';
 		this.userService.model.analyser_user_uri = '';
@@ -40,12 +50,12 @@ export class DashboardDetailsComponent implements OnInit, OnDestroy {
 	private scUserNamePattern: any = /[*]{3,}/; // tslint:disable-line
 	private scUserNameKey(event): void { // tslint:disable-line
 		if (event.which === 13 || event.keyCode === 13 || event.key === 'Enter' || event.code === 'Enter') {
-			this.getUserDetails();
+			this.getUser();
 		}
 	}
-	private getUserDetails(): void { // tslint:disable-line
+	private getUser(): void { // tslint:disable-line
 		this.emitSpinnerStartEvent();
-		this.scGetUserService.getUserDetails(this.scUserName).subscribe(
+		this.scGetUserService.getData(this.scUserName).subscribe(
 			data => {
 				this.publicData.user = data;
 				this.displayError = undefined;
@@ -57,18 +67,36 @@ export class DashboardDetailsComponent implements OnInit, OnDestroy {
 			},
 			error => this.displayError = <any> error,
 			() => {
-				console.log('getUserDetails done');
+				console.log('getUserService done');
 				this.emitSpinnerStopEvent();
 			}
 		);
 	}
 
 // Data tabs
-	private dataTabs: string[] = ['Tracks', 'Playlists', 'Favorites', 'Followers', 'Followings'];
-	private selectedTab: string = 'Tracks';
-	private selectTab(tab): void {
+	private dataTabs: string[] = ['Tracks', 'Playlists', 'Favorites', 'Followers', 'Followings']; // tslint:disable-line
+	private endpoints: string[] = ['tracks', 'playlists', 'favorites', 'followers', 'followings']; // tslint:disable-line
+	private selectedTab: string = '';
+	private selectedEndpoint: string = '';
+	private selectTab(tab): void { // tslint:disable-line
 		console.log('selectTab, tab: ', tab);
 		this.selectedTab = tab;
+		for (let i in this.dataTabs) {
+			if (this.dataTabs[i] === tab) { this.selectedEndpoint = this.endpoints[i]; }
+		}
+		console.log('this.selectedEndpoint: ', this.selectedEndpoint);
+		this.emitSpinnerStartEvent();
+		this.scGetUserDetailsService.getData(this.userService.model.analyser_user_uri + '/' + this.selectedEndpoint).subscribe(
+			data => {
+				this.publicData[this.selectedEndpoint] = data;
+				this.displayError = undefined;
+			},
+			error => this.displayError = <any> error,
+			() => {
+				console.log('getUserDetailsService done');
+				this.emitSpinnerStopEvent();
+			}
+		);
 	}
 
 // Filters
@@ -111,7 +139,7 @@ export class DashboardDetailsComponent implements OnInit, OnDestroy {
 		this.emitter.emitEvent({appInfo: 'hide'});
 		this.userService.restoreUser(() => {
 			this.scUserName = this.userService.model.analyser_query;
-			if (this.scUserName !== '') { this.getUserDetails(); }
+			if (this.scUserName !== '') { this.getUser(); }
 		});
 		this.emitSpinnerStopEvent();
 		this.subscription = this.emitter.getEmitter().subscribe((message) => {

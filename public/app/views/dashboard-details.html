@@ -10,7 +10,7 @@
 				<span class="input-group-addon">http://soundcloud.com/</span>
 				<input type="text" class="form-control" [(ngModel)]="scUserName" pattern="scUserNamePattern" (keyup)="scUserNameKey($event)">
 				<span class="input-group-btn">
-					<button class="btn" [ngClass]="{ 'btn-danger': (!scUserName || scUserName.length < 3), 'btn-success': (scUserName && scUserName.length >= 3) }" (click)="getUserDetails()" [disabled]="!scUserName || scUserName.length < 3 ">get</button>
+					<button class="btn" [ngClass]="{ 'btn-danger': (!scUserName || scUserName.length < 3), 'btn-success': (scUserName && scUserName.length >= 3) }" (click)="getUser()" [disabled]="!scUserName || scUserName.length < 3 ">get</button>
 				</span>
 			</div>
 		</div>
