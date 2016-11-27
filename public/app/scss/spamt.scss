@@ -3,7 +3,15 @@ $white: #ffffff;
 $grey: #101010;
 $lightgrey: #f0f0f0;
 $red: #ff0000;
+
+$primary: #007ab7;
+$success: #5cb85c;
+$info: #5bc0de;
+$warning: #f0ad4e;
+$danger: #d9534f;
+
 $boxPadding: 0.5em;
+
 body {
 	color: $black;
 	font-family: 'Play', sans-serif;
@@ -102,7 +110,7 @@ body {
 		#filters {
 			z-index: 2;
 			width: 100%;
-			border: 1px $grey dotted;
+			border: 1px $lightgrey dotted;
 			box-sizing: border-box;
 			padding: $boxPadding;
 			display: flex;
@@ -112,9 +120,28 @@ body {
 				text-align: center;
 			}
 		}
-
 		#sc-user {
 			font-size: 0.9em;
+		}
+		#data {
+			.waveform {
+				height: 7vh;
+				width: 100%;
+				background: $info;
+			}
+			.controls {
+				z-index: 2;
+				width: 100%;
+				border: 1px $lightgrey dotted;
+				box-sizing: border-box;
+				padding: $boxPadding;
+				display: flex;
+				align-items: center;
+				.flex-item {
+					flex: 1;
+					text-align: center;
+				}
+			}
 		}
 	}
 }
