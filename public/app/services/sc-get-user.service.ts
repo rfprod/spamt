@@ -21,7 +21,7 @@ export class SCgetUserService {
 		return Observable.throw(errMsg);
 	}
 
-	public getData(userName): Observable<any[]> { // tslint:disable-line
+	public getData(userName: string): Observable<any[]> { // tslint:disable-line
 		return this.http.get(this.appDataUrl + userName)
 			.map(this.extractData)
 			.catch(this.handleError);

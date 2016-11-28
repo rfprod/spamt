@@ -5,11 +5,12 @@ import { Observable } from 'rxjs/Observable';
 import 'rxjs/Rx';
 
 @Injectable()
-export class SCgetUserDetailsService {
-	public appDataUrl: string = window.location.origin + '/sc/get/user/details?endpoint_uri=';
+export class SCgetUserTrackStreamService {
+	public appDataUrl: string = window.location.origin + '/sc/get/user/track/stream?endpoint_uri=';
 	constructor (private http: Http) {}
 
 	public extractData(res: Response) {
+		console.log('extractData: ', res);
 		let body = res.json();
 		return body || {};
 	}
@@ -21,8 +22,11 @@ export class SCgetUserDetailsService {
 		return Observable.throw(errMsg);
 	}
 
-	public getData(endpointUri: string): Observable<any[]> { // tslint:disable-line
-		return this.http.get(this.appDataUrl + endpointUri)
+	public getData(apiUri: string): Observable<any> { // tslint:disable-line
+		/*
+		*	Returns { status: '', location: ''}
+		*/
+		return this.http.get(this.appDataUrl + apiUri)
 			.map(this.extractData)
 			.catch(this.handleError);
 	}
