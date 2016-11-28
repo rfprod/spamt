@@ -19,7 +19,8 @@ module.exports = function(app, passport, User, SrvInfo, DataInit, syncRec) { // 
 			this.apiUrl = 'https://api.soundcloud.com/';
 			this.regExp = {
 				userDetails: /http(s)?\:\/\/api\.soundcloud\.com\/users\/[0-9]+\/(tracks|playlists|favorites|followers|followings)/,
-				userTrackDownload: /http(s)?\:\/\/api\.soundcloud\.com\/tracks\/[0-9]+\/download/
+				userTrackDownload: /http(s)?\:\/\/api\.soundcloud\.com\/tracks\/[0-9]+\/download/,
+				userTrackStream: /http(s)?\:\/\/api\.soundcloud\.com\/tracks\/[0-9]+\/stream/
 			};
 			this.endpoints = { resolve: 'resolve' };
 			this.clientID = process.env.SOUNDCLOUD_CLIENT_ID;
@@ -32,10 +33,10 @@ module.exports = function(app, passport, User, SrvInfo, DataInit, syncRec) { // 
 			return syncRec('GET', url);
 		}
 
-		getURI(apiUri) {
+		getURI(apiUri, options) {
 			console.log('getting sc details by apiUri: ', apiUri);
 			const url = apiUri + '?' + this.clientIDparam;
-			return syncRec('GET', url);
+			return (options) ? syncRec('GET', url, options) : syncRec('GET', url);
 		}
 	}
 
@@ -128,8 +129,7 @@ module.exports = function(app, passport, User, SrvInfo, DataInit, syncRec) { // 
 
 	app.get('/sc/get/user/track/download', (req, res) => {
 		/*
-		*	Requests and returns soundcloud users details by type:
-		* 'tracks', 'playlists', 'favorites', 'followers', 'followings'
+		*	Requests and returns soundcloud user's downloadable track
 		*/
 		const scEndpointUri = req.query.endpoint_uri;
 		let resolveRequest = undefined;
@@ -139,7 +139,7 @@ module.exports = function(app, passport, User, SrvInfo, DataInit, syncRec) { // 
 
 			if (SCapi.regExp.userTrackDownload.test(scEndpointUri)) {
 				resolveRequest = SCapi.getURI(scEndpointUri);
-				console.log('resolveRequest: ', resolveRequest);
+				//console.log('resolveRequest: ', resolveRequest);
 
 				if (resolveRequest.statusCode === 200) {
 					output = resolveRequest.getBody();
@@ -171,7 +171,52 @@ module.exports = function(app, passport, User, SrvInfo, DataInit, syncRec) { // 
 			res.setHeader('X-AMZ-Meta-Duration', resolveRequest.headers['x-amz-meta-duration']);
 			res.setHeader('X-AMZ-Meta-File-Type', resolveRequest.headers['x-amz-meta-file-type']);
 			res.send(output);
-			//res.send(resolveRequest);
+		}
+	});
+
+	app.get('/sc/get/user/track/stream', (req, res) => {
+		/*
+		*	Requests and returns soundcloud user's track preview url
+		*/
+		const scEndpointUri = req.query.endpoint_uri;
+		let resolveRequest = undefined;
+		let output = undefined;
+
+		if (scEndpointUri) {
+
+			if (SCapi.regExp.userTrackStream.test(scEndpointUri)) {
+				resolveRequest = SCapi.getURI(scEndpointUri, { followRedirects: false });
+				//console.log('resolveRequest: ', resolveRequest);
+
+				if (resolveRequest.statusCode === 200) {
+					/*
+					*	send client a location to be loaded as <source src='...'>
+					*/
+					output = { location: resolveRequest.headers['location'] };
+				} else {
+					/*
+					*	proxy errors from soundcloud API
+					*/
+					output = resolveRequest.body;
+				}
+			} else {
+				output = { error: 'Wrong mandatory request parameter - endpoint_uri.' };
+			}
+		} else {
+			output = { error: 'Missing mandatory request parameter - endpoint_uri.' };
+		}
+
+		res.setHeader('Cache-Control', 'no-cache, no-store');
+		if (output.error) {
+			res.format({
+				'application/json': function(){
+					res.status(400).send(output);
+				}
+			});
+		} else {
+			res.setHeader('Content-Type', resolveRequest.headers['content-type']);
+			res.setHeader('Location', resolveRequest.headers['location']);
+			res.send(output);
 		}
 	});
 

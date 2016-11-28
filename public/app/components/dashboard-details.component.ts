@@ -3,6 +3,7 @@ import { EventEmitterService } from '../services/event-emitter.service';
 import { SCgetUserService } from '../services/sc-get-user.service';
 import { SCgetUserDetailsService } from '../services/sc-get-user-details.service';
 import { SCgetUserTrackDownloadService } from '../services/sc-get-user-track-download.service';
+import { SCgetUserTrackStreamService } from '../services/sc-get-user-track-stream.service';
 import { UserService } from '../services/user-service.service';
 
 declare var $: JQueryStatic;
@@ -18,6 +19,7 @@ export class DashboardDetailsComponent implements OnInit, OnDestroy {
 		private scGetUserService: SCgetUserService,
 		private scGetUserDetailsService: SCgetUserDetailsService,
 		private scGetUserTrackDownloadService: SCgetUserTrackDownloadService,
+		private scGetUserTrackStreamService: SCgetUserTrackStreamService,
 		private userService: UserService
 	) {
 		console.log('this.el.nativeElement:', this.el.nativeElement);
@@ -139,14 +141,35 @@ export class DashboardDetailsComponent implements OnInit, OnDestroy {
 	}
 
 // Data tabs controls: Tracks
-	private playTrack(uri): void {
+	private selectedTrackURI: string;
+	private selectedTrack: string = undefined;
+	private resolvePreviewSource(uri) {
+		this.selectedTrack = undefined;
+		this.emitSpinnerStartEvent();
+		this.scGetUserTrackStreamService.getData(uri).subscribe(
+			data => {
+				console.log('scGetUserTrackPlayService, data: ', data);
+				this.selectedTrack = data.location;
+				this.selectedTrackURI = uri;
+				this.displayError = undefined;
+			},
+			error => this.displayError = <any> error,
+			() => {
+				console.log('scGetUserTrackPlayService done');
+				this.emitSpinnerStopEvent();
+			}
+		);
+	}
+	private playTrack(uri): void { // tslint:disable-line
 		console.log('playTrack, sc api uri: ', uri);
+		if (this.selectedTrackURI !== uri) { this.resolvePreviewSource(uri); }
+		else { console.log('trigger player'); }
 		/*
 		*	TODO
 		*	add respective server method to fullfill the request
 		*/
 	}
-	private downloadTrack(uri): void {
+	private downloadTrack(uri): void { // tslint:disable-line
 		console.log('downloadTrack, sc api uri: ', uri);
 		this.scGetUserTrackDownloadService.openInNewWindow(uri);
 	}

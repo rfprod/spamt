@@ -120,6 +120,10 @@
 			</div>
 			<div id="data" class="panel panel-default" *ngFor="let tab of dataTabs" [hidden]="tab !== selectedTab">
 				<div class="panel-body">
+					<audio controls="controls" *ngIf="selectedTrack">
+						<source src="{{selectedTrack}}" type="audio/mpeg">
+						Error: Your browser does not support <code>audio</code> element.
+					</audio>
 					<div class="media" *ngFor="let track of publicData.tracks">
 						<div class="media-left">
 							<a (click)="playTrack(track.stream_url)">
