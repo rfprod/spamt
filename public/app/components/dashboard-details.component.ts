@@ -142,6 +142,7 @@ export class DashboardDetailsComponent implements OnInit, OnDestroy {
 
 // Data tabs controls: Tracks
 	private selectedTrackURI: string;
+	private audioPlayback: boolean = false;
 	private selectedTrack: string = undefined;
 	private resolvePreviewSource(uri) {
 		this.selectedTrack = undefined;
@@ -157,13 +158,29 @@ export class DashboardDetailsComponent implements OnInit, OnDestroy {
 			() => {
 				console.log('scGetUserTrackPlayService done');
 				this.emitSpinnerStopEvent();
+				setTimeout(() => {
+					this.emitter.emitEvent({audio: 'play'});
+					this.audioPlayback = true;
+				}, 1000);
 			}
 		);
 	}
 	private playTrack(uri): void { // tslint:disable-line
 		console.log('playTrack, sc api uri: ', uri);
-		if (this.selectedTrackURI !== uri) { this.resolvePreviewSource(uri); }
-		else { console.log('trigger player'); }
+		if (this.selectedTrackURI !== uri) {
+			this.emitter.emitEvent({audio: 'pause'});
+			this.audioPlayback = false;
+			this.resolvePreviewSource(uri);
+		} else {
+			console.log('trigger player');
+			if (this.audioPlayback) {
+				this.emitter.emitEvent({audio: 'pause'});
+				this.audioPlayback = false;
+			} else {
+				this.emitter.emitEvent({audio: 'play'});
+				this.audioPlayback = true;
+			}
+		}
 		/*
 		*	TODO
 		*	add respective server method to fullfill the request

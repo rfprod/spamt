@@ -1,6 +1,6 @@
 $black: #000000;
 $white: #ffffff;
-$grey: #101010;
+$grey: #949494;
 $lightgrey: #f0f0f0;
 $red: #ff0000;
 
@@ -26,6 +26,9 @@ body {
 	}
 	.selected {
 		background: $lightgrey;
+	}
+	.selected-track {
+		border: 1px $grey dotted;
 	}
 	.inactive {
 		background: none;
@@ -127,10 +130,24 @@ body {
 			audio {
 				width: 100%;
 			}
-			.waveform {
-				height: 7vh;
+			.waveform-container {
+				display: block;
+				height: auto !important;
 				width: 100%;
-				background: $info;
+				.waveform {
+					display: inline-block;
+					z-index: 2;
+					position: relative;
+					height: 7vh;
+					width: 100%;
+				}
+				.undelay {
+					display: inline-block;
+					position: absolute;
+					background: $info;
+					height: 7vh;
+					width: 0%;
+				}
 			}
 			.controls {
 				z-index: 2;
