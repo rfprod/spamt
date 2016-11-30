@@ -198,13 +198,16 @@ export class DashboardDetailsComponent implements OnInit, OnDestroy {
 		this.emitSpinnerStopEvent();
 		this.subscription = this.emitter.getEmitter().subscribe((message) => {
 			console.log('/details consuming event:', JSON.stringify(message));
+			/*
+			*	listen to filtering messages
+			*/
 			if (message.search || message.search === '') {
-				let domElsUsername = this.el.nativeElement.querySelector('#data').querySelectorAll('.media-heading');
-				for (let nameObj of domElsUsername) {
-					if (nameObj.innerHTML.toLowerCase().indexOf(message.search.toLowerCase()) !== -1) {
-						nameObj.parentElement.parentElement.style.display = 'block';
+				let domTitleObjects = this.el.nativeElement.querySelector('#data').querySelectorAll('.media-heading');
+				for (let domObj of domTitleObjects) {
+					if (domObj.innerHTML.toLowerCase().indexOf(message.search.toLowerCase()) !== -1) {
+						domObj.parentElement.parentElement.style.display = 'block';
 					} else {
-						nameObj.parentElement.parentElement.style.display = 'none';
+						domObj.parentElement.parentElement.style.display = 'none';
 					}
 				}
 			}
@@ -222,6 +225,14 @@ export class DashboardDetailsComponent implements OnInit, OnDestroy {
 						return 0;
 					});
 				}
+			}
+			/*
+			*	listen to <audio> element playback controls messages
+			*/
+			if (message.AudioPlayerDirective) {
+				console.log('/data consuming event from AudioPlayerDirective: ', message);
+				if (message.AudioPlayerDirective === 'play') { this.audioPlayback = true; }
+				if (message.AudioPlayerDirective === 'pause') { this.audioPlayback = false; }
 			}
 		});
 	}
