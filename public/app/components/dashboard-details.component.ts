@@ -181,10 +181,6 @@ export class DashboardDetailsComponent implements OnInit, OnDestroy {
 				this.audioPlayback = true;
 			}
 		}
-		/*
-		*	TODO
-		*	add respective server method to fullfill the request
-		*/
 	}
 	private downloadTrack(uri): void { // tslint:disable-line
 		console.log('downloadTrack, sc api uri: ', uri);
@@ -203,8 +199,7 @@ export class DashboardDetailsComponent implements OnInit, OnDestroy {
 		this.subscription = this.emitter.getEmitter().subscribe((message) => {
 			console.log('/details consuming event:', JSON.stringify(message));
 			if (message.search || message.search === '') {
-				console.log('searching:', message.search);
-				let domElsUsername = this.el.nativeElement.querySelector('div#data').querySelectorAll('div.media-heading');
+				let domElsUsername = this.el.nativeElement.querySelector('#data').querySelectorAll('.media-heading');
 				for (let nameObj of domElsUsername) {
 					if (nameObj.innerHTML.toLowerCase().indexOf(message.search.toLowerCase()) !== -1) {
 						nameObj.parentElement.parentElement.style.display = 'block';
@@ -217,7 +212,7 @@ export class DashboardDetailsComponent implements OnInit, OnDestroy {
 				console.log('sorting by:', message.sort);
 				if (message.sort === 'timestamp') {
 					this.publicData[this.selectedEndpoint].sort((a, b) => {
-						return b.created_at - a.created_at;
+						return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
 					});
 				}
 				if (message.sort === 'name') {
