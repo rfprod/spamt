@@ -136,7 +136,7 @@
 							<div class="label label-default pull-right">{{track.created_at | date:'yyyy-MM-dd'}}</div>
 							<h4 class="media-heading">{{track.title}}</h4>
 							<span class="waveform-container">
-								<div class="undelay"></div>
+								<div class="underlay" *ngIf="selectedTrackURI === track.stream_url"></div>
 								<img class="waveform" [src]="track.waveform_url">
 							</span>
 							<span class="controls">

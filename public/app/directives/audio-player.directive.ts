@@ -1,7 +1,5 @@
 import { Directive, ElementRef, Renderer, OnInit, OnDestroy } from '@angular/core';
 import { EventEmitterService } from '../services/event-emitter.service';
-import { Observable } from 'rxjs/Observable';
-import 'rxjs/Rx';
 
 @Directive({ selector: '[audioPlayer]' })
 export class AudioPlayerDirective implements OnInit, OnDestroy {
@@ -14,17 +12,10 @@ export class AudioPlayerDirective implements OnInit, OnDestroy {
 	}
 	private subscription: any;
 	
-	public reportProgress(): Observable<any> {
-		/*
-		*	TODO
-		*	use this method in dashboard details controller
-		*/
-		return Observable.timer(1000).map(() => {
-			/*
-			*	returns elapsed time in percent
-			*/
-			return 100 * this.el.nativeElement.played.end(0) / this.el.nativeElement.seekable.end(0);
-		});
+	private progressInterval: any;
+	public reportProgress(): void {
+		const progress = 100 * this.el.nativeElement.currentTime / this.el.nativeElement.duration;
+		this.el.nativeElement.parentElement.querySelector('.underlay').style.width = progress+'%';
 	}
 	
 	private interval: any;
@@ -55,9 +46,28 @@ export class AudioPlayerDirective implements OnInit, OnDestroy {
 				}
 			}
 		});
+		this.progressInterval = setInterval(() => {
+			if (this.el.nativeElement.readyState === 4) {
+				console.log('reporting progress: ', this.el.nativeElement.readyState);
+				this.reportProgress();
+			}
+		}, 1000);
+		/*
+		*	listen to <audio> element playback controls and broadcast message
+		*/
+		this.el.nativeElement.addEventListener('play', () => {
+			console.log('AudioPlayerDirective, played with <audio> controls');
+			this.emitter.emitEvent({ AudioPlayerDirective: 'play' });
+		});
+		this.el.nativeElement.addEventListener('pause', () => {
+			console.log('AudioPlayerDirective, paused with <audio> controls');
+			this.emitter.emitEvent({ AudioPlayerDirective: 'pause' });
+		});
 	}
 	public ngOnDestroy() {
 		console.log('ngOnDestroy: AudioPlayerDirective destroyed');
 		this.subscription.unsubscribe();
+		clearInterval(this.interval);
+		clearInterval(this.progressInterval);
 	}
 }
