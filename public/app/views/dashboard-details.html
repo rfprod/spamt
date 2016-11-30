@@ -119,7 +119,7 @@
 				</span>
 			</div>
 			<div id="data" class="panel panel-default" *ngFor="let tab of dataTabs" [hidden]="tab !== selectedTab">
-				<div class="panel-body">
+				<div class="panel-body" *ngIf="selectedTab === dataTabs[0]">
 					<audio controls="controls" *ngIf="selectedTrack" audioPlayer>
 						<source src="{{selectedTrack}}" type="audio/mpeg">
 						Error: Your browser does not support <code>audio</code> element.
@@ -159,6 +159,18 @@
 							</span>
 						</div>
 					</div>
+				</div>
+				<div class="panel-body" *ngIf="selectedTab === dataTabs[1]">
+					{{tab}}
+				</div>
+				<div class="panel-body" *ngIf="selectedTab === dataTabs[2]">
+					{{tab}}
+				</div>
+				<div class="panel-body" *ngIf="selectedTab === dataTabs[3]">
+					{{tab}}
+				</div>
+				<div class="panel-body" *ngIf="selectedTab === dataTabs[4]">
+					{{tab}}
 				</div>
 			</div>
 		</span>
