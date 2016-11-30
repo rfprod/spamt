@@ -27,22 +27,25 @@ export class AudioPlayerDirective implements OnInit, OnDestroy {
 		});
 	}
 	
+	private interval: any;
+
 	public ngOnInit() {
 		console.log('ngOnInit: AudioPlayerDirective initialized');
 		this.subscription = this.emitter.getEmitter().subscribe((message) => {
 			if (message.audio) {
 				console.log('AudioPlayerDirective consuming control signal: ', message.audio);
 				if (message.audio === 'play') {
-					let wait = setInterval(() => {
+					this.interval = setInterval(() => {
 						console.log('this.el.nativeElement.readyState: ', this.el.nativeElement.readyState);
 						if (this.el.nativeElement.readyState === 4) {
 							this.el.nativeElement.play();
-							clearInterval(wait);
+							clearInterval(this.interval);
 						}
 					}, 1000);
 				}
 				if (message.audio === 'pause') {
 					this.el.nativeElement.pause();
+					clearInterval(this.interval);
 				}
 				if (message.audio === 'volume+') {
 					this.el.nativeElement.volume += 0.1;
