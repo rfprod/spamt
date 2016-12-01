@@ -197,12 +197,12 @@ export class DashboardDetailsComponent implements OnInit, OnDestroy {
 		});
 		this.emitSpinnerStopEvent();
 		this.subscription = this.emitter.getEmitter().subscribe((message) => {
-			console.log('/details consuming event:', JSON.stringify(message));
 			/*
 			*	listen to filtering messages
 			*/
 			if (message.search || message.search === '') {
-				let domTitleObjects = this.el.nativeElement.querySelector('#data').querySelectorAll('.media-heading');
+				console.log('/data consuming message:', message);
+				let domTitleObjects = this.el.nativeElement.querySelectorAll('#data')[this.dataTabs.indexOf(this.selectedTab)].querySelectorAll('.media-heading');
 				for (let domObj of domTitleObjects) {
 					if (domObj.innerHTML.toLowerCase().indexOf(message.search.toLowerCase()) !== -1) {
 						domObj.parentElement.parentElement.style.display = 'block';
@@ -212,7 +212,7 @@ export class DashboardDetailsComponent implements OnInit, OnDestroy {
 				}
 			}
 			if (message.sort) {
-				console.log('sorting by:', message.sort);
+				console.log('/data consuming message:', message);
 				if (message.sort === 'timestamp') {
 					this.publicData[this.selectedEndpoint].sort((a, b) => {
 						return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();

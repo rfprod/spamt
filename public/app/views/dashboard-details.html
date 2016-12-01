@@ -161,7 +161,39 @@
 					</div>
 				</div>
 				<div class="panel-body" *ngIf="selectedTab === dataTabs[1]">
-					{{tab}}
+					<div class="media" *ngFor="let playlist of publicData.playlists">
+						<div class="media-left">
+							<a (click)="expandPlaylist()">
+								<img class="media-object" [src]="playlist.artwork_url">
+							</a>
+							<div class="label label-default">{{playlist.genre}}</div>
+							<div class="label label-default">{{playlist.license}}</div>
+						</div>
+						<div class="media-body">
+							<div class="label label-default pull-right">{{playlist.created_at | date:'yyyy-MM-dd'}}</div>
+							<h4 class="media-heading">{{playlist.title}}</h4>
+							<span class="description-container" contenteditable="false">
+								{{playlist.description}}
+							</span>
+							<span class="controls">
+								<a (click)="expandPlaylist()" class="flex-item">
+									<i class="glyphicon glyphicon-music"></i> {{playlist.track_count}}
+								</a>
+								<span class="flex-item">
+									<i class="glyphicon glyphicon-time"></i> {{playlist.duration | date:'hh:mm:ss'}}
+								</span>
+								<a [href]="playlist.purchase_url" target=_blank class="flex-item" *ngIf="playlist.purchase_url">
+									<i class="glyphicon glyphicon-shopping-cart"></i>
+								</a>
+								<span class="flex-item" *ngIf="playlist.label_name">
+									<i class="glyphicon glyphicon-tag"></i> {{playlist.label_name}}
+								</span>
+								<span class="flex-item" *ngIf="playlist.release_year && playlist.release_month && playlist.release_day">
+									<i class="glyphicon glyphicon-calendar"></i> {{playlist.release_year}}-{{playlist.release_month}}-{{playlist.release_day}}
+								</span>
+							</span>
+						</div>
+					</div>
 				</div>
 				<div class="panel-body" *ngIf="selectedTab === dataTabs[2]">
 					{{tab}}
