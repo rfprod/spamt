@@ -5,7 +5,14 @@
 ## Overview
 
 SPAMT stands for Social Profile Analysis and Management Tool.
-It allows a user to analyse and manage owned profiles on integrated social networks.
+
+### User Stories
+* User can see brief information about the application - `/intro` view
+* User can analyse any Soundcloud profile by providing a soundcloud username - `/data` view
+* While analysing a Soundcloud profile, user can:
+  * see public profile data: user, tracks, playlists, favorites, followers, followings
+  * listen to profile tracks
+  * filter profile tracks, playlists, favorites, followers, followings
 
 ### Integrations
 

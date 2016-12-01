@@ -149,6 +149,12 @@ body {
 					width: 0%;
 				}
 			}
+			.description-container {
+				display: block;
+				height: auto !important;
+				width: 100%;
+				font-size: 0.8em;
+			}
 			.controls {
 				z-index: 2;
 				width: 100%;
