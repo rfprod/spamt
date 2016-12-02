@@ -119,6 +119,7 @@
 				</span>
 			</div>
 			<div id="data" class="panel panel-default" *ngFor="let tab of dataTabs" [hidden]="tab !== selectedTab">
+
 				<div class="panel-body" *ngIf="selectedTab === dataTabs[0]">
 					<audio controls="controls" *ngIf="selectedTrack" audioPlayer>
 						<source src="{{selectedTrack}}" type="audio/mpeg">
@@ -160,6 +161,7 @@
 						</div>
 					</div>
 				</div>
+
 				<div class="panel-body" *ngIf="selectedTab === dataTabs[1]">
 					<div class="media" *ngFor="let playlist of publicData.playlists; let j = index;">
 						<div class="media-left">
@@ -211,12 +213,53 @@
 						</div>
 					</div>
 				</div>
+
 				<div class="panel-body" *ngIf="selectedTab === dataTabs[2]">
-					{{tab}}
+					<audio controls="controls" *ngIf="selectedTrack" audioPlayer>
+						<source src="{{selectedTrack}}" type="audio/mpeg">
+						Error: Your browser does not support <code>audio</code> element.
+					</audio>
+					<div class="media" *ngFor="let track of publicData.favorites" [ngClass]="{ 'selected-track': selectedTrackURI ===  track.stream_url }">
+						<div class="media-left">
+							<a (click)="playTrack(track.stream_url)">
+								<img class="media-object" [src]="track.artwork_url">
+							</a>
+							<div class="label label-default">{{track.genre}}</div>
+							<div class="label label-default">{{track.license}}</div>
+						</div>
+						<div class="media-body">
+							<div class="label label-default pull-right">{{track.created_at | date:'yyyy-MM-dd'}}</div>
+							<h4 class="media-heading">{{track.title}}</h4>
+							<span class="waveform-container">
+								<div class="underlay" *ngIf="selectedTrackURI === track.stream_url"></div>
+								<img class="waveform" [src]="track.waveform_url">
+							</span>
+							<span class="controls">
+								<a (click)="playTrack(track.stream_url)" class="flex-item">
+									<i class="glyphicon glyphicon-pause" *ngIf="audioPlayback && selectedTrackURI ===  track.stream_url"></i>
+									<i class="glyphicon glyphicon-play" *ngIf="!audioPlayback || (audioPlayback && selectedTrackURI !==  track.stream_url)"></i> {{track.playback_count}}
+								</a>
+								<a (click)="downloadTrack(track.download_url)" class="flex-item" *ngIf="track.downloadable">
+									<i class="glyphicon glyphicon-save"></i>
+								</a>
+								<a [href]="track.purchase_url" target=_blank class="flex-item" *ngIf="track.purchase_url">
+									<i class="glyphicon glyphicon-shopping-cart"></i>
+								</a>
+								<span class="flex-item">
+									<i class="glyphicon glyphicon-heart"></i> {{track.favoritings_count}}
+								</span>
+								<span class="flex-item">
+									<i class="glyphicon glyphicon-comment"></i> {{track.comment_count}}
+								</span>
+							</span>
+						</div>
+					</div>
 				</div>
+
 				<div class="panel-body" *ngIf="selectedTab === dataTabs[3]">
 					{{tab}}
 				</div>
+
 				<div class="panel-body" *ngIf="selectedTab === dataTabs[4]">
 					{{tab}}
 				</div>
