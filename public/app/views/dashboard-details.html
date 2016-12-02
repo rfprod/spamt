@@ -145,6 +145,9 @@
 									<i class="glyphicon glyphicon-pause" *ngIf="audioPlayback && selectedTrackURI ===  track.stream_url"></i>
 									<i class="glyphicon glyphicon-play" *ngIf="!audioPlayback || (audioPlayback && selectedTrackURI !==  track.stream_url)"></i> {{track.playback_count}}
 								</a>
+								<span class="flex-item">
+									<i class="glyphicon glyphicon-time"></i> {{track.duration | duration}}
+								</span>
 								<a (click)="downloadTrack(track.download_url)" class="flex-item" *ngIf="track.downloadable">
 									<i class="glyphicon glyphicon-save"></i>
 								</a>
@@ -180,7 +183,7 @@
 									<i class="glyphicon glyphicon-music"></i> {{playlist.track_count}}
 								</a>
 								<span class="flex-item">
-									<i class="glyphicon glyphicon-time"></i> {{playlist.duration | date:'hh:mm:ss'}}
+									<i class="glyphicon glyphicon-time"></i> {{playlist.duration | duration}}
 								</span>
 								<a [href]="playlist.permalink_url" target=_blank class="flex-item">
 									<i class="glyphicon glyphicon-new-window"></i>
@@ -206,7 +209,7 @@
 										<td>{{i}}</td>
 										<td>{{playlistTrack.title}}</td>
 										<td>{{playlistTrack.genre}}</td>
-										<td>{{playlistTrack.duration | date:'hh:mm:ss'}}</td>
+										<td>{{playlistTrack.duration | duration}}</td>
 									</tr>
 								</tbody>
 							</table>
@@ -273,28 +276,28 @@
 							</span>
 							<span class="controls">
 								<span class="flex-item">
-									<i class="glyphicon glyphicon-music"></i><br>{{user.track_count}}
+									<i class="glyphicon glyphicon-music"></i> {{user.track_count}}
 								</span>
 								<span class="flex-item">
-									<i class="glyphicon glyphicon-th-list"></i><br>{{user.playlist_count}}
+									<i class="glyphicon glyphicon-th-list"></i> {{user.playlist_count}}
 								</span>
 								<span class="flex-item">
-									<i class="glyphicon glyphicon-heart"></i><br>{{user.public_favorites_count}}
+									<i class="glyphicon glyphicon-heart"></i> {{user.public_favorites_count}}
 								</span>
 								<span class="flex-item">
-									<i class="glyphicon glyphicon-retweet"></i><br>{{user.reposts_count}}
+									<i class="glyphicon glyphicon-retweet"></i> {{user.reposts_count}}
 								</span>
 								<span class="flex-item">
-									<i class="glyphicon glyphicon-comment"></i><br>{{user.comments_count}}
+									<i class="glyphicon glyphicon-comment"></i> {{user.comments_count}}
 								</span>
 								<span class="flex-item">
-									<i class="glyphicon glyphicon-user"></i><i class="glyphicon glyphicon-arrow-up"></i><br>{{user.followers_count}}
+									<i class="glyphicon glyphicon-user"></i><i class="glyphicon glyphicon-arrow-up"></i> {{user.followers_count}}
 								</span>
 								<span class="flex-item">
-									<i class="glyphicon glyphicon-user"></i><i class="glyphicon glyphicon-arrow-down"></i><br>{{user.followings_count}}
+									<i class="glyphicon glyphicon-user"></i><i class="glyphicon glyphicon-arrow-down"></i> {{user.followings_count}}
 								</span>
 								<a class="flex-item" [href]="user.website" *ngIf="user.website && user.website_title">
-									<i class="glyphicon glyphicon-link"></i><br>{{user.website_title}}
+									<i class="glyphicon glyphicon-link"></i> {{user.website_title}}
 								</a>
 								<a class="flex-item" (click)="analyseThisUser(user.permalink)">
 									<i class="glyphicon glyphicon-search"></i>
@@ -321,28 +324,28 @@
 							</span>
 							<span class="controls">
 								<span class="flex-item">
-									<i class="glyphicon glyphicon-music"></i><br>{{user.track_count}}
+									<i class="glyphicon glyphicon-music"></i> {{user.track_count}}
 								</span>
 								<span class="flex-item">
-									<i class="glyphicon glyphicon-th-list"></i><br>{{user.playlist_count}}
+									<i class="glyphicon glyphicon-th-list"></i> {{user.playlist_count}}
 								</span>
 								<span class="flex-item">
-									<i class="glyphicon glyphicon-heart"></i><br>{{user.public_favorites_count}}
+									<i class="glyphicon glyphicon-heart"></i> {{user.public_favorites_count}}
 								</span>
 								<span class="flex-item">
-									<i class="glyphicon glyphicon-retweet"></i><br>{{user.reposts_count}}
+									<i class="glyphicon glyphicon-retweet"></i> {{user.reposts_count}}
 								</span>
 								<span class="flex-item">
-									<i class="glyphicon glyphicon-comment"></i><br>{{user.comments_count}}
+									<i class="glyphicon glyphicon-comment"></i> {{user.comments_count}}
 								</span>
 								<span class="flex-item">
-									<i class="glyphicon glyphicon-user"></i><i class="glyphicon glyphicon-arrow-up"></i><br>{{user.followers_count}}
+									<i class="glyphicon glyphicon-user"></i><i class="glyphicon glyphicon-arrow-up"></i> {{user.followers_count}}
 								</span>
 								<span class="flex-item">
-									<i class="glyphicon glyphicon-user"></i><i class="glyphicon glyphicon-arrow-down"></i><br>{{user.followings_count}}
+									<i class="glyphicon glyphicon-user"></i><i class="glyphicon glyphicon-arrow-down"></i> {{user.followings_count}}
 								</span>
 								<a class="flex-item" [href]="user.website" *ngIf="user.website && user.website_title">
-									<i class="glyphicon glyphicon-link"></i><br>{{user.website_title}}
+									<i class="glyphicon glyphicon-link"></i> {{user.website_title}}
 								</a>
 								<a class="flex-item" (click)="analyseThisUser(user.permalink)">
 									<i class="glyphicon glyphicon-search"></i>
