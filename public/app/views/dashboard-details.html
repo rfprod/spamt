@@ -161,11 +161,9 @@
 					</div>
 				</div>
 				<div class="panel-body" *ngIf="selectedTab === dataTabs[1]">
-					<div class="media" *ngFor="let playlist of publicData.playlists">
+					<div class="media" *ngFor="let playlist of publicData.playlists; let j = index;">
 						<div class="media-left">
-							<a (click)="expandPlaylist()">
-								<img class="media-object" [src]="playlist.artwork_url">
-							</a>
+							<img class="media-object" [src]="playlist.artwork_url">
 							<div class="label label-default">{{playlist.genre}}</div>
 							<div class="label label-default">{{playlist.license}}</div>
 						</div>
@@ -176,14 +174,14 @@
 								{{playlist.description}}
 							</span>
 							<span class="controls">
-								<a (click)="expandPlaylist()" class="flex-item">
+								<a (click)="togglePlaylist(j)" class="flex-item">
 									<i class="glyphicon glyphicon-music"></i> {{playlist.track_count}}
 								</a>
 								<span class="flex-item">
 									<i class="glyphicon glyphicon-time"></i> {{playlist.duration | date:'hh:mm:ss'}}
 								</span>
-								<a [href]="playlist.purchase_url" target=_blank class="flex-item" *ngIf="playlist.purchase_url">
-									<i class="glyphicon glyphicon-shopping-cart"></i>
+								<a [href]="playlist.permalink_url" target=_blank class="flex-item">
+									<i class="glyphicon glyphicon-new-window"></i>
 								</a>
 								<span class="flex-item" *ngIf="playlist.label_name">
 									<i class="glyphicon glyphicon-tag"></i> {{playlist.label_name}}
@@ -192,6 +190,24 @@
 									<i class="glyphicon glyphicon-calendar"></i> {{playlist.release_year}}-{{playlist.release_month}}-{{playlist.release_day}}
 								</span>
 							</span>
+							<table class="table table-condensed table-hover playlist-tracks" *ngIf="displayPlaylistTracks[j]">
+								<thead>
+									<tr>
+										<th>#</th>
+										<th>Title</th>
+										<th>Genre</th>
+										<th>Duration</th>
+									</tr>
+								</thead>
+								<tbody>
+									<tr *ngFor="let playlistTrack of playlist.tracks; let i = index;">
+										<td>{{i}}</td>
+										<td>{{playlistTrack.title}}</td>
+										<td>{{playlistTrack.genre}}</td>
+										<td>{{playlistTrack.duration | date:'hh:mm:ss'}}</td>
+									</tr>
+								</tbody>
+							</table>
 						</div>
 					</div>
 				</div>

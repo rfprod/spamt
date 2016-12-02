@@ -11,13 +11,13 @@ export class AudioPlayerDirective implements OnInit, OnDestroy {
 		console.log('AudioPlayerDirective element: ', el.nativeElement);
 	}
 	private subscription: any;
-	
+
 	private progressInterval: any;
 	public reportProgress(): void {
 		const progress = 100 * this.el.nativeElement.currentTime / this.el.nativeElement.duration;
-		this.el.nativeElement.parentElement.querySelector('.underlay').style.width = progress+'%';
+		this.el.nativeElement.parentElement.querySelector('.underlay').style.width = progress + '%';
 	}
-	
+
 	private interval: any;
 
 	public ngOnInit() {

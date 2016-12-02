@@ -96,6 +96,11 @@ export class DashboardDetailsComponent implements OnInit, OnDestroy {
 		this.scGetUserDetailsService.getData(this.userService.model.analyser_user_uri + '/' + this.selectedEndpoint).subscribe(
 			data => {
 				this.publicData[this.selectedEndpoint] = data;
+				if (this.selectedEndpoint === 'playlists') {
+					for (let i of data) {
+						this.displayPlaylistTracks.push(false);
+					}
+				}
 				this.displayError = undefined;
 			},
 			error => this.displayError = <any> error,
@@ -185,6 +190,13 @@ export class DashboardDetailsComponent implements OnInit, OnDestroy {
 	private downloadTrack(uri): void { // tslint:disable-line
 		console.log('downloadTrack, sc api uri: ', uri);
 		this.scGetUserTrackDownloadService.openInNewWindow(uri);
+	}
+
+// Data tabs controls: Playlists
+	private displayPlaylistTracks: boolean[] = [];
+	private togglePlaylist(index) {
+		console.log('togglePlaylist, dispalyPlaylistTracks index: ', index);
+		this.displayPlaylistTracks[index] = (this.displayPlaylistTracks[index]) ? false : true;
 	}
 
 	public ngOnInit() {
