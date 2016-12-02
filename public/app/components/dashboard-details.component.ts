@@ -79,7 +79,7 @@ export class DashboardDetailsComponent implements OnInit, OnDestroy {
 			}
 		);
 	}
-	private analyseThisUser(permalink) {
+	private analyseThisUser(permalink) { // tslint:disable-line
 		this.scUserName = permalink;
 		this.selectedTab = '';
 		for (let key in this.publicData) {
@@ -111,7 +111,7 @@ export class DashboardDetailsComponent implements OnInit, OnDestroy {
 					this.publicData[this.selectedEndpoint] = data.collection;
 				} else { this.publicData[this.selectedEndpoint] = data; }
 				if (this.selectedEndpoint === 'playlists') {
-					for (let i of data) {
+					for (let i of data) { // tslint:disable-line
 						this.displayPlaylistTracks.push(false);
 					}
 				}
@@ -208,7 +208,7 @@ export class DashboardDetailsComponent implements OnInit, OnDestroy {
 
 // Data tabs controls: Playlists
 	private displayPlaylistTracks: boolean[] = [];
-	private togglePlaylist(index) {
+	private togglePlaylist(index) { // tslint:disable-line
 		console.log('togglePlaylist, dispalyPlaylistTracks index: ', index);
 		this.displayPlaylistTracks[index] = (this.displayPlaylistTracks[index]) ? false : true;
 	}
@@ -241,13 +241,21 @@ export class DashboardDetailsComponent implements OnInit, OnDestroy {
 				console.log('/data consuming message:', message);
 				if (message.sort === 'timestamp') {
 					this.publicData[this.selectedEndpoint].sort((a, b) => {
+						if (this.selectedEndpoint === 'followers' || this.selectedEndpoint === 'followings') {
+							return new Date(b.last_modified).getTime() - new Date(a.last_modified).getTime();
+						}
 						return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
 					});
 				}
 				if (message.sort === 'name') {
 					this.publicData[this.selectedEndpoint].sort((a, b) => {
-						if (a.title < b.title) { return -1; }
-						if (a.title > b.title) { return 1; }
+						if (this.selectedEndpoint === 'followers' || this.selectedEndpoint === 'followings') {
+							if (a.username < b.username) { return -1; }
+							if (a.username > b.username) { return 1; }
+						} else {
+							if (a.title < b.title) { return -1; }
+							if (a.title > b.title) { return 1; }
+						}
 						return 0;
 					});
 				}
