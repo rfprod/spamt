@@ -79,6 +79,14 @@ export class DashboardDetailsComponent implements OnInit, OnDestroy {
 			}
 		);
 	}
+	private analyseThisUser(permalink) {
+		this.scUserName = permalink;
+		this.selectedTab = '';
+		for (let key in this.publicData) {
+			if (this.publicData[key] !== 'user') { this.publicData[key] = []; }
+		}
+		this.getUser();
+	}
 
 // Data tabs
 	private dataTabs: string[] = ['Tracks', 'Playlists', 'Favorites', 'Followers', 'Followings']; // tslint:disable-line
@@ -94,8 +102,14 @@ export class DashboardDetailsComponent implements OnInit, OnDestroy {
 		console.log('this.selectedEndpoint: ', this.selectedEndpoint);
 		this.emitSpinnerStartEvent();
 		this.scGetUserDetailsService.getData(this.userService.model.analyser_user_uri + '/' + this.selectedEndpoint).subscribe(
-			data => {
-				this.publicData[this.selectedEndpoint] = data;
+			(data: any) => {
+				if (data.hasOwnProperty('collection')) {
+					/*
+					*	SC API returns followers and following as {collection: [{...}, {...}]}
+					* while other endpoints returns [{...}, {...}]
+					*/
+					this.publicData[this.selectedEndpoint] = data.collection;
+				} else { this.publicData[this.selectedEndpoint] = data; }
 				if (this.selectedEndpoint === 'playlists') {
 					for (let i of data) {
 						this.displayPlaylistTracks.push(false);

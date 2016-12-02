@@ -235,11 +235,11 @@
 								<img class="waveform" [src]="track.waveform_url">
 							</span>
 							<span class="controls">
-								<a (click)="playTrack(track.stream_url)" class="flex-item">
+								<a class="flex-item" (click)="playTrack(track.stream_url)">
 									<i class="glyphicon glyphicon-pause" *ngIf="audioPlayback && selectedTrackURI ===  track.stream_url"></i>
 									<i class="glyphicon glyphicon-play" *ngIf="!audioPlayback || (audioPlayback && selectedTrackURI !==  track.stream_url)"></i> {{track.playback_count}}
 								</a>
-								<a (click)="downloadTrack(track.download_url)" class="flex-item" *ngIf="track.downloadable">
+								<a class="flex-item" (click)="downloadTrack(track.download_url)" *ngIf="track.downloadable">
 									<i class="glyphicon glyphicon-save"></i>
 								</a>
 								<a [href]="track.purchase_url" target=_blank class="flex-item" *ngIf="track.purchase_url">
@@ -257,11 +257,99 @@
 				</div>
 
 				<div class="panel-body" *ngIf="selectedTab === dataTabs[3]">
-					{{tab}}
+					<div class="media" *ngFor="let user of publicData.followers">
+						<div class="media-left">
+							<a [href]="user.permalink_url" target=_blank>
+								<img class="media-object" [src]="user.avatar_url">
+							</a>
+							<div class="label label-default">{{user.plan}}</div>
+							<div class="label" [ngClass]="{ 'label-success': user.online, 'label-danger': !user.online }">online</div>
+						</div>
+						<div class="media-body">
+							<div class="label label-default pull-right">{{user.last_modified | date:'yyyy-MM-dd'}}</div>
+							<h4 class="media-heading">{{user.username}}</h4>
+							<span class="description-container" contenteditable="false">
+								{{user.description}}
+							</span>
+							<span class="controls">
+								<span class="flex-item">
+									<i class="glyphicon glyphicon-music"></i><br>{{user.track_count}}
+								</span>
+								<span class="flex-item">
+									<i class="glyphicon glyphicon-th-list"></i><br>{{user.playlist_count}}
+								</span>
+								<span class="flex-item">
+									<i class="glyphicon glyphicon-heart"></i><br>{{user.public_favorites_count}}
+								</span>
+								<span class="flex-item">
+									<i class="glyphicon glyphicon-retweet"></i><br>{{user.reposts_count}}
+								</span>
+								<span class="flex-item">
+									<i class="glyphicon glyphicon-comment"></i><br>{{user.comments_count}}
+								</span>
+								<span class="flex-item">
+									<i class="glyphicon glyphicon-user"></i><i class="glyphicon glyphicon-arrow-up"></i><br>{{user.followers_count}}
+								</span>
+								<span class="flex-item">
+									<i class="glyphicon glyphicon-user"></i><i class="glyphicon glyphicon-arrow-down"></i><br>{{user.followings_count}}
+								</span>
+								<a class="flex-item" [href]="user.website" *ngIf="user.website && user.website_title">
+									<i class="glyphicon glyphicon-link"></i><br>{{user.website_title}}
+								</a>
+								<a class="flex-item" (click)="analyseThisUser(user.permalink)">
+									<i class="glyphicon glyphicon-search"></i>
+								</a>
+							</span>
+						</div>
+					</div>
 				</div>
 
 				<div class="panel-body" *ngIf="selectedTab === dataTabs[4]">
-					{{tab}}
+					<div class="media" *ngFor="let user of publicData.followings">
+						<div class="media-left">
+							<a [href]="user.permalink_url" target=_blank>
+								<img class="media-object" [src]="user.avatar_url">
+							</a>
+							<div class="label label-default">{{user.plan}}</div>
+							<div class="label" [ngClass]="{ 'label-success': user.online, 'label-danger': !user.online }">online</div>
+						</div>
+						<div class="media-body">
+							<div class="label label-default pull-right">{{user.last_modified | date:'yyyy-MM-dd'}}</div>
+							<h4 class="media-heading">{{user.username}}</h4>
+							<span class="description-container" contenteditable="false">
+								{{user.description}}
+							</span>
+							<span class="controls">
+								<span class="flex-item">
+									<i class="glyphicon glyphicon-music"></i><br>{{user.track_count}}
+								</span>
+								<span class="flex-item">
+									<i class="glyphicon glyphicon-th-list"></i><br>{{user.playlist_count}}
+								</span>
+								<span class="flex-item">
+									<i class="glyphicon glyphicon-heart"></i><br>{{user.public_favorites_count}}
+								</span>
+								<span class="flex-item">
+									<i class="glyphicon glyphicon-retweet"></i><br>{{user.reposts_count}}
+								</span>
+								<span class="flex-item">
+									<i class="glyphicon glyphicon-comment"></i><br>{{user.comments_count}}
+								</span>
+								<span class="flex-item">
+									<i class="glyphicon glyphicon-user"></i><i class="glyphicon glyphicon-arrow-up"></i><br>{{user.followers_count}}
+								</span>
+								<span class="flex-item">
+									<i class="glyphicon glyphicon-user"></i><i class="glyphicon glyphicon-arrow-down"></i><br>{{user.followings_count}}
+								</span>
+								<a class="flex-item" [href]="user.website" *ngIf="user.website && user.website_title">
+									<i class="glyphicon glyphicon-link"></i><br>{{user.website_title}}
+								</a>
+								<a class="flex-item" (click)="analyseThisUser(user.permalink)">
+									<i class="glyphicon glyphicon-search"></i>
+								</a>
+							</span>
+						</div>
+					</div>
 				</div>
 			</div>
 		</span>
