@@ -6,8 +6,6 @@ import { SCgetUserTrackDownloadService } from '../services/sc-get-user-track-dow
 import { SCgetUserTrackStreamService } from '../services/sc-get-user-track-stream.service';
 import { UserService } from '../services/user-service.service';
 
-declare var $: JQueryStatic;
-
 @Component({
 	selector: 'dashboard-details',
 	templateUrl: '/public/app/views/dashboard-details.html',
@@ -152,11 +150,11 @@ export class DashboardDetailsComponent implements OnInit, OnDestroy {
 // Spinner
 	private emitSpinnerStartEvent(): void {
 		console.log('root spinner start event emitted');
-		this.emitter.emitEvent({sys: 'start spinner'});
+		this.emitter.emitEvent({spinner: 'start'});
 	}
 	private emitSpinnerStopEvent(): void {
 		console.log('root spinner stop event emitted');
-		this.emitter.emitEvent({sys: 'stop spinner'});
+		this.emitter.emitEvent({spinner: 'stop'});
 	}
 
 // Data tabs controls: Tracks
@@ -220,8 +218,8 @@ export class DashboardDetailsComponent implements OnInit, OnDestroy {
 		this.userService.restoreUser(() => {
 			this.scUserName = this.userService.model.analyser_query;
 			if (this.scUserName !== '') { this.getUser(); }
+			else { this.emitSpinnerStopEvent(); }
 		});
-		this.emitSpinnerStopEvent();
 		this.subscription = this.emitter.getEmitter().subscribe((message) => {
 			/*
 			*	listen to filtering messages
