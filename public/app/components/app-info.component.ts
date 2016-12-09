@@ -41,9 +41,11 @@ export class AppInfoComponent implements OnInit, OnDestroy {
 	public ngOnInit() {
 		console.log('ngOnInit: AppInfoComponent initialized');
 		this.subscription = this.emitter.getEmitter().subscribe((message) => {
-			console.log('app-info consuming event:', message);
-			if (message.appInfo === 'hide') { this.hideInfo = true; }
-			if (message.appInfo === 'show') { this.hideInfo = false; }
+			if (message.appInfo) {
+				console.log('app-info consuming event:', message);
+				if (message.appInfo === 'hide') { this.hideInfo = true; }
+				if (message.appInfo === 'show') { this.hideInfo = false; }
+			}
 		});
 	}
 	public ngOnDestroy() {

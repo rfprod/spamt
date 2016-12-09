@@ -7,6 +7,7 @@ declare let $: JQueryStatic;
 	selector: 'spamt',
 	template: `
 		<app-nav></app-nav>
+		<loading-indicator></loading-indicator>
 		<router-outlet></router-outlet>
 		<app-info></app-info>
 	`,
@@ -16,25 +17,11 @@ export class AppComponent implements OnInit, OnDestroy {
 	constructor( public el: ElementRef, private emitter: EventEmitterService ) {
 		console.log('this.el.nativeElement', this.el.nativeElement);
 	}
-	public startSpinner() {
-		console.log('spinner start');
-	}
-	public stopSpinner() {
-		console.log('spinner stop');
-	}
 	public ngOnInit() {
 		console.log('ngOnInit: AppComponent initialized');
 		$('#init-spinner').remove();
 		this.subscription = this.emitter.getEmitter().subscribe((message) => {
 			console.log('app consuming event:', message);
-			if (message.sys === 'start spinner') {
-				console.log('starting spinner');
-				this.startSpinner();
-			}
-			if (message.sys === 'stop spinner') {
-				console.log('stopping spinner');
-				this.stopSpinner();
-			}
 		});
 	}
 	public ngOnDestroy() {

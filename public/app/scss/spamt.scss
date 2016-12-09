@@ -180,4 +180,36 @@ body {
 			}
 		}
 	}
+
+	loading-indicator {
+		background: $black;
+		display: block;
+		position: absolute;
+		width: 6vw;
+		height: 6vw;
+		left: 48.5vw;
+		top: 45%;
+		margin: 0 0 0 -15px;
+		border: 8px solid #fff;
+		border-right-color: transparent;
+		border-radius: 50%;
+		box-shadow: 0 0 25px 2px #eee;
+		-webkit-animation: spin 1s linear infinite;
+		-moz-animation: spin 1s linear infinite;
+		-ms-animation: spin 1s linear infinite;
+		-o-animation: spin 1s linear infinite;
+		animation: spin 1s linear infinite;
+
+	}
+	@-webkit-keyframes spin {
+		from { transform: rotate(0deg);   opacity: 0.2; }
+		50%  { transform: rotate(180deg); opacity: 1.0; }
+		to   { transform: rotate(360deg); opacity: 0.2; }
+	}
+	@keyframes spin {
+		from { transform: rotate(0deg);   opacity: 0.2; }
+		50%  { transform: rotate(180deg); opacity: 1.0; }
+		to   { transform: rotate(360deg); opacity: 0.2; }
+	}
+
 }

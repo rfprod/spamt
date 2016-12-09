@@ -3,8 +3,7 @@ import { EventEmitterService } from '../services/event-emitter.service';
 import { ServerStaticDataService } from '../services/server-static-data.service';
 import { PublicDataService } from '../services/public-data.service';
 
-declare let d3: any;
-declare let $: JQueryStatic;
+//declare let d3: any;
 
 @Component({
 	selector: 'dashboard-intro',
@@ -98,11 +97,11 @@ export class DashboardIntroComponent implements OnInit, OnDestroy {
 
 	private emitSpinnerStartEvent() {
 		console.log('root spinner start event emitted');
-		this.emitter.emitEvent({sys: 'start spinner'});
+		this.emitter.emitEvent({spinner: 'start'});
 	}
 	private emitSpinnerStopEvent() {
 		console.log('root spinner stop event emitted');
-		this.emitter.emitEvent({sys: 'stop spinner'});
+		this.emitter.emitEvent({spinner: 'stop'});
 	}
 
 	private showModal: boolean = false;
@@ -146,8 +145,8 @@ export class DashboardIntroComponent implements OnInit, OnDestroy {
 		};
 
 		this.subscription = this.emitter.getEmitter().subscribe((message) => {
-			console.log('/intro consuming event:', message);
 			if (message.sys === 'close websocket') {
+				console.log('/intro consuming event:', message);
 				console.log('closing webcosket');
 				this.subscription.unsubscribe();
 				this.ws.close();

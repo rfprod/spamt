@@ -1,8 +1,6 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { EventEmitterService } from '../services/event-emitter.service';
 
-declare var $: JQueryStatic;
-
 @Component({
 	selector: 'app-nav',
 	templateUrl: '/public/app/views/dashboard-nav.html',
@@ -42,9 +40,8 @@ export class AppNavComponent implements OnInit, OnDestroy {
 		console.log('ngOnInit: AppNavComponent initialized');
 		// check active route on app init - app-nav loads once on app init
 		this.subscription = this.emitter.getEmitter().subscribe((message) => {
-			console.log('/app-nav consuming event:', message);
 			if (typeof message.route !== 'undefined') {
-				console.log('route is defined');
+				console.log('/app-nav consuming event:', message);
 				this.switchNavButtons(message, false);
 				this.subscription.unsubscribe();
 			}
