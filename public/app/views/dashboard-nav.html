@@ -1,11 +1,11 @@
 <div id="flex-nav">
   <a (click)="switchNavButtons($event, true);" class="flex-nav-item" [ngClass]="{selected: navButtonsState[0], inactive: !navButtonsState[0]}">
-    <i class="fa fa-question-circle-o"></i> Help
+    <i class="fa fa-question-circle-o" [ngClass]="{ 'help-highlight': showHelp }"></i> Help <span class="label label-warning" *ngIf="showHelp">show help labels</span>
   </a>
   <a [routerLink]="['intro']" (click)="switchNavButtons($event, true)" class="flex-nav-item" [ngClass]="{selected: navButtonsState[1], inactive: !navButtonsState[1]}">
-    <i class="fa fa-tachometer"></i> Intro
+    <i class="fa fa-tachometer" [ngClass]="{ 'help-highlight': showHelp }"></i> Intro <span class="label label-warning" *ngIf="showHelp">show application intro</span>
   </a>
   <a [routerLink]="['data']" (click)="switchNavButtons($event, true)" class="flex-nav-item" [ngClass]="{selected: navButtonsState[2], inactive: !navButtonsState[2]}">
-    <i class="fa fa-database"></i> Data
+    <i class="fa fa-database" [ngClass]="{ 'help-highlight': showHelp }"></i> Data <span class="label label-warning" *ngIf="showHelp">analyse account</span>
   </a>
 </div>

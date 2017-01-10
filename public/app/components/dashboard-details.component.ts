@@ -211,15 +211,23 @@ export class DashboardDetailsComponent implements OnInit, OnDestroy {
 		this.displayPlaylistTracks[index] = (this.displayPlaylistTracks[index]) ? false : true;
 	}
 
+// Help
+	private showHelp: boolean = false; // controls help labells visibility, catches events from nav component
+
 	public ngOnInit() {
 		console.log('ngOnInit: DashboardDetailsComponent initialized');
 		this.emitter.emitEvent({route: '/data'});
 		this.emitter.emitEvent({appInfo: 'hide'});
-		this.userService.restoreUser(() => {
-			this.scUserName = this.userService.model.analyser_query;
-			if (this.scUserName !== '') { this.getUser(); }
-			else { this.emitSpinnerStopEvent(); }
-		});
+		console.log('this.userService:', this.userService.model);
+		if (this.userService.model.analyser_query !== '') {
+			this.userService.restoreUser(() => {
+				this.scUserName = this.userService.model.analyser_query;
+				this.getUser();
+			});
+		} else {
+			console.log('this.scUserName:', this.scUserName);
+			this.emitSpinnerStopEvent();
+		}
 		this.subscription = this.emitter.getEmitter().subscribe((message) => {
 			/*
 			*	listen to filtering messages
@@ -257,6 +265,11 @@ export class DashboardDetailsComponent implements OnInit, OnDestroy {
 						return 0;
 					});
 				}
+			}
+			if (message.help === 'toggle') {
+				console.log('/data consuming event:', message);
+				console.log('toggling help labels visibility');
+				this.showHelp = (this.showHelp) ? false : true;
 			}
 			/*
 			*	listen to <audio> element playback controls messages
