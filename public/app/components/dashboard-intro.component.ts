@@ -3,7 +3,7 @@ import { EventEmitterService } from '../services/event-emitter.service';
 import { ServerStaticDataService } from '../services/server-static-data.service';
 import { PublicDataService } from '../services/public-data.service';
 
-//declare let d3: any;
+// declare let d3: any;
 
 @Component({
 	selector: 'dashboard-intro',
@@ -112,6 +112,9 @@ export class DashboardIntroComponent implements OnInit, OnDestroy {
 		this.showModal = (!this.showModal) ? true : false;
 	};
 
+// Help
+	private showHelp: boolean = false; // controls help labells visibility, catches events from nav component
+
 	public ngOnInit() {
 		console.log('ngOnInit: DashboardIntroComponent initialized');
 		this.emitSpinnerStartEvent();
@@ -150,6 +153,11 @@ export class DashboardIntroComponent implements OnInit, OnDestroy {
 				console.log('closing webcosket');
 				this.subscription.unsubscribe();
 				this.ws.close();
+			}
+			if (message.help === 'toggle') {
+				console.log('/intro consuming event:', message);
+				console.log('toggling help labels visibility', this.showHelp);
+				this.showHelp = (this.showHelp) ? false : true;
 			}
 		});
 
