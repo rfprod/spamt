@@ -68,6 +68,7 @@ export class DashboardDetailsComponent implements OnInit, OnDestroy {
 				this.userService.model.analyser_query = this.scUserName;
 				this.userService.model.analyser_user_id = this.publicData.user.id;
 				this.userService.model.analyser_user_uri = this.publicData.user.uri;
+				console.log('this.userService.model update:', this.userService.model);
 				this.userService.saveUser();
 			},
 			error => this.displayError = <any> error,
@@ -219,10 +220,15 @@ export class DashboardDetailsComponent implements OnInit, OnDestroy {
 		this.emitter.emitEvent({route: '/data'});
 		this.emitter.emitEvent({appInfo: 'hide'});
 		console.log('this.userService:', this.userService.model);
-		if (this.userService.model.analyser_query !== '') {
+		if (this.userService.model.analyser_query === '') {
 			this.userService.restoreUser(() => {
 				this.scUserName = this.userService.model.analyser_query;
-				this.getUser();
+				if (this.userService.model.analyser_query !== '') {
+					this.getUser();
+				} else {
+					console.log('local storage is empty');
+					this.emitSpinnerStopEvent();
+				}
 			});
 		} else {
 			console.log('this.scUserName:', this.scUserName);

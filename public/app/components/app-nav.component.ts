@@ -29,7 +29,7 @@ export class AppNavComponent implements OnInit, OnDestroy {
 			this.emitter.emitEvent({ help: 'toggle' });
 			this.showHelp = (this.showHelp) ? false : true;
 			route = this.router.url; // set current route
-		}		
+		}
 		const path = route.substring(route.lastIndexOf('/') + 1, route.length);
 		if (path === 'intro') {
 			index = '1';
