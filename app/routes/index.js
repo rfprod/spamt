@@ -2,7 +2,7 @@
 
 const path = process.cwd();
 
-module.exports = function(app, passport, User, SrvInfo, DataInit, syncRec) { // eslint-disable-line no-unused-vars
+module.exports = function(app, passport, User, Query, SrvInfo, DataInit, syncRec) { // eslint-disable-line no-unused-vars
 
 /*
 *	check if data init is needed
@@ -47,11 +47,14 @@ module.exports = function(app, passport, User, SrvInfo, DataInit, syncRec) { // 
 */
 
 	app.get('/', (req, res) => {
+		/**
+		*	serve application page
+		*/
 		res.sendFile(path + '/public/index.html');
 	});
 
 	app.get('/sc/get/user', (req, res) => {
-		/*
+		/**
 		*	Resolves soundcloud resource to get user data,
 		*	return response if user
 		*/
@@ -71,6 +74,54 @@ module.exports = function(app, passport, User, SrvInfo, DataInit, syncRec) { // 
 
 			if (resolveRequest.statusCode === 200) {
 				output = JSON.parse(resolveRequest.getBody());
+				/*
+				*	TODO update Queries collection
+				*/
+				Query.find({}, (err, docs) => {
+					if (err) throw err;
+					const now = new Date().getTime();
+					if (docs.length === 0) {
+						let newQuery = new Query();
+						newQuery.name = scUserName;
+						newQuery.weight = 1;
+						newQuery.timestamp = now;
+						newQuery.save(err => {
+							if (err) throw err;
+							console.log('new query registered');
+						});
+					} else {
+						console.log('queries exist');
+						searchQueryLoop:
+						for (let i in docs) {
+							const item = docs[i];
+							if (item.name === scUserName) {
+								// update db record
+								const newWeight = item.weight + 1;
+								Query.update(
+									{'name': scUserName},
+									{$set:{'weight':newWeight, 'timestamp':now}},
+									(err,data) => {
+										if (err) { throw err; }
+										console.log('updated existing query:', JSON.stringify(data));
+									}
+								);
+								break searchQueryLoop;
+							}
+							console.log('docs.length, i:', docs.length, i);
+							if (i == docs.length - 1) {
+								// add new query
+								let newQuery = new Query();
+								newQuery.name = scUserName;
+								newQuery.weight = 1;
+								newQuery.timestamp = now;
+								newQuery.save(err => {
+									if (err) throw err;
+									console.log('new query registered');
+								});
+							}
+						}
+					}
+				});
 			} else {
 				/*
 				*	proxy errors from soundcloud API
@@ -90,8 +141,32 @@ module.exports = function(app, passport, User, SrvInfo, DataInit, syncRec) { // 
 		});
 	});
 
+	app.get('/sc/get/queries', (req, res) => {
+		/**
+		*	get most popular queries
+		*/
+		let output = {};
+		Query.find({}, (err, docs) => {
+			if (err) throw err;
+			docs.sort((a, b) => {
+				if (a.weight > b.weight) { return -1; }
+				if (a.weight < b.weight) { return 1; }
+				return 0;
+			});
+			console.log(docs);
+			output.data = (docs.length > 30) ? docs.slice(0, 30) : docs;
+			res.setHeader('Cache-Control', 'no-cache, no-store');
+			res.format({
+				'application/json': function(){
+					if (output.error) res.status(400);
+					res.send(output);
+				}
+			});
+		});
+	});
+
 	app.get('/sc/get/user/details', (req, res) => {
-		/*
+		/**
 		*	Requests and returns soundcloud users details by type:
 		* 'tracks', 'playlists', 'favorites', 'followers', 'followings'
 		*/
@@ -128,7 +203,7 @@ module.exports = function(app, passport, User, SrvInfo, DataInit, syncRec) { // 
 	});
 
 	app.get('/sc/get/user/track/download', (req, res) => {
-		/*
+		/**
 		*	Requests and returns soundcloud user's downloadable track
 		*/
 		const scEndpointUri = req.query.endpoint_uri;
@@ -175,7 +250,7 @@ module.exports = function(app, passport, User, SrvInfo, DataInit, syncRec) { // 
 	});
 
 	app.get('/sc/get/user/track/stream', (req, res) => {
-		/*
+		/**
 		*	Requests and returns soundcloud user's track preview url
 		*/
 		const scEndpointUri = req.query.endpoint_uri;
@@ -221,7 +296,7 @@ module.exports = function(app, passport, User, SrvInfo, DataInit, syncRec) { // 
 	});
 
 	app.get('/users/list', (req, res) => {
-		/*
+		/**
 		*	TODO
 		* should return data depending on access privileges, i.e.
 		*	- no auth: id, firstName, registered
@@ -258,6 +333,9 @@ module.exports = function(app, passport, User, SrvInfo, DataInit, syncRec) { // 
 	});
 
 	app.get('/app-diag/usage', (req, res) => {
+		/**
+		*	number of users and administrators 
+		*/
 		User.find({}, (err, docs) => {
 			if (err) { throw err; }
 			console.log('count list', docs.length);
@@ -281,6 +359,9 @@ module.exports = function(app, passport, User, SrvInfo, DataInit, syncRec) { // 
 	});
 
 	app.get('/app-diag/static', (req, res) => {
+		/**
+		* static server information
+		*/
 		res.setHeader('Cache-Control', 'no-cache, no-store');
 		res.format({
 			'application/json': function(){
@@ -290,6 +371,9 @@ module.exports = function(app, passport, User, SrvInfo, DataInit, syncRec) { // 
 	});
 
 	app.ws('/app-diag/dynamic', (ws) => {
+		/**
+		* dynamic server information
+		*/
 		console.log('websocket opened /app-diag/dynamic');
 		let sender = null;
 		ws.on('message', (msg) => {

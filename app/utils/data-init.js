@@ -21,7 +21,7 @@ module.exports = {
 					city: 'city 0',
 					country: 'country 0'
 				};
-				newUser.save((err) => {
+				newUser.save(err => {
 					if (err) throw err;
 					console.log('default user id 0 created');
 					callback(newUser);
@@ -33,7 +33,7 @@ module.exports = {
 		});
 	},
 
-	createDefaultUser: function (callback){
+	createDefaultUser: function (callback) {
 		User.find({id: 1}, (err, docs) => {
 			if (err) throw err;
 			if (docs.length == 0) {
@@ -52,7 +52,7 @@ module.exports = {
 					city: 'city 1',
 					country: 'country 1'
 				};
-				newUser.save((err) => {
+				newUser.save(err => {
 					if (err) throw err;
 					console.log('default user id 1 created');
 					callback(newUser);
@@ -67,10 +67,10 @@ module.exports = {
 	initData: function (callback) {
 		console.log('db data initialization');
 		let response = {};
-		this.createDefaultAdmin((admin) => {
+		this.createDefaultAdmin(admin => {
 			response.defaultAdminAccount = admin;
 
-			this.createDefaultUser((user) => {
+			this.createDefaultUser(user => {
 				response.defaultUserAccount = user;
 				console.log('data initialized:', response);
 				if (callback) callback();
