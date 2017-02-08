@@ -3,19 +3,19 @@ const User = require('../models/users');
 module.exports = {
 
 	createDefaultAdmin: function (callback) {
-		User.find({id: 0}, (err, docs) => {
+		User.find({role: 'admin'}, (err, docs) => {
 			if (err) throw err;
-			if (docs.length == 0) {
+			if (docs.length === 0) {
 				let newUser = new User();
 				newUser.id = 0;
 				newUser.role = 'admin';
 				newUser.registered = new Date().getTime();
 				newUser.lastLogin = new Date().getTime();
+				newUser.salt = '';
+				newUser.jwToken = '';
 				newUser.userExtended = {
+					login: 'admin',
 					email: 'admin@email.email',
-					salt: '',
-					pass: '000',
-					passResetToken: '',
 					firstName: 'first name 0',
 					lastName: 'last name 0',
 					city: 'city 0',
@@ -34,19 +34,19 @@ module.exports = {
 	},
 
 	createDefaultUser: function (callback) {
-		User.find({id: 1}, (err, docs) => {
+		User.find({role: 'user'}, (err, docs) => {
 			if (err) throw err;
-			if (docs.length == 0) {
+			if (docs.length === 0) {
 				let newUser = new User();
 				newUser.id = 1;
 				newUser.role = 'user';
 				newUser.registered = new Date().getTime();
 				newUser.lastLogin = new Date().getTime();
+				newUser.salt = '';
+				newUser.jwToken = '';
 				newUser.userExtended = {
+					login: 'user1',
 					email: 'user1@email.email',
-					salt: '',
-					pass: '000',
-					passResetToken: '',
 					firstName: 'first name 1',
 					lastName: 'last name 1',
 					city: 'city 1',

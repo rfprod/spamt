@@ -2,7 +2,7 @@
 
 const path = process.cwd();
 
-module.exports = function(app, passport, User, Query, SrvInfo, DataInit, syncRec) { // eslint-disable-line no-unused-vars
+module.exports = function(app, passport, User, Query, SrvInfo, DataInit, syncRec, JWT, mailTransporter) { // eslint-disable-line no-unused-vars
 
 /*
 *	check if data init is needed
@@ -43,6 +43,39 @@ module.exports = function(app, passport, User, Query, SrvInfo, DataInit, syncRec
 	const SCapi = new SC();
 
 /*
+* CORS headers
+*/
+
+	app.all('/*', function(req, res, next) {
+		res.header('Access-Control-Allow-Origin', '*');
+		res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS');
+		res.header('Access-Control-Allow-Headers', 'Content-type,Accept,X-Access-Token,X-Key');
+		res.header('Access-Control-Expose-Headers', 'userTokenUpdate');
+		if (req.method == 'OPTIONS') res.status(200).end();
+		else next();
+	});
+
+/*
+*	Mailer config
+*/
+	function sendAccessLink(recipientEmail, accessLink, callback) {
+		if (recipientEmail && accessLink) {
+			let mailOptions = {
+				from: '"SPAMT 👥" <'+process.env.MAILER_EMAIL+'>',
+				to: recipientEmail,
+				subject: 'SPAMT: controls access ✔',
+				text: 'SPAMT: Controls access was requested using your email address.\nIf you did not request it, ignore this message.\nIf you requested access follow the link: '+accessLink+'.', // plaintext body
+				html: '<h3>SPAMT: Controls access was requested using your email address.</h3><p>If you did not request it, ignore this message.</p><p>If you requested access follow the link: '+accessLink+'.</p>' // html body
+			};
+			mailTransporter.sendMail(mailOptions, (err, info) => {
+				if (err) throw err;
+				console.log('Message sent: ' + info.response);
+				if (callback) { callback(); }
+			});
+		}
+	}
+
+/*
 *	routes
 */
 
@@ -75,7 +108,7 @@ module.exports = function(app, passport, User, Query, SrvInfo, DataInit, syncRec
 			if (resolveRequest.statusCode === 200) {
 				output = JSON.parse(resolveRequest.getBody());
 				/*
-				*	TODO update Queries collection
+				*	update Queries collection
 				*/
 				Query.find({}, (err, docs) => {
 					if (err) throw err;
@@ -399,5 +432,93 @@ module.exports = function(app, passport, User, Query, SrvInfo, DataInit, syncRec
 			clearInterval(sender);
 		});
 		ws.on('error', () => {console.log('Persistent websocket: ERROR');});
+	});
+
+// Administration endpoints
+	app.get('/request/access', (req, res) => {
+		const userEmail = req.query.email;
+		console.log('userEmail:', userEmail);
+		if (userEmail) {
+			console.log('controls access request from address:', userEmail);
+			User.find({'userExtended.email': userEmail}, (err, docs) => {
+				if (err) throw err;
+				if (!docs.length) {
+					res.status(401).json({error: 'Unknown user'});
+				} else {
+					const user = docs[0];
+					const storedSalt = (user.salt) ? user.salt : null;
+					const expirationDate = new Date();
+					expirationDate.setDate(expirationDate.getDate() + 7); // expires in one week
+					const payload = {
+						id: user._id,
+						login: user.userExtended.login,
+						email: user.userExtended.email,
+						role: user.role,
+						expires: expirationDate.getTime()
+					};
+					const tokenObj = JWT.generateJWToken(payload, storedSalt);
+					console.log(payload, tokenObj);
+					JWT.setUserJWToken(user._id, tokenObj, () => {
+						let accessLink = process.env.APP_URL + '?user_token=' + tokenObj.token;
+						sendAccessLink(userEmail, accessLink, () => {
+							res.status(200).json({success: 'access link was sent to provided email address', token: tokenObj.token});
+						});
+					});
+				}
+			});
+		} else {
+			res.status(401).json({error: 'Missing mandatory request param: \'email\''});
+		}
+	});
+	app.all('/controls/*', (req, res, next) => {
+		passport.authenticate('token-bearer', { session: false }, function(err, user, info) {
+			let userToken = req.query.user_token; // token from url var
+			if (typeof userToken == 'undefined') userToken = req.body.user_token; // token from request body
+			if (userToken) {
+				JWT.checkJWTokenExpiration(userToken, (tokenStatus) => {
+					req.renewedToken = false;
+					console.log('token status:', tokenStatus);
+					if (tokenStatus.expired) return res.status(401).json({ error: 'token expired' });
+					//if (tokenStatus.renew) return res.status(200).json({ to_be_configured: 'this event should regenerate user token' });
+					if (tokenStatus.renew) {
+						JWT.renewUserToken(req, (tokenObj) => {
+							console.log('new token:', tokenObj);
+							req.renewedTokenObj = tokenObj;
+							return next();
+						});
+					}
+					else if (info.statusCode == 200) return next();
+					else if (!info.statusCode) return res.status(401).json({ error: info });
+					else return res.status(info.statusCode).json({ error: info.message });
+				});
+			} else {
+				const responseMessage = {error: 'Token missing \'user_token\''};
+				console.log('responseMessage:', responseMessage);
+				res.status(401).json(responseMessage);
+			}
+		})(req,res);
+	});
+	app.get('/controls/dashboard', (req, res) => {
+		let userToken = req.query.user_token;
+		User.find({jwToken: userToken}, (err, docs) => {
+			if (err) throw err;
+			let status, message;
+			if (docs.length === 0) {
+				status = 401;
+				message = {error: 'User does not exist'};
+			} else {
+				status = 200;
+				message = {success: 'dashboard loaded'};
+			}
+			res.status(status).json(message);
+		});
+	});
+	app.get('/controls/logout', (req, res) => {
+		let userToken = req.query.user_token; // token from url var
+		if (typeof userToken == 'undefined') userToken = req.body.user_token; // token from request body
+		JWT.resetUserJWToken(null, userToken, (err) => {
+			if (err) { res.status(401).json(err); }
+			else { res.status(200).json({success: 'logged out, token reset'}); }
+		});
 	});
 };

@@ -2,28 +2,43 @@
 
 var LocalStrategy = require('passport-local').Strategy;
 var TwitterStrategy = require('passport-twitter').Strategy;
+var SoundcloudStrategy = require('passport-soundcloud').Strategy;
+var BearerStrategy = require('passport-http-api-token-bearer').Strategy;
 var User = require('../models/users');
 var configAuthTwitter = require('./auth-twitter');
+var configAuthSoundcloud = require('./auth-soundcloud');
 var crypto = require('crypto');
 
-module.exports = function (passport) {
-	passport.serializeUser(function (user, done) {
+module.exports = function(passport) {
+	passport.serializeUser((user, done) => {
 		done(null, user.id);
 	});
-	passport.deserializeUser(function (id, done) {
-		User.findById(id, function (err, user) {
+	passport.deserializeUser((id, done) => {
+		User.findById(id, (err, user) => {
 			done(err, user);
 		});
 	});
+
+	passport.use(new BearerStrategy({
+		access_token: 'user_token'
+	}, (token, done) => {
+		process.nextTick(() => {
+			User.findOne({'userExtended.jwToken': token}, (err, user) => {
+				if (err) return done(err);
+				if (!user) return done(null, false, {statusCode: 401, error: true, message: 'Unknown user'});
+				return done(null, user, {statusCode: 200, scope: 'all'});
+			});
+		});
+	}));
+
 	passport.use(new TwitterStrategy({
 		consumerKey: configAuthTwitter.twitterAuth.clientID,
 		consumerSecret: configAuthTwitter.twitterAuth.clientSecret,
 		callbackURL: configAuthTwitter.twitterAuth.callbackURL
-	},function(token, tokenSecret, profile, done) {
-		console.log('passport profile');
-		console.log(profile);
-		process.nextTick(function () {
-			User.findOne({ 'twitter.id': profile.id }, function (err, user) {
+	}, (token, tokenSecret, profile, done) => {
+		console.log('twitter passport profile:', profile);
+		process.nextTick(() => {
+			User.findOne({ 'twitter.id': profile.id }, (err, user) => {
 				if (err) return done(err);
 				if (user) return done(null, user);
 				else {
@@ -31,8 +46,7 @@ module.exports = function (passport) {
 					newUser.twitter.id = profile.id;
 					newUser.twitter.username = profile.username;
 					newUser.twitter.displayName = profile.displayName;
-					newUser.nbrClicks.clicks = 0;
-					newUser.save(function (err) {
+					newUser.save(err => {
 						if (err) throw err;
 						return done(err, newUser);
 					});
@@ -40,8 +54,32 @@ module.exports = function (passport) {
 			});
 		});
 	}));
-	
-	function generateDerivate(password, storedSalt){
+
+	passport.use(new SoundcloudStrategy({
+		clientID: configAuthSoundcloud.soundcloudAuth.clientID,
+		clientSecret: configAuthSoundcloud.soundcloudAuth.clientSecret,
+		callbackURL: configAuthSoundcloud.soundcloudAuth.callbackURL
+	}, (token, tokenSecret, profile, done) => {
+		console.log('soundcloud passport profile', profile);
+		process.nextTick(() => {
+			User.findOne({ 'soundcloud.id': profile.id }, (err, user) => {
+				if (err) return done(err);
+				if (user) return done(null, user);
+				else {
+					var newUser = new User();
+					newUser.soundcloud.id = profile.id;
+					newUser.soundcloud.username = profile.username;
+					newUser.soundcloud.displayName = profile.displayName;
+					newUser.save(err => {
+						if (err) throw err;
+						return done(err, newUser);
+					});
+				}
+			});
+		});
+	}));
+
+	function generateDerivate(password, storedSalt) {
 		var salt, derivate, obj;
 		
 		if (storedSalt) salt = storedSalt;
@@ -49,16 +87,16 @@ module.exports = function (passport) {
 		
 		derivate = crypto.pbkdf2Sync(password, salt, 100000, 64, 'sha512').toString('hex');
 		obj = { derivate: derivate, salt: salt };
-		console.log(obj);
+		//console.log(obj);
 		return obj;
 	}
 	passport.use(new LocalStrategy({
 		usernameField: 'emailLogin',
 		passwordField: 'passwordLogin',
 		passReqToCallback: true
-	},function (req, username, password, done) {
-		process.nextTick(function () {
-			User.findOne({ 'userExtended.email': username }, function (err, user) {
+	}, (req, username, password, done) => {
+		process.nextTick(() => {
+			User.findOne({ 'userExtended.email': username }, (err, user) => {
 				if (err) return done(err);
 				if (!user) return done(null, false, {message: 'Unknown user'});
 				if (user.userExtended.salt) {

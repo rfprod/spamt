@@ -8,7 +8,12 @@ const express = require('express'),
 	MongoStore = require('connect-mongodb-session')(session),
 	app = express(),
 	expressWs = require('express-ws')(app), // eslint-disable-line no-unused-vars
+	bodyParser = require('body-parser'),
+	jwt = require('jwt-simple'),
+	flash = require('connect-flash'),
 	syncReq = require('sync-request'),
+	nodemailer = require('nodemailer'),
+	crypto = require('crypto'),
 	cluster = require('cluster'),
 	os = require('os');
 let clusterStop = false;
@@ -27,6 +32,10 @@ const User = require('./app/models/users.js'),
 	Query = require('./app/models/queries.js'),
 	SrvInfo = require('./app/utils/srv-info.js'),
 	DataInit = require('./app/utils/data-init.js');
+/*
+*	JWT methods
+*/
+const JWT = require('./app/utils/jwt-methods.js')(crypto, jwt, User);
 
 process.title = 'spamt';
 
@@ -48,8 +57,36 @@ if (process.env.OPENSHIFT_MONGODB_DB_HOST) {
 }
 app.use(passport.initialize());
 app.use(passport.session());
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json());
+app.use(flash());
 
-routes(app, passport, User, Query, SrvInfo, DataInit, syncReq);
+/*
+* nodemailer usage notice:
+* To use Gmail you may need to configure "Allow Less Secure Apps" (https://www.google.com/settings/security/lesssecureapps)
+* in your Gmail account unless you are using 2FA
+* in which case you would have to create an Application Specific password (https://security.google.com/settings/security/apppasswords).
+* You also may need to unlock your account with "Allow access to your Google account" (https://accounts.google.com/DisplayUnlockCaptcha)
+* to use SMTP.
+*/
+let smtpConfig = {
+	host: process.env.MAILER_HOST,
+	port: process.env.MAILER_PORT,
+	secure: true, // use SSL
+	auth: {
+		user: process.env.MAILER_EMAIL,
+		pass: process.env.MAILER_PASS
+	}
+};
+// set proxy for smtp for development environment
+if (process.env.HOME.indexOf('ruser') != -1) {
+	console.log('development environment launch detected, setting proxy for smtpConfig');
+	smtpConfig.proxy = 'socks5://127.0.0.1:9150/';
+}
+
+const mailTransporter = nodemailer.createTransport(smtpConfig); // reusable transporter object using the default SMTP transport
+
+routes(app, passport, User, Query, SrvInfo, DataInit, syncReq, JWT, mailTransporter);
 
 const port = process.env.PORT || process.env.OPENSHIFT_NODEJS_PORT || 8080,
 	ip = process.env.OPENSHIFT_NODEJS_IP; // "127.0.0.1" is not specified here on purpose, this env var should be included in .openshift.env
