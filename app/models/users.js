@@ -4,18 +4,18 @@ const mongoose = require('mongoose'),
 	Schema = mongoose.Schema;
 
 let User = new Schema({
-	id:								String,	// generated
-	role:							String,	// generated
-	registered:				String,	// generated
-	lastLogin:				String,	// generated
+	role:							String,	// gen
+	salt:							String,	// gen
+	jwToken:					String,	// gen
+	registered:				String,	// gen
+	lastLogin:				String,	// gen
 	userExtended: {
-		email:					String,	// user input
-		salt:						String,	// generated
-		pass:						String,	// generated
-		passResetToken:	String,	// generated
-		fullName:				String,	// user input
-		city:						String,	// user input
-		country:				String	// user input
+		login:					String, // gen
+		email:					String,	// input
+		firstName:			String,	// input
+		lastName:			String,	// input
+		city:						String,	// input
+		country:				String	// input
 	},
 	twitter: {
 		id:							String,	// sync
