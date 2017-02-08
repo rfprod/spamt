@@ -1,5 +1,6 @@
 import { Component, ElementRef, OnInit, OnDestroy } from '@angular/core';
 import { EventEmitterService } from '../services/event-emitter.service';
+import { SCgetQueriesService } from '../services/sc-get-queries.service';
 import { SCgetUserService } from '../services/sc-get-user.service';
 import { SCgetUserDetailsService } from '../services/sc-get-user-details.service';
 import { SCgetUserTrackDownloadService } from '../services/sc-get-user-track-download.service';
@@ -14,6 +15,7 @@ export class DashboardDetailsComponent implements OnInit, OnDestroy {
 	constructor(
 		public el: ElementRef,
 		private emitter: EventEmitterService,
+		private scGetQueriesService: SCgetQueriesService,
 		private scGetUserService: SCgetUserService,
 		private scGetUserDetailsService: SCgetUserDetailsService,
 		private scGetUserTrackDownloadService: SCgetUserTrackDownloadService,
@@ -34,6 +36,23 @@ export class DashboardDetailsComponent implements OnInit, OnDestroy {
 	};
 	private publicDataKeys = Object.keys(this.publicData);
 	private displayError: string;
+
+// 03 popular queries
+	private queries: any;
+	private getQueries(): void { // tslint:disable-line
+		this.emitSpinnerStartEvent();
+		this.scGetQueriesService.getData().subscribe(
+			data => {
+				this.queries = data;
+				console.log('this.queries: ', this.queries);
+			},
+			error => this.displayError = <any> error,
+			() => {
+				console.log('getQueriesService done');
+				this.emitSpinnerStopEvent();
+			}
+		);
+	}
 
 // User
 	private userSelected() { // tslint:disable-line
@@ -70,6 +89,7 @@ export class DashboardDetailsComponent implements OnInit, OnDestroy {
 				this.userService.model.analyser_user_uri = this.publicData.user.uri;
 				console.log('this.userService.model update:', this.userService.model);
 				this.userService.saveUser();
+				this.getQueries();
 			},
 			error => this.displayError = <any> error,
 			() => {
@@ -227,7 +247,8 @@ export class DashboardDetailsComponent implements OnInit, OnDestroy {
 					this.getUser();
 				} else {
 					console.log('local storage is empty');
-					this.emitSpinnerStopEvent();
+					this.getQueries();
+					//this.emitSpinnerStopEvent();
 				}
 			});
 		} else {

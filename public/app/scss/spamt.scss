@@ -130,6 +130,15 @@ body {
 		#sc-user {
 			font-size: 0.9em;
 		}
+		#queries-flex {
+			display: flex;
+			align-items: center;
+			align-content: flex-start;
+			flex-wrap: wrap;
+			.btn {
+				flex: 1;
+			}
+		}
 		#data {
 			audio {
 				width: 100%;

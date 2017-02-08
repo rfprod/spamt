@@ -357,7 +357,10 @@
 			</div>
 		</span>
 		<span *ngIf="!userSelected()">
-			input <a href="https://soundcloud.com" target=_blank><i class="glyphicon glyphicon-new-window"></i> soundcloud</a> user name to be able to request data
+			input <a href="https://soundcloud.com" target=_blank><i class="glyphicon glyphicon-new-window"></i> soundcloud</a> user name to be able to request data, or select one from the following list
+			<div id="queries-flex" *ngIf="queries">
+				<span class="btn btn-default" *ngFor="let q of queries.data" (click)="analyseThisUser(q.name)">{{q.name}}</span>
+			</div>
 		</span>
 	</div>
 </div>

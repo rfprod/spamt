@@ -21,6 +21,7 @@ import { ConvertDuration } from './pipes/convert-duration.pipe';
 import { EventEmitterService } from './services/event-emitter.service';
 import { UsersListService } from './services/users-list.service';
 import { UserService } from './services/user-service.service';
+import { SCgetQueriesService } from './services/sc-get-queries.service';
 import { SCgetUserService } from './services/sc-get-user.service';
 import { SCgetUserDetailsService } from './services/sc-get-user-details.service';
 import { SCgetUserTrackDownloadService } from './services/sc-get-user-track-download.service';
@@ -34,7 +35,7 @@ declare let $: JQueryStatic;
 @NgModule({
 	declarations: [ AppComponent, AppNavComponent, AppInfoComponent, DashboardIntroComponent, DashboardDetailsComponent, nvD3 , AudioPlayerDirective, LoadingIndicatorDirective, ConvertDuration],
 	imports 		: [ BrowserModule, FormsModule, HttpModule, RouterModule.forRoot(APP_ROUTES) ],
-	providers 	: [ {provide: LocationStrategy, useClass: HashLocationStrategy}, {provide: Window, useValue: window}, EventEmitterService, UsersListService, UserService, ServerStaticDataService, PublicDataService, SCgetUserService, SCgetUserDetailsService, SCgetUserTrackDownloadService, SCgetUserTrackStreamService ],
+	providers 	: [ {provide: LocationStrategy, useClass: HashLocationStrategy}, {provide: Window, useValue: window}, EventEmitterService, UsersListService, UserService, ServerStaticDataService, PublicDataService, SCgetQueriesService, SCgetUserService, SCgetUserDetailsService, SCgetUserTrackDownloadService, SCgetUserTrackStreamService ],
 	schemas 		: [ CUSTOM_ELEMENTS_SCHEMA ],
 	bootstrap 	: [ AppComponent ],
 })
