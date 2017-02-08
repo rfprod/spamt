@@ -24,6 +24,7 @@ mongoose.connect(mongo_uri);
 *	database models and data initialization methods
 */
 const User = require('./app/models/users.js'),
+	Query = require('./app/models/queries.js'),
 	SrvInfo = require('./app/utils/srv-info.js'),
 	DataInit = require('./app/utils/data-init.js');
 
@@ -48,7 +49,7 @@ if (process.env.OPENSHIFT_MONGODB_DB_HOST) {
 app.use(passport.initialize());
 app.use(passport.session());
 
-routes(app, passport, User, SrvInfo, DataInit, syncReq);
+routes(app, passport, User, Query, SrvInfo, DataInit, syncReq);
 
 const port = process.env.PORT || process.env.OPENSHIFT_NODEJS_PORT || 8080,
 	ip = process.env.OPENSHIFT_NODEJS_IP; // "127.0.0.1" is not specified here on purpose, this env var should be included in .openshift.env
