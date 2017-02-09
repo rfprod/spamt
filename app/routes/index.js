@@ -463,6 +463,30 @@ module.exports = function(app, passport, User, Query, SrvInfo, DataInit, syncRec
 		})(req,res);
 	});
 
+	app.get('/controls/me', (req, res) => {
+		let userToken = req.query.user_token;
+		User.find({jwToken: userToken}, (err, docs) => {
+			if (err) throw err;
+			let output = {};
+			console.log(docs);
+			for (let key in docs) {
+				console.log(key);
+				if (key !== 'salt' && key !== 'jwToken') {
+					if (typeof docs[key] === 'object') {
+						output[key] = {};
+						const subObj = docs[key];
+						for (let k in subObj) {
+							output[key][k] = subObj[k];
+						}
+					} else {
+						output[key] = docs[key];
+					}
+				}
+			}
+			res.status(200).json(output);
+		});
+	});
+
 	app.get('/controls/dashboard', (req, res) => {
 		let userToken = req.query.user_token;
 		User.find({jwToken: userToken}, (err, docs) => {
