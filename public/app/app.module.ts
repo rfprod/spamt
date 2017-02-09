@@ -29,6 +29,7 @@ import { SCgetUserTrackDownloadService } from './services/sc-get-user-track-down
 import { SCgetUserTrackStreamService } from './services/sc-get-user-track-stream.service';
 import { ServerStaticDataService } from './services/server-static-data.service';
 import { PublicDataService } from './services/public-data.service';
+import { ControlsLoginService } from './services/controls-login.service';
 import { nvD3 } from 'ng2-nvd3';
 
 declare let $: JQueryStatic;
@@ -36,7 +37,7 @@ declare let $: JQueryStatic;
 @NgModule({
 	declarations: [ AppComponent, AppNavComponent, AppInfoComponent, DashboardIntroComponent, DashboardDetailsComponent, DashboardControlsComponent, nvD3 , AudioPlayerDirective, LoadingIndicatorDirective, ConvertDuration],
 	imports 		: [ BrowserModule, FormsModule, HttpModule, RouterModule.forRoot(APP_ROUTES) ],
-	providers 	: [ {provide: LocationStrategy, useClass: HashLocationStrategy}, {provide: Window, useValue: window}, EventEmitterService, UsersListService, UserService, ServerStaticDataService, PublicDataService, SCgetQueriesService, SCgetUserService, SCgetUserDetailsService, SCgetUserTrackDownloadService, SCgetUserTrackStreamService ],
+	providers 	: [ {provide: LocationStrategy, useClass: HashLocationStrategy}, {provide: Window, useValue: window}, EventEmitterService, UsersListService, UserService, ServerStaticDataService, PublicDataService, SCgetQueriesService, SCgetUserService, SCgetUserDetailsService, SCgetUserTrackDownloadService, SCgetUserTrackStreamService, ControlsLoginService ],
 	schemas 		: [ CUSTOM_ELEMENTS_SCHEMA ],
 	bootstrap 	: [ AppComponent ],
 })

@@ -9,6 +9,6 @@
     <i class="fa fa-database" [ngClass]="{ 'help-highlight': showHelp }"></i> Data <span class="label label-warning" *ngIf="showHelp">analyse account</span>
   </a>
   <a [routerLink]="['controls']" (click)="switchNavButtons($event, true)" class="flex-nav-item" [ngClass]="{selected: navButtonsState[3], inactive: !navButtonsState[3]}">
-    <i class="fa fa-unlock-alt" [ngClass]="{ 'help-highlight': showHelp }"></i> Controls <span class="label label-warning" *ngIf="showHelp">application controls</span>
+    <i class="fa fa-cogs" [ngClass]="{ 'help-highlight': showHelp }"></i> Controls <span class="label label-warning" *ngIf="showHelp">application controls</span>
   </a>
 </div>
