@@ -240,15 +240,15 @@ export class DashboardDetailsComponent implements OnInit, OnDestroy {
 		this.emitter.emitEvent({route: '/data'});
 		this.emitter.emitEvent({appInfo: 'hide'});
 		console.log('this.userService:', this.userService.model);
-		if (this.userService.model.analyser_query === '') {
+		if (!this.userService.model.analyser_query) {
 			this.userService.restoreUser(() => {
 				this.scUserName = this.userService.model.analyser_query;
-				if (this.userService.model.analyser_query !== '') {
+				if (this.userService.model.analyser_query) {
 					this.getUser();
 				} else {
 					console.log('local storage is empty');
 					this.getQueries();
-					//this.emitSpinnerStopEvent();
+					// this.emitSpinnerStopEvent();
 				}
 			});
 		} else {
