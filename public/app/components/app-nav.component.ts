@@ -9,7 +9,7 @@ import { EventEmitterService } from '../services/event-emitter.service';
 export class AppNavComponent implements OnInit, OnDestroy {
 	constructor( private emitter: EventEmitterService, private router: Router ) {}
 	private subscription: any;
-	public navButtonsState: boolean[] = [false, false, false];
+	public navButtonsState: boolean[] = [false, false, false, false];
 	private showHelp: boolean = false;
 	public switchNavButtons(event, isClick: boolean) {
 		let route, index;
@@ -33,8 +33,10 @@ export class AppNavComponent implements OnInit, OnDestroy {
 		const path = route.substring(route.lastIndexOf('/') + 1, route.length);
 		if (path === 'intro') {
 			index = '1';
-		} else {
-			if (path === 'data') { index = '2'; }
+		} else if (path === 'data') {
+			index = '2';
+		} else if (path === 'controls') {
+			index = '3';
 		}
 		for (let b in this.navButtonsState) {
 			if (b === index) { this.navButtonsState[b] = true; } else { this.navButtonsState[b] = false; }
