@@ -5,6 +5,7 @@ export class UserService {
 	constructor (public window: Window) {}
 
 	public model: any = {
+		user_token: '',
 		analyser_query: '',
 		analyser_user_id: '',
 		analyser_user_uri: '',

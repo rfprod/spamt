@@ -328,43 +328,6 @@ module.exports = function(app, passport, User, Query, SrvInfo, DataInit, syncRec
 		}
 	});
 
-	app.get('/users/list', (req, res) => {
-		/**
-		*	TODO
-		* should return data depending on access privileges, i.e.
-		*	- no auth: id, firstName, registered
-		* - auth: id, firstName, lastName, role, registered, lastLogin, city, country
-		*/
-		User.find({}, (err, docs) => {
-			if (err) { throw err; }
-			console.log('users list', docs);
-			let resData = [],
-				dataUnit = {};
-			for (let i in docs) {
-				if (docs[i]) {
-					dataUnit = {
-						id: docs[i].id,
-						role:	docs[i].role,
-						registered:	docs[i].registered,
-						lastLogin: docs[i].lastLogin,
-						email: docs[i].userExtended.email,
-						firstName: docs[i].userExtended.firstName,
-						lastName: docs[i].userExtended.lastName,
-						city: docs[i].userExtended.city,
-						country: docs[i].userExtended.country
-					};
-					resData.push(dataUnit);
-				}
-			}
-			res.setHeader('Cache-Control', 'no-cache, no-store');
-			res.format({
-				'application/json': function(){
-					res.send(resData);
-				}
-			});
-		});
-	});
-
 	app.get('/app-diag/usage', (req, res) => {
 		/**
 		*	number of users and administrators 
@@ -470,6 +433,7 @@ module.exports = function(app, passport, User, Query, SrvInfo, DataInit, syncRec
 			res.status(401).json({error: 'Missing mandatory request param: \'email\''});
 		}
 	});
+
 	app.all('/controls/*', (req, res, next) => {
 		passport.authenticate('token-bearer', { session: false }, function(err, user, info) {
 			let userToken = req.query.user_token; // token from url var
@@ -498,6 +462,7 @@ module.exports = function(app, passport, User, Query, SrvInfo, DataInit, syncRec
 			}
 		})(req,res);
 	});
+
 	app.get('/controls/dashboard', (req, res) => {
 		let userToken = req.query.user_token;
 		User.find({jwToken: userToken}, (err, docs) => {
@@ -513,6 +478,37 @@ module.exports = function(app, passport, User, Query, SrvInfo, DataInit, syncRec
 			res.status(status).json(message);
 		});
 	});
+
+	app.get('/controls/list/users', (req, res) => {
+		User.find({}, (err, docs) => {
+			if (err) { throw err; }
+			let resData = [],
+				dataUnit = {};
+			for (let i in docs) {
+				if (docs[i]) {
+					dataUnit = {
+						id: docs[i]._id,
+						role:	docs[i].role,
+						registered:	docs[i].registered,
+						lastLogin: docs[i].lastLogin,
+						email: docs[i].userExtended.email,
+						firstName: docs[i].userExtended.firstName,
+						lastName: docs[i].userExtended.lastName,
+						city: docs[i].userExtended.city,
+						country: docs[i].userExtended.country
+					};
+					resData.push(dataUnit);
+				}
+			}
+			res.setHeader('Cache-Control', 'no-cache, no-store');
+			res.format({
+				'application/json': function(){
+					res.status(200).send(resData);
+				}
+			});
+		});
+	});
+
 	app.get('/controls/logout', (req, res) => {
 		let userToken = req.query.user_token; // token from url var
 		if (typeof userToken == 'undefined') userToken = req.body.user_token; // token from request body
