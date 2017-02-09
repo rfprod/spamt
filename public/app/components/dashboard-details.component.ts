@@ -294,8 +294,7 @@ export class DashboardDetailsComponent implements OnInit, OnDestroy {
 				}
 			}
 			if (message.help === 'toggle') {
-				console.log('/data consuming event:', message);
-				console.log('toggling help labels visibility');
+				console.log('/data consuming event:', message, ' | toggling help labels visibility');
 				this.showHelp = (this.showHelp) ? false : true;
 			}
 			/*

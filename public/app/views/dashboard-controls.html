@@ -1,0 +1,50 @@
+<div class="container-fluid">
+	<div class="row">
+		<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+			<span *ngIf="!userService.model.user_token">
+				<h3>{{title}}</h3>
+				<p>{{description.welcome}}</p>
+			</span>
+			<span *ngIf="userService.model.user_token">
+				<h3>{{title}} <a href="#" (click)="toggleModal()"><i class="fa fa-bar-chart" [ngClass]="{ 'help-highlight': showHelp }"></i></a> <span class="label label-warning" *ngIf="showHelp">application stats</span></h3>
+				<p>{{description.authenticated}}</p>
+			</span>
+
+			<div *ngIf="errorMessage" class="alert alert-danger alert-dismissible" role="alert">{{errorMessage}}</div>
+			
+			<span *ngIf="!userService.model.user_token" class="row">
+				<span class="hidden-xs col-sm-1 col-md-2 col-lg-3"></span>
+				<form class="col-xs-12 col-sm-10 col-md-8 col-lg-6" name="authForm" (ngSubmit)="login()" novalidate>
+					<div class="form-group has-feedback" [ngClass]="{ 'has-error': !authEmail.valid && !authEmail.pristine }">
+						<input type="email" id="email" class="form-control" pattern="^[\w%+-]+@[\w.-]+" [(ngModel)]="userService.model.email" name="email" #authEmail="ngModel" title="email" placeholder="email" required novalidate>
+						<span class="glyphicon glyphicon-envelope form-control-feedback"></span>
+						<p *ngIf="!authEmail.valid && !authEmail.pristine" class="help-block">invalid email</p>
+					</div>
+					<div class="btn-group btn-group-justified">
+						<div class="btn-group">
+							<input type="submit" class="btn btn-lg btn-primary" value="Authenticate" [disabled]="!authEmail.valid">
+						</div>
+					</div>
+				</form>
+				<span class="hidden-xs col-sm-1 col-md-2 col-lg-3"></span>
+			</span>
+
+			<span *ngIf="userService.model.user_token">
+				<nvd3 [options]="chartOptions" [data]="appUsageData"></nvd3>
+			</span>
+
+			<span id="modal" *ngIf="showModal">
+				<button type="button" class="close" (click)="toggleModal()"><span>&times;</span></button>
+				<h4>Platform Diagnostics</h4>
+				<table class="table table-condensed table-responsive">
+					<tbody>
+						<tr *ngFor="let unit of serverData.static">
+							<td>{{unit.name}}</td>
+							<td>{{unit.value}}</td>
+						</tr>
+					</tbody>
+				</table>
+			</span>
+		</div>
+	</div>
+</div>
