@@ -162,7 +162,7 @@ module.exports = function(app, passport, User, Query, SrvInfo, DataInit, syncRec
 				output = resolveRequest.body;
 			}
 		} else {
-			output = { error: 'Missing mandatory request parameter - name.' };
+			output = { message: 'Missing mandatory request parameter - name.' };
 		}
 
 		res.setHeader('Cache-Control', 'no-cache, no-store');
@@ -220,10 +220,10 @@ module.exports = function(app, passport, User, Query, SrvInfo, DataInit, syncRec
 					output = resolveRequest.body;
 				}
 			} else {
-				output = { error: 'Wrong mandatory request parameter - endpoint_uri.' };
+				output = { message: 'Wrong mandatory request parameter - endpoint_uri.' };
 			}
 		} else {
-			output = { error: 'Missing mandatory request parameter - endpoint_uri.' };
+			output = { message: 'Missing mandatory request parameter - endpoint_uri.' };
 		}
 
 		res.setHeader('Cache-Control', 'no-cache, no-store');
@@ -258,10 +258,10 @@ module.exports = function(app, passport, User, Query, SrvInfo, DataInit, syncRec
 					output = resolveRequest.body;
 				}
 			} else {
-				output = { error: 'Wrong mandatory request parameter - endpoint_uri.' };
+				output = { message: 'Wrong mandatory request parameter - endpoint_uri.' };
 			}
 		} else {
-			output = { error: 'Missing mandatory request parameter - endpoint_uri.' };
+			output = { message: 'Missing mandatory request parameter - endpoint_uri.' };
 		}
 
 		res.setHeader('Cache-Control', 'no-cache, no-store');
@@ -308,10 +308,10 @@ module.exports = function(app, passport, User, Query, SrvInfo, DataInit, syncRec
 					output = resolveRequest.body;
 				}
 			} else {
-				output = { error: 'Wrong mandatory request parameter - endpoint_uri.' };
+				output = { message: 'Wrong mandatory request parameter - endpoint_uri.' };
 			}
 		} else {
-			output = { error: 'Missing mandatory request parameter - endpoint_uri.' };
+			output = { message: 'Missing mandatory request parameter - endpoint_uri.' };
 		}
 
 		res.setHeader('Cache-Control', 'no-cache, no-store');
@@ -406,7 +406,7 @@ module.exports = function(app, passport, User, Query, SrvInfo, DataInit, syncRec
 			User.find({'userExtended.email': userEmail}, (err, docs) => {
 				if (err) throw err;
 				if (!docs.length) {
-					res.status(401).json({error: 'Unknown user'});
+					res.status(401).json({message: 'Unknown user'});
 				} else {
 					const user = docs[0];
 					const storedSalt = (user.salt) ? user.salt : null;
@@ -424,13 +424,13 @@ module.exports = function(app, passport, User, Query, SrvInfo, DataInit, syncRec
 					JWT.setUserJWToken(user._id, tokenObj, () => {
 						let accessLink = process.env.APP_URL + '?user_token=' + tokenObj.token;
 						sendAccessLink(userEmail, accessLink, () => {
-							res.status(200).json({success: 'access link was sent to provided email address', token: tokenObj.token});
+							res.status(200).json({message: 'access link was sent to provided email address', token: tokenObj.token});
 						});
 					});
 				}
 			});
 		} else {
-			res.status(401).json({error: 'Missing mandatory request param: \'email\''});
+			res.status(401).json({message: 'Missing mandatory request param: \'email\''});
 		}
 	});
 
@@ -442,7 +442,7 @@ module.exports = function(app, passport, User, Query, SrvInfo, DataInit, syncRec
 				JWT.checkJWTokenExpiration(userToken, (tokenStatus) => {
 					req.renewedToken = false;
 					console.log('token status:', tokenStatus);
-					if (tokenStatus.expired) return res.status(401).json({ error: 'token expired' });
+					if (tokenStatus.expired) return res.status(401).json({ message: 'token expired' });
 					//if (tokenStatus.renew) return res.status(200).json({ to_be_configured: 'this event should regenerate user token' });
 					if (tokenStatus.renew) {
 						JWT.renewUserToken(req, (tokenObj) => {
@@ -452,11 +452,11 @@ module.exports = function(app, passport, User, Query, SrvInfo, DataInit, syncRec
 						});
 					}
 					else if (info.statusCode == 200) return next();
-					else if (!info.statusCode) return res.status(401).json({ error: info });
-					else return res.status(info.statusCode).json({ error: info.message });
+					else if (!info.statusCode) return res.status(401).json({ message: info });
+					else return res.status(info.statusCode).json({ message: info.message });
 				});
 			} else {
-				const responseMessage = {error: 'Token missing \'user_token\''};
+				const responseMessage = {message: 'Token missing \'user_token\''};
 				console.log('responseMessage:', responseMessage);
 				res.status(401).json(responseMessage);
 			}
@@ -494,10 +494,10 @@ module.exports = function(app, passport, User, Query, SrvInfo, DataInit, syncRec
 			let status, message;
 			if (docs.length === 0) {
 				status = 401;
-				message = {error: 'User does not exist'};
+				message = {message: 'User does not exist'};
 			} else {
 				status = 200;
-				message = {success: 'dashboard loaded'};
+				message = {message: 'dashboard loaded'};
 			}
 			res.status(status).json(message);
 		});
@@ -538,7 +538,7 @@ module.exports = function(app, passport, User, Query, SrvInfo, DataInit, syncRec
 		if (typeof userToken == 'undefined') userToken = req.body.user_token; // token from request body
 		JWT.resetUserJWToken(null, userToken, (err) => {
 			if (err) { res.status(401).json(err); }
-			else { res.status(200).json({success: 'logged out, token reset'}); }
+			else { res.status(200).json({message: 'logged out, token reset'}); }
 		});
 	});
 };

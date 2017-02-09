@@ -4,6 +4,7 @@ import { ServerStaticDataService } from '../services/server-static-data.service'
 import { PublicDataService } from '../services/public-data.service';
 import { UsersListService } from '../services/users-list.service';
 import { UserService } from '../services/user-service.service';
+import { ControlsLoginService } from '../services/controls-login.service';
 
 // declare let d3: any;
 
@@ -18,7 +19,8 @@ export class DashboardControlsComponent implements OnInit, OnDestroy {
 		private serverStaticDataService: ServerStaticDataService,
 		private publicDataService: PublicDataService,
 		private usersListService: UsersListService,
-		private userService: UserService
+		private userService: UserService,
+		private controlsLoginService: ControlsLoginService
 	) {
 		console.log('this.el.nativeElement:', this.el.nativeElement);
 	}
@@ -74,12 +76,16 @@ export class DashboardControlsComponent implements OnInit, OnDestroy {
 		},
 	];
 	public serverData: any = {
-		static: []
+		static: [],
 	};
 	public errorMessage: string;
+	public successMessage: string;
 	private getServerStaticData(callback) {
 		this.serverStaticDataService.getData().subscribe(
-			data => this.serverData.static = data,
+			data => {
+				this.serverData.static = data;
+				this.errorMessage = '';
+			},
 			error => this.errorMessage = <any> error,
 			() => {
 				console.log('getServerStaticData done, data:', this.serverData.static);
@@ -89,11 +95,33 @@ export class DashboardControlsComponent implements OnInit, OnDestroy {
 	}
 	private getPublicData(callback) {
 		this.publicDataService.getData().subscribe(
-			data => this.appUsageData = data,
+			data => {
+				this.appUsageData = data;
+				this.errorMessage = '';
+			},
 			error => this.errorMessage = <any> error,
 			() => {
 				console.log('getPublicData done, data:', this.appUsageData);
 				callback(this);
+			}
+		);
+	}
+
+	private requestControlsAccess() {
+		this.emitSpinnerStartEvent();
+		this.controlsLoginService.getData(this.userService.model.email).subscribe(
+			data => {
+				this.successMessage = <any> data['message'];
+				this.errorMessage = '';
+			},
+			error => {
+				this.successMessage = '';
+				this.errorMessage = <any> error;
+				this.emitSpinnerStopEvent();
+			},
+			() => {
+				console.log('requestControlsAccess done');
+				this.emitSpinnerStopEvent();
 			}
 		);
 	}
@@ -107,9 +135,10 @@ export class DashboardControlsComponent implements OnInit, OnDestroy {
 		this.emitter.emitEvent({spinner: 'stop'});
 	}
 
-	private login() {
+	private login() { /* tslint:disable-line */
 		console.log('login attempt with email', this.userService.model.email);
 		this.userService.saveUser();
+		this.requestControlsAccess();
 	};
 
 	private showModal: boolean = false;
@@ -126,10 +155,14 @@ export class DashboardControlsComponent implements OnInit, OnDestroy {
 		this.emitter.emitEvent({route: '/controls'});
 		this.emitter.emitEvent({appInfo: 'show'});
 
-		if (!this.userService.model.analyser_query) {
+		if (!this.userService.model.user_token) {
 			this.userService.restoreUser(() => {
-				if (this.userService.model.analyser_query) {
+				if (this.userService.model.user_token) {
+					/*
+					*	TODO config if authed
+					*/
 					//this.getMe();
+					this.emitter.emitEvent({appInfo: 'hide'});
 					this.emitSpinnerStopEvent();
 				} else {
 					console.log('local storage is empty');

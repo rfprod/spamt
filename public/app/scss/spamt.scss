@@ -212,7 +212,7 @@ body {
 		-ms-animation: spin 1s linear infinite;
 		-o-animation: spin 1s linear infinite;
 		animation: spin 1s linear infinite;
-
+		z-index: 1000;
 	}
 	@-webkit-keyframes spin {
 		from { transform: rotate(0deg);   opacity: 0.2; }

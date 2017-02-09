@@ -1,7 +1,7 @@
 <div class="container-fluid">
 	<div class="row">
 		<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
-			<h3>{{title}} <a href="#" (click)="toggleModal()"><i class="fa fa-cogs" [ngClass]="{ 'help-highlight': showHelp }"></i></a> <span class="label label-warning" *ngIf="showHelp">application diagnostics</span></h3>
+			<h3>{{title}} <a href="#" (click)="toggleModal()"><i class="fa fa-heartbeat" [ngClass]="{ 'help-highlight': showHelp }"></i></a> <span class="label label-warning" *ngIf="showHelp">application diagnostics</span></h3>
 			<p>{{description}}</p>
 
 			<nvd3 [options]="chartOptions" [data]="appUsageData"></nvd3>
