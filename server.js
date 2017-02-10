@@ -13,6 +13,7 @@ const express = require('express'),
 	flash = require('connect-flash'),
 	syncReq = require('sync-request'),
 	nodemailer = require('nodemailer'),
+	xoauth2 = require('xoauth2'),
 	crypto = require('crypto'),
 	cluster = require('cluster'),
 	os = require('os');
@@ -74,8 +75,13 @@ let smtpConfig = {
 	port: process.env.MAILER_PORT,
 	secure: true, // use SSL
 	auth: {
-		user: process.env.MAILER_EMAIL,
-		pass: process.env.MAILER_PASS
+		xoauth2: xoauth2.createXOAuth2Generator({
+			user: process.env.MAILER_EMAIL,
+			clientId: process.env.MAILER_CLIENT_ID,
+			clientSecret: process.env.MAILER_CLIENT_SECRET,
+			refreshToken: process.env.MAILER_REFRESH_TOKEN,
+			accessToken: 'empty'
+		})
 	}
 };
 // set proxy for smtp for development environment
