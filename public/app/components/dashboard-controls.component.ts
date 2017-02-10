@@ -27,7 +27,7 @@ export class DashboardControlsComponent implements OnInit, OnDestroy {
 	private subscription: any;
 	public title: string = 'SPAMT Controls';
 	public description: Object = {
-		'welcome': 'In order to gain access to Social Profile Analysis and Management Tool Controls you should have an account associated with an email address. Porvide this email address to get an authentication link.',
+		'welcome': 'In order to gain access to Social Profile Analysis and Management Tool Controls you should have an account associated with an email address. Porovide this email address to get an authentication link.',
 		'authenticated': 'Social Profile Analysis and Management Tool Controls',
 	};
 	public chartOptions: Object = {
