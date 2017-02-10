@@ -64,8 +64,8 @@ module.exports = function(app, passport, User, Query, SrvInfo, DataInit, syncRec
 				from: '"SPAMT 👥" <'+process.env.MAILER_EMAIL+'>',
 				to: recipientEmail,
 				subject: 'SPAMT: controls access ✔',
-				text: 'SPAMT: Controls access was requested using your email address.\nIf you did not request it, ignore this message.\nIf you requested access follow the link: '+accessLink+'.', // plaintext body
-				html: '<h3>SPAMT: Controls access was requested using your email address.</h3><p>If you did not request it, ignore this message.</p><p>If you requested access follow the link: '+accessLink+'.</p>' // html body
+				text: 'SPAMT: Controls access was requested using your email address.\nIf you did not request it, ignore this message.\nIf you requested access, follow the link: '+accessLink+'.', // plaintext body
+				html: '<h3>SPAMT: Controls access was requested using your email address.</h3><p>If you did not request it, ignore this message.</p><p>If you requested access, follow the link: '+accessLink+'.</p>' // html body
 			};
 			mailTransporter.sendMail(mailOptions, (err, info) => {
 				if (err) throw err;
@@ -422,7 +422,7 @@ module.exports = function(app, passport, User, Query, SrvInfo, DataInit, syncRec
 					const tokenObj = JWT.generateJWToken(payload, storedSalt);
 					console.log(payload, tokenObj);
 					JWT.setUserJWToken(user._id, tokenObj, () => {
-						let accessLink = process.env.APP_URL + '?user_token=' + tokenObj.token;
+						let accessLink = process.env.APP_URL + '#/controls?user_token=' + tokenObj.token;
 						sendAccessLink(userEmail, accessLink, () => {
 							res.status(200).json({message: 'access link was sent to provided email address', token: tokenObj.token});
 						});

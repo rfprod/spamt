@@ -53,6 +53,11 @@ SOUNDCLOUD_CLIENT_ID=soundcloud-client-id
 MONGO_URI=mongodb://localhost:27017/spamt
 PORT=8080
 APP_URL=http://localhost:8080/
+MAILER_HOST=smtp.gmail.com
+MAILER_PORT=465
+MAILER_EMAIL=dummy-sender-email@gmail.com
+MAILER_PASS=dummy-password
+MAILER_RECIPIENT_EMAIL=dummy-recipient-email@gmail.com
 ```
 
 #### Openshift deployment requires env variables setup via rhc
@@ -71,6 +76,11 @@ SOUNDCLOUD_CLIENT_ID=soundcloud-client-id
 APP_URL=application-url
 MONGO_USR=database-user-name
 MONGO_PASS=database-user-password
+MAILER_HOST=smtp.gmail.com
+MAILER_PORT=465
+MAILER_EMAIL=dummy-sender-email@gmail.com
+MAILER_PASS=dummy-password
+MAILER_RECIPIENT_EMAIL=dummy-recipient-email@gmail.com
 ```
 
 ### Starting the App
