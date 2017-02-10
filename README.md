@@ -62,6 +62,14 @@ MAILER_REFRESH_TOKEN=dummy-refresh-token
 MAILER_RECIPIENT_EMAIL=dummy-recipient-email@gmail.com
 ```
 
+##### Google Mail API instructions
+
+1. go to [https://console.developers.google.com/](https://console.developers.google.com/) and create a project
+2. create clientId, provide `https://developers.google.com/oauthplayground` as a Redirect URL form value, download data as json or copy paste it, you'll need `Client ID` and `Client secret`
+3. go to [https://developers.google.com/oauthplayground](https://developers.google.com/oauthplayground), open config (click cog icon, right top screen part), select `Access token location`: `Authorization header w/ Bearer prefix`, set use you own OAuth credentials flag and input your credentials from previous step, close config
+4. `Step1` Select & authorize APIs: type your own `https://mail.google.com`
+5. `Step2` Exchange authorization code for tokens: get a refresh token - use this token as a value for the MAILER_REFRESH_TOKEN `.env` var
+
 #### Openshift deployment requires env variables setup via rhc
 
 for example
