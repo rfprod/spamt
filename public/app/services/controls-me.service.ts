@@ -5,8 +5,8 @@ import { Observable } from 'rxjs/Observable';
 import 'rxjs/Rx';
 
 @Injectable()
-export class ControlsLoginService {
-	public appDataUrl: string = window.location.origin + '/request/access?email=';
+export class ControlsMeService {
+	public appDataUrl: string = window.location.origin + '/controls/me?user_token=';
 	constructor (private http: Http) {}
 
 	public extractData(res: Response) {
@@ -22,8 +22,8 @@ export class ControlsLoginService {
 		return Observable.throw(errMsg);
 	}
 
-	public getData(userEmail: string): Observable<any> { // tslint:disable-line
-		return this.http.get(this.appDataUrl + userEmail)
+	public getData(userToken: string): Observable<any> { // tslint:disable-line
+		return this.http.get(this.appDataUrl + userToken)
 			.map(this.extractData)
 			.catch(this.handleError);
 	}

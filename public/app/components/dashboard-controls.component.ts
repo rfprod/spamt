@@ -1,10 +1,13 @@
 import { Component, OnInit, OnDestroy, ElementRef } from '@angular/core';
+import { Router } from '@angular/router';
 import { EventEmitterService } from '../services/event-emitter.service';
 import { ServerStaticDataService } from '../services/server-static-data.service';
 import { PublicDataService } from '../services/public-data.service';
 import { UsersListService } from '../services/users-list.service';
 import { UserService } from '../services/user-service.service';
 import { ControlsLoginService } from '../services/controls-login.service';
+import { ControlsLogoutService } from '../services/controls-logout.service';
+import { ControlsMeService } from '../services/controls-me.service';
 
 // declare let d3: any;
 
@@ -20,14 +23,17 @@ export class DashboardControlsComponent implements OnInit, OnDestroy {
 		private publicDataService: PublicDataService,
 		private usersListService: UsersListService,
 		private userService: UserService,
-		private controlsLoginService: ControlsLoginService
+		private controlsLoginService: ControlsLoginService,
+		private controlsLogoutService: ControlsLogoutService,
+		private controlsMeService: ControlsMeService,
+		private router: Router
 	) {
 		console.log('this.el.nativeElement:', this.el.nativeElement);
 	}
 	private subscription: any;
 	public title: string = 'SPAMT Controls';
 	public description: Object = {
-		'welcome': 'In order to gain access to Social Profile Analysis and Management Tool Controls you should have an account associated with an email address. Porovide this email address to get an authentication link.',
+		'welcome': 'In order to gain access to Social Profile Analysis and Management Tool Controls you should have an account associated with an email address. Provide this email address to get an authentication link.',
 		'authenticated': 'Social Profile Analysis and Management Tool Controls',
 	};
 	public chartOptions: Object = {
@@ -80,12 +86,13 @@ export class DashboardControlsComponent implements OnInit, OnDestroy {
 	};
 	public errorMessage: string;
 	public successMessage: string;
+	private dismissMessages() {
+		this.errorMessage = '';
+		this.successMessage = '';
+	};
 	private getServerStaticData(callback) {
 		this.serverStaticDataService.getData().subscribe(
-			data => {
-				this.serverData.static = data;
-				this.errorMessage = '';
-			},
+			data => this.serverData.static = data,
 			error => this.errorMessage = <any> error,
 			() => {
 				console.log('getServerStaticData done, data:', this.serverData.static);
@@ -97,7 +104,6 @@ export class DashboardControlsComponent implements OnInit, OnDestroy {
 		this.publicDataService.getData().subscribe(
 			data => {
 				this.appUsageData = data;
-				this.errorMessage = '';
 			},
 			error => this.errorMessage = <any> error,
 			() => {
@@ -109,18 +115,65 @@ export class DashboardControlsComponent implements OnInit, OnDestroy {
 
 	private requestControlsAccess() {
 		this.emitSpinnerStartEvent();
+		this.dismissMessages();
 		this.controlsLoginService.getData(this.userService.model.email).subscribe(
-			data => {
-				this.successMessage = <any> data['message'];
-				this.errorMessage = '';
-			},
-			error => {
-				this.successMessage = '';
-				this.errorMessage = <any> error;
-				this.emitSpinnerStopEvent();
-			},
+			data => this.successMessage = data.message,
+			error => this.errorMessage = <any> error,
 			() => {
 				console.log('requestControlsAccess done');
+				this.emitSpinnerStopEvent();
+			}
+		);
+	}
+
+	private getMe() {
+		this.emitSpinnerStartEvent();
+		this.dismissMessages();
+		this.controlsMeService.getData(this.userService.model.user_token).subscribe(
+			data => {
+				this.userService.model.role = data.role;
+				this.userService.model.login = data.login;
+				this.userService.model.full_name = data.full_name;
+				this.userService.model.last_login = data.last_login;
+				this.userService.model.registered = data.registered;
+				this.successMessage = 'Successful login';
+			},
+			error => {
+				this.errorMessage = <any> error;
+				this.userService.resetUser();
+				this.emitter.emitEvent({appInfo: 'show'});
+				this.router.navigateByUrl('/controls');
+				console.log(this.errorMessage);
+			},
+			() => {
+				console.log('getMe done');
+				this.emitSpinnerStopEvent();
+			}
+		);
+	}
+
+	private login() { /* tslint:disable-line */
+		console.log('login attempt with email', this.userService.model.email);
+		this.userService.saveUser();
+		this.requestControlsAccess();
+	};
+
+	private logout() { /* tslint:disable-line */
+		console.log('logging out, resetting token');
+		this.emitSpinnerStartEvent();
+		this.dismissMessages();
+		this.controlsLogoutService.getData(this.userService.model.user_token).subscribe(
+			data => {
+				this.successMessage = 'Logout success';
+				this.userService.resetUser();
+				this.emitter.emitEvent({appInfo: 'show'});
+				this.router.navigateByUrl('/controls');
+			},
+			error => {
+				this.errorMessage = <any> error;
+			},
+			() => {
+				console.log('logout done');
 				this.emitSpinnerStopEvent();
 			}
 		);
@@ -134,12 +187,6 @@ export class DashboardControlsComponent implements OnInit, OnDestroy {
 		console.log('root spinner stop event emitted');
 		this.emitter.emitEvent({spinner: 'stop'});
 	}
-
-	private login() { /* tslint:disable-line */
-		console.log('login attempt with email', this.userService.model.email);
-		this.userService.saveUser();
-		this.requestControlsAccess();
-	};
 
 	private showModal: boolean = false;
 	private toggleModal() { /* tslint:disable-line */
@@ -155,21 +202,27 @@ export class DashboardControlsComponent implements OnInit, OnDestroy {
 		this.emitter.emitEvent({route: '/controls'});
 		this.emitter.emitEvent({appInfo: 'show'});
 
-		if (!this.userService.model.user_token) {
-			this.userService.restoreUser(() => {
-				if (this.userService.model.user_token) {
-					/*
-					*	TODO config if authed
-					*/
-					//this.getMe();
-					this.emitter.emitEvent({appInfo: 'hide'});
-					this.emitSpinnerStopEvent();
-				} else {
-					console.log('local storage is empty');
-					this.emitSpinnerStopEvent();
-				}
-			});
+		const route = this.router.url;
+		const urlParams = route.substring(route.lastIndexOf('?') + 1, route.length);
+		//console.log('route:', route);
+		//console.log('urlParams:', urlParams);
+		//console.log(/^user_token\=[^&]+$/.test(urlParams));
+		if (/^user_token\=[^&]+$/.test(urlParams)) {
+			const token = urlParams.split('=')[1];
+			console.log('user got token, save it:', token);
+			this.userService.model.user_token = token;
+			this.userService.saveUser();
 		}
+
+		this.userService.restoreUser(() => {
+			if (this.userService.model.user_token) {
+				this.emitter.emitEvent({appInfo: 'hide'});
+				this.getMe();
+			} else {
+				console.log('local storage is empty');
+				this.emitSpinnerStopEvent();
+			}
+		});
 
 		this.subscription = this.emitter.getEmitter().subscribe((message) => {
 			if (message.help === 'toggle') {

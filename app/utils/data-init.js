@@ -17,9 +17,7 @@ module.exports = {
 					login: 'admin',
 					email: 'temp@rfprod.tk',
 					firstName: 'first name 0',
-					lastName: 'last name 0',
-					city: 'city 0',
-					country: 'country 0'
+					lastName: 'last name 0'
 				};
 				newUser.save(err => {
 					if (err) throw err;
@@ -48,9 +46,7 @@ module.exports = {
 					login: 'user1',
 					email: 'user1@email.email',
 					firstName: 'first name 1',
-					lastName: 'last name 1',
-					city: 'city 1',
-					country: 'country 1'
+					lastName: 'last name 1'
 				};
 				newUser.save(err => {
 					if (err) throw err;
