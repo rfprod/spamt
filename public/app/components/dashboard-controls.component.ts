@@ -93,7 +93,10 @@ export class DashboardControlsComponent implements OnInit, OnDestroy {
 	private getServerStaticData(callback) {
 		this.serverStaticDataService.getData().subscribe(
 			data => this.serverData.static = data,
-			error => this.errorMessage = <any> error,
+			error => {
+				this.errorMessage = <any> error;
+				this.emitSpinnerStopEvent();
+			},
 			() => {
 				console.log('getServerStaticData done, data:', this.serverData.static);
 				callback(this);
@@ -105,7 +108,10 @@ export class DashboardControlsComponent implements OnInit, OnDestroy {
 			data => {
 				this.appUsageData = data;
 			},
-			error => this.errorMessage = <any> error,
+			error => {
+				this.errorMessage = <any> error;
+				this.emitSpinnerStopEvent();
+			},
 			() => {
 				console.log('getPublicData done, data:', this.appUsageData);
 				callback(this);
@@ -118,7 +124,10 @@ export class DashboardControlsComponent implements OnInit, OnDestroy {
 		this.dismissMessages();
 		this.controlsLoginService.getData(this.userService.model.email).subscribe(
 			data => this.successMessage = data.message,
-			error => this.errorMessage = <any> error,
+			error => {
+				this.errorMessage = <any> error;
+				this.emitSpinnerStopEvent();
+			},
 			() => {
 				console.log('requestControlsAccess done');
 				this.emitSpinnerStopEvent();
@@ -142,8 +151,8 @@ export class DashboardControlsComponent implements OnInit, OnDestroy {
 				this.errorMessage = <any> error;
 				this.userService.resetUser();
 				this.emitter.emitEvent({appInfo: 'show'});
+				this.emitSpinnerStopEvent();
 				this.router.navigateByUrl('/controls');
-				console.log(this.errorMessage);
 			},
 			() => {
 				console.log('getMe done');
@@ -171,6 +180,7 @@ export class DashboardControlsComponent implements OnInit, OnDestroy {
 			},
 			error => {
 				this.errorMessage = <any> error;
+				this.emitSpinnerStopEvent();
 			},
 			() => {
 				console.log('logout done');
@@ -204,9 +214,6 @@ export class DashboardControlsComponent implements OnInit, OnDestroy {
 
 		const route = this.router.url;
 		const urlParams = route.substring(route.lastIndexOf('?') + 1, route.length);
-		//console.log('route:', route);
-		//console.log('urlParams:', urlParams);
-		//console.log(/^user_token\=[^&]+$/.test(urlParams));
 		if (/^user_token\=[^&]+$/.test(urlParams)) {
 			const token = urlParams.split('=')[1];
 			console.log('user got token, save it:', token);
