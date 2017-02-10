@@ -13,9 +13,7 @@ let User = new Schema({
 		login:					String, // gen
 		email:					String,	// input
 		firstName:			String,	// input
-		lastName:			String,	// input
-		city:						String,	// input
-		country:				String	// input
+		lastName:				String	// input
 	},
 	twitter: {
 		id:							String,	// sync

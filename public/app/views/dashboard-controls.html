@@ -6,16 +6,20 @@
 				<p>{{description.welcome}}</p>
 			</span>
 			<span *ngIf="userService.model.user_token">
-				<h3>{{title}} <a href="#" (click)="toggleModal()"><i class="fa fa-bar-chart" [ngClass]="{ 'help-highlight': showHelp }"></i></a> <span class="label label-warning" *ngIf="showHelp">application stats</span></h3>
+				<h3>
+					{{title}}
+					<a (click)="toggleModal()"><i class="fa fa-bar-chart" [ngClass]="{ 'help-highlight': showHelp }"></i></a> <span class="label label-warning" *ngIf="showHelp">application stats</span>
+					<a (click)="logout()"><i class="fa fa-sign-out" [ngClass]="{ 'help-highlight': showHelp }"></i></a> <span class="label label-warning" *ngIf="showHelp">log out of SPAMT Controls</span>
+				</h3>
 				<p>{{description.authenticated}}</p>
 			</span>
 
 			<div *ngIf="errorMessage" class="alert alert-danger alert-dismissible" role="alert">
-				<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+				<button type="button" class="close" (click)="dismissMessages()" aria-label="Close"><span aria-hidden="true">&times;</span></button>
 				<i class="fa fa-warning"></i> {{errorMessage}}
 			</div>
 			<div *ngIf="successMessage" class="alert alert-success alert-dismissible" role="alert">
-				<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+				<button type="button" class="close" (click)="dismissMessages()" aria-label="Close"><span aria-hidden="true">&times;</span></button>
 				<i class="fa fa-check-circle"></i> {{successMessage}}
 			</div>
 			

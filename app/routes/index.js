@@ -400,9 +400,8 @@ module.exports = function(app, passport, User, Query, SrvInfo, DataInit, syncRec
 // Administration endpoints
 	app.get('/request/access', (req, res) => {
 		const userEmail = req.query.email;
-		console.log('userEmail:', userEmail);
+		// console.log('controls access request from address:', userEmail);
 		if (userEmail) {
-			console.log('controls access request from address:', userEmail);
 			User.find({'userExtended.email': userEmail}, (err, docs) => {
 				if (err) throw err;
 				if (!docs.length) {
@@ -420,12 +419,17 @@ module.exports = function(app, passport, User, Query, SrvInfo, DataInit, syncRec
 						expires: expirationDate.getTime()
 					};
 					const tokenObj = JWT.generateJWToken(payload, storedSalt);
-					console.log(payload, tokenObj);
+					// console.log(payload, tokenObj);
 					JWT.setUserJWToken(user._id, tokenObj, () => {
 						let accessLink = process.env.APP_URL + '#/controls?user_token=' + tokenObj.token;
 						sendAccessLink(userEmail, accessLink, () => {
-							res.status(200).json({message: 'access link was sent to provided email address', token: tokenObj.token});
+							res.status(200).json({message: 'access link was sent to provided email address'});
 						});
+					});
+					// update lastLogin
+					User.update({'userExtended.email': userEmail}, {$set: {'lastLogin': new Date().getTime()}}, (err, res) => {
+						if (err) throw err;
+						console.log('last login updated', res);
 					});
 				}
 			});
@@ -468,21 +472,13 @@ module.exports = function(app, passport, User, Query, SrvInfo, DataInit, syncRec
 		User.find({jwToken: userToken}, (err, docs) => {
 			if (err) throw err;
 			let output = {};
-			console.log(docs);
-			for (let key in docs) {
-				console.log(key);
-				if (key !== 'salt' && key !== 'jwToken') {
-					if (typeof docs[key] === 'object') {
-						output[key] = {};
-						const subObj = docs[key];
-						for (let k in subObj) {
-							output[key][k] = subObj[k];
-						}
-					} else {
-						output[key] = docs[key];
-					}
-				}
-			}
+			docs = docs[0];
+			output.id = docs._id;
+			output.last_login = docs.lastLogin;
+			output.registered = docs.registered;
+			output.role = docs.role;
+			output.login = docs.userExtended.login;
+			output.full_name = docs.userExtended.firstName + ' ' + docs.userExtended.lastName;
 			res.status(200).json(output);
 		});
 	});
@@ -535,7 +531,6 @@ module.exports = function(app, passport, User, Query, SrvInfo, DataInit, syncRec
 
 	app.get('/controls/logout', (req, res) => {
 		let userToken = req.query.user_token; // token from url var
-		if (typeof userToken == 'undefined') userToken = req.body.user_token; // token from request body
 		JWT.resetUserJWToken(null, userToken, (err) => {
 			if (err) { res.status(401).json(err); }
 			else { res.status(200).json({message: 'logged out, token reset'}); }

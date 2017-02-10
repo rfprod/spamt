@@ -6,7 +6,12 @@ export class UserService {
 
 	public model: any = {
 		email: '',
+		role: '',
+		login: '',
+		full_name: '',
 		user_token: '',
+		last_login: '',
+		registered: '',
 		analyser_query: '',
 		analyser_user_id: '',
 		analyser_user_uri: '',
