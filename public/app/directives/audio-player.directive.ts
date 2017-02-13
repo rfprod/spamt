@@ -15,7 +15,8 @@ export class AudioPlayerDirective implements OnInit, OnDestroy {
 	private progressInterval: any;
 	public reportProgress(): void {
 		const progress = 100 * this.el.nativeElement.currentTime / this.el.nativeElement.duration;
-		this.el.nativeElement.parentElement.querySelector('.underlay').style.width = progress + '%';
+		const waveformWidth = this.el.nativeElement.parentElement.querySelector('.waveform').width;
+		this.el.nativeElement.parentElement.querySelector('.underlay').style.width = (waveformWidth * progress / 100) + 'px';
 	}
 
 	private interval: any;
@@ -28,7 +29,15 @@ export class AudioPlayerDirective implements OnInit, OnDestroy {
 				if (message.audio === 'play') {
 					this.interval = setInterval(() => {
 						console.log('this.el.nativeElement.readyState: ', this.el.nativeElement.readyState);
-						if (this.el.nativeElement.readyState === 4) {
+						/*
+						*	states
+						*	0 - nothing
+						*	1 - has metadata
+						*	2 - has current data
+						*	3 - has future data
+						*	4 - has enough data
+						*/
+						if (this.el.nativeElement.readyState >= 2) {
 							this.el.nativeElement.play();
 							clearInterval(this.interval);
 						}
