@@ -139,10 +139,10 @@ body {
 				flex: 1;
 			}
 		}
+		audio {
+			width: 100%;
+		}
 		#data {
-			audio {
-				width: 100%;
-			}
 			.waveform-container {
 				display: block;
 				height: auto !important;

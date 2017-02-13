@@ -114,6 +114,14 @@ export class DashboardDetailsComponent implements OnInit, OnDestroy {
 	private selectedEndpoint: string = '';
 	private selectTab(tab): void { // tslint:disable-line
 		console.log('selectTab, tab: ', tab);
+
+		if (this.audioPlayback || this.selectedTrack || this.selectedTrackURI) {
+			this.emitter.emitEvent({audio: 'pause'});
+			this.audioPlayback = false;
+			this.selectedTrack = undefined;
+			this.selectedTrackURI = undefined;
+		}
+
 		this.selectedTab = tab;
 		for (let i in this.dataTabs) {
 			if (this.dataTabs[i] === tab) { this.selectedEndpoint = this.endpoints[i]; }
@@ -182,7 +190,7 @@ export class DashboardDetailsComponent implements OnInit, OnDestroy {
 	private selectedTrackURI: string;
 	private audioPlayback: boolean = false;
 	private selectedTrack: string = undefined;
-	private resolvePreviewSource(uri) {
+	private resolvePreviewSource(uri): void {
 		this.selectedTrack = undefined;
 		this.emitSpinnerStartEvent();
 		this.scGetUserTrackStreamService.getData(uri).subscribe(
@@ -192,13 +200,16 @@ export class DashboardDetailsComponent implements OnInit, OnDestroy {
 				this.selectedTrackURI = uri;
 				this.displayError = undefined;
 			},
-			error => this.displayError = <any> error,
+			error => {
+				this.displayError = <any> error;
+				this.emitSpinnerStopEvent();
+			},
 			() => {
 				console.log('scGetUserTrackPlayService done');
-				this.emitSpinnerStopEvent();
 				setTimeout(() => {
 					this.emitter.emitEvent({audio: 'play'});
 					this.audioPlayback = true;
+					this.emitSpinnerStopEvent();
 				}, 1000);
 			}
 		);
@@ -206,9 +217,11 @@ export class DashboardDetailsComponent implements OnInit, OnDestroy {
 	private playTrack(uri): void { // tslint:disable-line
 		console.log('playTrack, sc api uri: ', uri);
 		if (this.selectedTrackURI !== uri) {
-			this.emitter.emitEvent({audio: 'pause'});
-			this.audioPlayback = false;
-			this.resolvePreviewSource(uri);
+			if (this.selectedTrackURI && this.audioPlayback) {
+				this.emitter.emitEvent({audio: 'pause'});
+				this.audioPlayback = false;
+			}
+				this.resolvePreviewSource(uri);
 		} else {
 			console.log('trigger player');
 			if (this.audioPlayback) {
