@@ -27,7 +27,7 @@ export class AudioPlayerDirective implements OnInit, OnDestroy {
 			if (message.audio) {
 				console.log('AudioPlayerDirective consuming control signal: ', message.audio);
 				if (message.audio === 'play') {
-					this.interval = setInterval(() => {
+						this.interval = setInterval(() => {
 						console.log('this.el.nativeElement.readyState: ', this.el.nativeElement.readyState);
 						/*
 						*	states
@@ -38,10 +38,10 @@ export class AudioPlayerDirective implements OnInit, OnDestroy {
 						*	4 - has enough data
 						*/
 						if (this.el.nativeElement.readyState >= 2) {
-							this.el.nativeElement.play();
 							clearInterval(this.interval);
+							this.el.nativeElement.play();
 						}
-					}, 1000);
+					}, 2000);
 				}
 				if (message.audio === 'pause') {
 					this.el.nativeElement.pause();
