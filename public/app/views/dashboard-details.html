@@ -124,9 +124,9 @@
 				Error: Your browser does not support <code>audio</code> element.
 			</audio>
 
-			<div id="data" class="panel panel-default" *ngFor="let tab of dataTabs" [hidden]="tab !== selectedTab">
+			<div id="data" class="panel panel-default">
 
-				<div class="panel-body" *ngIf="selectedTab === dataTabs[0]" id="tracks-tab">
+				<div class="panel-body" *ngIf="selectedTab === dataTabs[0]">
 
 					<div class="media" *ngFor="let track of publicData.tracks" [ngClass]="{ 'selected-track': selectedTrackURI ===  track.stream_url }">
 						<div class="media-left">
@@ -220,7 +220,7 @@
 					</div>
 				</div>
 
-				<div class="panel-body" *ngIf="selectedTab === dataTabs[2]" id="favourites-tab">
+				<div class="panel-body" *ngIf="selectedTab === dataTabs[2]">
 
 					<div class="media" *ngFor="let track of publicData.favorites" [ngClass]="{ 'selected-track': selectedTrackURI ===  track.stream_url }">
 						<div class="media-left">
