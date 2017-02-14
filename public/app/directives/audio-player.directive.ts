@@ -15,8 +15,9 @@ export class AudioPlayerDirective implements OnInit, OnDestroy {
 	private progressInterval: any;
 	public reportProgress(): void {
 		const progress = 100 * this.el.nativeElement.currentTime / this.el.nativeElement.duration;
-		const waveformWidth = this.el.nativeElement.parentElement.querySelector('.waveform').width;
-		this.el.nativeElement.parentElement.querySelector('.underlay').style.width = (waveformWidth * progress / 100) + 'px';
+		const selectedTrackObj = this.el.nativeElement.parentElement.querySelector('.selected-track');
+		const waveformWidth = selectedTrackObj.querySelector('.waveform').width;
+		selectedTrackObj.querySelector('.underlay').style.width = (waveformWidth * progress / 100) + 'px';
 	}
 
 	private interval: any;
@@ -41,7 +42,7 @@ export class AudioPlayerDirective implements OnInit, OnDestroy {
 							clearInterval(this.interval);
 							this.el.nativeElement.play();
 						}
-					}, 2000);
+					}, 1500);
 				}
 				if (message.audio === 'pause') {
 					this.el.nativeElement.pause();
@@ -57,7 +58,7 @@ export class AudioPlayerDirective implements OnInit, OnDestroy {
 		});
 		this.progressInterval = setInterval(() => {
 			if (this.el.nativeElement.readyState === 4) {
-				console.log('reporting progress: ', this.el.nativeElement.readyState);
+				// console.log('reporting progress: ', this.el.nativeElement.readyState);
 				this.reportProgress();
 			}
 		}, 1000);

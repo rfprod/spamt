@@ -89,7 +89,6 @@ export class DashboardDetailsComponent implements OnInit, OnDestroy {
 				this.userService.model.analyser_user_uri = this.publicData.user.uri;
 				console.log('this.userService.model update:', this.userService.model);
 				this.userService.saveUser();
-				this.getQueries();
 			},
 			error => this.displayError = <any> error,
 			() => {
@@ -250,23 +249,23 @@ export class DashboardDetailsComponent implements OnInit, OnDestroy {
 
 	public ngOnInit() {
 		console.log('ngOnInit: DashboardDetailsComponent initialized');
+		this.emitSpinnerStartEvent();
 		this.emitter.emitEvent({route: '/data'});
 		this.emitter.emitEvent({appInfo: 'hide'});
 		console.log('this.userService:', this.userService.model);
+		this.getQueries();
 		if (!this.userService.model.analyser_query) {
 			this.userService.restoreUser(() => {
 				this.scUserName = this.userService.model.analyser_query;
-				if (this.userService.model.analyser_query) {
+				if (this.scUserName) {
+					console.log('restored user selection, this.scUserName:', this.scUserName);
 					this.getUser();
 				} else {
-					console.log('local storage is empty');
-					this.getQueries();
-					// this.emitSpinnerStopEvent();
+					console.log('restored user selection, user is not selected');
 				}
 			});
 		} else {
-			console.log('this.scUserName:', this.scUserName);
-			this.emitSpinnerStopEvent();
+			console.log('user is selected, this.scUserName:', this.scUserName);
 		}
 		this.subscription = this.emitter.getEmitter().subscribe((message) => {
 			/*
