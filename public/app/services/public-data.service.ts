@@ -1,13 +1,12 @@
 import { Injectable } from '@angular/core';
 import { Http, Response } from '@angular/http';
 
-import { Observable } from 'rxjs/Observable';
-import 'rxjs/Rx';
+import { Observable } from 'rxjs/Rx';
 
 @Injectable()
 export class PublicDataService {
 	public appDataUrl: string = window.location.origin + '/app-diag/usage';
-	constructor (private http: Http) {}
+	constructor(private http: Http) {}
 
 	public extractData(res: Response) {
 		let body = res.json();

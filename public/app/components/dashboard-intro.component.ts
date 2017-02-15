@@ -80,7 +80,7 @@ export class DashboardIntroComponent implements OnInit, OnDestroy {
 			error => this.errorMessage = <any> error,
 			() => {
 				console.log('getServerStaticData done, data:', this.serverData.static);
-				callback(this);
+				if (callback) { callback(this); }
 			}
 		);
 	}
@@ -90,7 +90,7 @@ export class DashboardIntroComponent implements OnInit, OnDestroy {
 			error => this.errorMessage = <any> error,
 			() => {
 				console.log('getPublicData done, data:', this.appUsageData);
-				callback(this);
+				if (callback) { callback(this); }
 			}
 		);
 	}
