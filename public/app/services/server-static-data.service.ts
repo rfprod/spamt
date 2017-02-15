@@ -1,13 +1,12 @@
 import { Injectable } from '@angular/core';
 import { Http, Response } from '@angular/http';
 
-import { Observable } from 'rxjs/Observable';
-import 'rxjs/Rx';
+import { Observable } from 'rxjs/Rx';
 
 @Injectable()
 export class ServerStaticDataService {
 	public appDataUrl: string = window.location.origin + '/app-diag/static';
-	constructor( private http: Http ) {
+	constructor(private http: Http) {
 		console.log('window.location:', window.location);
 		console.log('window.location.origin:', window.location.origin);
 	}
