@@ -40,7 +40,7 @@ module.exports = function(config){
 
 		// preprocessors: {},
 
-		browserNoActivityTimeout: 20000,
+		browserNoActivityTimeout: 25000,
 		browsers: ['PhantomJS'],
 		// browsers: ['Chrome'],
 		// browsers : ['Firefox'],

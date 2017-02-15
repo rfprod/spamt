@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, ElementRef } from '@angular/core';
 import { EventEmitterService } from '../services/event-emitter.service';
 
 @Component({
@@ -12,7 +12,12 @@ import { EventEmitterService } from '../services/event-emitter.service';
 	`,
 })
 export class AppInfoComponent implements OnInit, OnDestroy {
-	constructor( private emitter: EventEmitterService ) {}
+	constructor(
+		public el: ElementRef,
+		private emitter: EventEmitterService
+	) {
+		console.log('this.el.nativeElement:', this.el.nativeElement);
+	}
 	private subscription: any;
 	private hideInfo: boolean = true;
 	private badges: any[] = [ // tslint:disable-line

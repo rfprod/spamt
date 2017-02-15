@@ -71,7 +71,6 @@ describe('DashboardIntroComponent', () => {
 		});
 
 		it('should be defined', (done) => {
-			console.log(this.component);
 			expect(this.component).toBeDefined();
 			done();
 		});
