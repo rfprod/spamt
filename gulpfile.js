@@ -13,6 +13,7 @@ const gulp = require('gulp'),
 	cssnano = require('gulp-cssnano'),
 	autoprefixer = require('gulp-autoprefixer'),
 	systemjsBuilder = require('gulp-systemjs-builder'),
+	runSequence = require('run-sequence'),
 	spawn = require('child_process').spawn,
 	exec = require('child_process').exec;
 let node,
@@ -42,7 +43,7 @@ gulp.task('database', () => {
 	mongo = spawn('mongod', ['--smallfiles', '--nojournal'], {stdio: 'inherit'});
 	mongo.on('close', (code) => {
 		if (code === 8) {
-			gulp.log('Error detected, waiting for changes...');
+			console.log('Error detected, waiting for changes...');
 		}
 	});
 });
@@ -52,17 +53,22 @@ gulp.task('server', () => {
 	node = spawn('node', ['server.js'], {stdio: 'inherit'});
 	node.on('close', (code) => {
 		if (code === 8) {
-			gulp.log('Error detected, waiting for changes...');
+			console.log('Error detected, waiting for changes...');
 		}
 	});
 });
 
-gulp.task('tsc', () => {
-	if (node) tsc.kill();
-	tsc = spawn('tsc', [], {stdio: 'inherit'});
+gulp.task('tsc', (done) => {
+	if (tsc) tsc.kill();
+	tsc = spawn('npm', ['run', 'tsc'], {stdio: 'inherit'});
+	tsc.on('error', (err) => {
+		console.log('Error', err);
+	})
 	tsc.on('close', (code) => {
 		if (code === 8) {
-			gulp.log('Error detected, waiting for changes...');
+			console.log('Error detected, waiting for changes...');
+		} else {
+			done();
 		}
 	});
 });
@@ -156,13 +162,25 @@ gulp.task('watch-client-and-test', () => {
 
 gulp.task('default', ['database','build-system-js','sass-autoprefix-minify-css','lint','server','watch','watch-and-lint']);
 
-gulp.task('production-start', ['database','tsc','build-system-js','sass-autoprefix-minify-css','server']);
+gulp.task('build', (done) => {
+	runSequence('sass-autoprefix-minify-css', 'tsc', 'build-system-js', done);
+});
+
+gulp.task('production-start', ['build', 'database', 'server']);
 
 process.on('exit', () => {
 	if (node) node.kill();
 	if (mongo) mongo.kill();
+	if (tsc) tsc.kill();
 });
 
-process.on('SIGINT', () => {
-	killProcessByName('gulp');
+['SIGHUP', 'SIGINT', 'SIGQUIT', 'SIGILL', 'SIGTRAP', 'SIGABRT',
+	'SIGBUS', 'SIGFPE', 'SIGUSR1', 'SIGSEGV', 'SIGUSR2', 'SIGTERM'
+].forEach((element) => {
+	process.on(element, () => {
+		if (node) node.kill();
+		if (mongo) mongo.kill();
+		if (tsc) tsc.kill();
+		killProcessByName('gulp');
+	});
 });
