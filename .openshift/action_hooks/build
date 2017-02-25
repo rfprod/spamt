@@ -3,8 +3,6 @@ HOME_TEMP=$HOME
 export HOME=$OPENSHIFT_REPO_DIR
 if [[ -f "${OPENSHIFT_REPO_DIR}"/gulpfile.js ]]; then
 	cd "${OPENSHIFT_REPO_DIR}"
-	gulp tsc
-	gulp sass-autoprefix-minify-css
-	gulp build-system-js
+	gulp build
 fi
 export HOME=$HOME_TEMP

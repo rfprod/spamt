@@ -220,7 +220,7 @@ export class DashboardDetailsComponent implements OnInit, OnDestroy {
 				this.emitter.emitEvent({audio: 'pause'});
 				this.audioPlayback = false;
 			}
-				this.resolvePreviewSource(uri);
+			this.resolvePreviewSource(uri);
 		} else {
 			console.log('trigger player');
 			if (this.audioPlayback) {
