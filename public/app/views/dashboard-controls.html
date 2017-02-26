@@ -41,7 +41,38 @@
 			</span>
 
 			<span *ngIf="userService.model.user_token">
+				<table class="table table-condensed">
+					<tbody>
+						<tr>
+							<td>login: {{userService.model.login}}</td>
+							<td>role: {{userService.model.role}}</td>
+							<td>full name: {{userService.model.full_name}}</td>
+						</tr>
+					</tbody>
+				</table>
 				<nvd3 [options]="chartOptions" [data]="appUsageData"></nvd3>
+				<table class="table table-condensed table-hover">
+					<thead>
+						<tr>
+							<th>Email</th>
+							<th>First name</th>
+							<th>Last name</th>
+							<th>Role</th>
+							<th>Last login</th>
+							<th>Registered</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr *ngFor="let user of usersList">
+							<td>{{user.email}}</td>
+							<td>{{user.firstName}}</td>
+							<td>{{user.lastName}}</td>
+							<td>{{user.role}}</td>
+							<td>{{user.lastLogin | date}}</td>
+							<td>{{user.registered | date}}</td>
+						</tr>
+					</tbody>
+				</table>
 			</span>
 
 			<span id="modal" *ngIf="showModal">

@@ -194,6 +194,18 @@ body {
 		}
 	}
 
+	dashboard-controls {
+		table {
+			tbody {
+				tr {
+					td {
+						cursor: default;
+					}
+				}
+			}
+		}
+	}
+
 	loading-indicator {
 		background: $black;
 		display: block;

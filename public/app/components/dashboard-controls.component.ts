@@ -84,6 +84,7 @@ export class DashboardControlsComponent implements OnInit, OnDestroy {
 	public serverData: any = {
 		static: [],
 	};
+	public usersList: any[] = [];
 	public errorMessage: string;
 	public successMessage: string;
 	private dismissMessages() {
@@ -99,22 +100,33 @@ export class DashboardControlsComponent implements OnInit, OnDestroy {
 			},
 			() => {
 				console.log('getServerStaticData done, data:', this.serverData.static);
-				callback(this);
+				if (callback) { callback(this); }
 			}
 		);
 	}
 	private getPublicData(callback) {
 		this.publicDataService.getData().subscribe(
-			data => {
-				this.appUsageData = data;
-			},
+			data => this.appUsageData = data,
 			error => {
 				this.errorMessage = <any> error;
 				this.emitSpinnerStopEvent();
 			},
 			() => {
 				console.log('getPublicData done, data:', this.appUsageData);
-				callback(this);
+				if (callback) { callback(this); }
+			}
+		);
+	}
+	private getUsersList() {
+		this.usersListService.getData(this.userService.model.user_token).subscribe(
+			data => this.usersList = data,
+			error => {
+				this.errorMessage = <any> error;
+				this.emitSpinnerStopEvent();
+			},
+			() => {
+				console.log('getUsersList done, data:', this.usersList);
+				this.emitSpinnerStopEvent();
 			}
 		);
 	}
@@ -146,6 +158,7 @@ export class DashboardControlsComponent implements OnInit, OnDestroy {
 				this.userService.model.last_login = data.last_login;
 				this.userService.model.registered = data.registered;
 				this.successMessage = 'Successful login';
+				this.userService.saveUser();
 			},
 			error => {
 				this.errorMessage = <any> error;
@@ -225,6 +238,7 @@ export class DashboardControlsComponent implements OnInit, OnDestroy {
 			if (this.userService.model.user_token) {
 				this.emitter.emitEvent({appInfo: 'hide'});
 				this.getMe();
+				this.getUsersList();
 			} else {
 				console.log('local storage is empty');
 				this.emitSpinnerStopEvent();
@@ -238,8 +252,8 @@ export class DashboardControlsComponent implements OnInit, OnDestroy {
 			}
 		});
 
-		this.getPublicData((/*scope*/) => {
-			this.getServerStaticData((/*scope*/) => {
+		this.getPublicData(() => {
+			this.getServerStaticData(() => {
 				this.emitSpinnerStopEvent();
 			});
 		});
