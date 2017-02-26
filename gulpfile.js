@@ -63,7 +63,7 @@ gulp.task('tsc', (done) => {
 	tsc = spawn('npm', ['run', 'tsc'], {stdio: 'inherit'});
 	tsc.on('error', (err) => {
 		console.log('Error', err);
-	})
+	});
 	tsc.on('close', (code) => {
 		if (code === 8) {
 			console.log('Error detected, waiting for changes...');
