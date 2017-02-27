@@ -186,7 +186,6 @@ module.exports = function(app, passport, User, Query, SrvInfo, DataInit, syncRec
 				if (a.weight < b.weight) { return 1; }
 				return 0;
 			});
-			console.log(docs);
 			output.data = (docs.length > 30) ? docs.slice(0, 30) : docs;
 			res.setHeader('Cache-Control', 'no-cache, no-store');
 			res.format({
@@ -399,8 +398,11 @@ module.exports = function(app, passport, User, Query, SrvInfo, DataInit, syncRec
 
 // Administration endpoints
 	app.get('/request/access', (req, res) => {
+		/**
+		* request controls access
+		* generates token and sends link to user email
+		*/
 		const userEmail = req.query.email;
-		// console.log('controls access request from address:', userEmail);
 		if (userEmail) {
 			User.find({'userExtended.email': userEmail}, (err, docs) => {
 				if (err) throw err;
@@ -439,6 +441,10 @@ module.exports = function(app, passport, User, Query, SrvInfo, DataInit, syncRec
 	});
 
 	app.all('/controls/*', (req, res, next) => {
+		/**
+		* /controls endpoint access restriction
+		* based on bearer token
+		*/
 		passport.authenticate('token-bearer', { session: false }, function(err, user, info) {
 			let userToken = req.query.user_token; // token from url var
 			if (typeof userToken == 'undefined') userToken = req.body.user_token; // token from request body
@@ -468,6 +474,9 @@ module.exports = function(app, passport, User, Query, SrvInfo, DataInit, syncRec
 	});
 
 	app.get('/controls/me', (req, res) => {
+		/**
+		* get authenticated user details
+		*/
 		let userToken = req.query.user_token;
 		User.find({jwToken: userToken}, (err, docs) => {
 			if (err) throw err;
@@ -483,23 +492,16 @@ module.exports = function(app, passport, User, Query, SrvInfo, DataInit, syncRec
 		});
 	});
 
-	app.get('/controls/dashboard', (req, res) => {
-		let userToken = req.query.user_token;
-		User.find({jwToken: userToken}, (err, docs) => {
-			if (err) throw err;
-			let status, message;
-			if (docs.length === 0) {
-				status = 401;
-				message = {message: 'User does not exist'};
-			} else {
-				status = 200;
-				message = {message: 'dashboard loaded'};
-			}
-			res.status(status).json(message);
-		});
-	});
-
 	app.get('/controls/list/users', (req, res) => {
+		/**
+		* get users list
+		* returns all records for now
+		*/
+		/**
+		* TODO
+		*	return 20 records per request similarly to /controls/list/queries
+		*	query parameter 'page' should control records offset
+		*/
 		User.find({}, (err, docs) => {
 			if (err) { throw err; }
 			let resData = [],
@@ -529,7 +531,44 @@ module.exports = function(app, passport, User, Query, SrvInfo, DataInit, syncRec
 		});
 	});
 
+	app.get('/controls/list/queries', (req, res) => {
+		/**
+		* get queries list
+		* returns 20 records per request
+		* query parameter 'page' controls records offset
+		*/
+		const page = (req.query.page) ? req.query.page : 1;
+		const limit = 20;
+		const offset = (page > 1) ? limit * page : 0;
+		Query.aggregate({$skip: offset}, {$limit: limit}, (err, docs) => {
+			if (err) { throw err; }
+			let resData = [],
+				dataUnit = {};
+			for (let i in docs) {
+				if (docs[i]) {
+					dataUnit = {
+						id: docs[i]._id,
+						name:	docs[i].name,
+						weight:	docs[i].weight,
+						timestamp: docs[i].timestamp
+					};
+					resData.push(dataUnit);
+				}
+			}
+			res.setHeader('Cache-Control', 'no-cache, no-store');
+			res.format({
+				'application/json': function(){
+					res.status(200).send(resData);
+				}
+			});
+		});
+	});
+
 	app.get('/controls/logout', (req, res) => {
+		/**
+		* log out authenticated user
+		* resets current user token
+		*/
 		let userToken = req.query.user_token; // token from url var
 		JWT.resetUserJWToken(null, userToken, (err) => {
 			if (err) { res.status(401).json(err); }
