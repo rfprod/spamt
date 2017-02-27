@@ -13,6 +13,7 @@ import { AppInfoComponent } from './components/app-info.component';
 import { DashboardIntroComponent } from './components/dashboard-intro.component';
 import { DashboardDetailsComponent } from './components/dashboard-details.component';
 import { DashboardControlsComponent } from './components/dashboard-controls.component';
+import { DashboardUserLoginComponent } from './components/dashboard-user-login.component';
 
 import { nvD3 } from 'ng2-nvd3';
 
@@ -39,7 +40,7 @@ import { ControlsQueriesListService } from './services/controls-queries-list.ser
 declare let $: JQueryStatic;
 
 @NgModule({
-	declarations: [ AppComponent, AppNavComponent, AppInfoComponent, DashboardIntroComponent, DashboardDetailsComponent, DashboardControlsComponent, nvD3 , AudioPlayerDirective, LoadingIndicatorDirective, ConvertDuration],
+	declarations: [ AppComponent, AppNavComponent, AppInfoComponent, DashboardIntroComponent, DashboardDetailsComponent, DashboardControlsComponent, DashboardUserLoginComponent, nvD3 , AudioPlayerDirective, LoadingIndicatorDirective, ConvertDuration],
 	imports 		: [ BrowserModule, FormsModule, HttpModule, RouterModule.forRoot(APP_ROUTES) ],
 	providers 	: [
 									{ provide: LocationStrategy, useClass: HashLocationStrategy },
