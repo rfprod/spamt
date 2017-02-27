@@ -8,8 +8,8 @@
 			<span *ngIf="userService.model.user_token">
 				<h3>
 					{{title}}
-					<a (click)="toggleModal()"><i class="fa fa-bar-chart" [ngClass]="{ 'help-highlight': showHelp }"></i></a> <span class="label label-warning" *ngIf="showHelp">application stats</span>
-					<a (click)="logout()"><i class="fa fa-sign-out" [ngClass]="{ 'help-highlight': showHelp }"></i></a> <span class="label label-warning" *ngIf="showHelp">log out of SPAMT Controls</span>
+					<a (click)="toggleModal()"><i class="fa fa-bar-chart" [ngClass]="{ 'help-highlight': showHelp }"></i> <span class="label label-warning" *ngIf="showHelp">application stats</span></a>
+					<a (click)="logout()"><i class="fa fa-sign-out" [ngClass]="{ 'help-highlight': showHelp }"></i> <span class="label label-warning" *ngIf="showHelp">log out of SPAMT Controls</span></a>
 				</h3>
 				<p>{{description.authenticated}}</p>
 			</span>
@@ -43,36 +43,71 @@
 			<span *ngIf="userService.model.user_token">
 				<table class="table table-condensed">
 					<tbody>
-						<tr>
-							<td>login: {{userService.model.login}}</td>
-							<td>role: {{userService.model.role}}</td>
-							<td>full name: {{userService.model.full_name}}</td>
+						<tr class="middle">
+							<td><i class="fa fa-address-card fa-2x"></i></td>
+							<td title="login">{{userService.model.login}}</td>
+							<td title="role">{{userService.model.role}}</td>
+							<td title="full name">{{userService.model.full_name}}</td>
 						</tr>
 					</tbody>
 				</table>
-				<nvd3 [options]="chartOptions" [data]="appUsageData"></nvd3>
-				<table class="table table-condensed table-hover">
-					<thead>
-						<tr>
-							<th>Email</th>
-							<th>First name</th>
-							<th>Last name</th>
-							<th>Role</th>
-							<th>Last login</th>
-							<th>Registered</th>
-						</tr>
-					</thead>
-					<tbody>
-						<tr *ngFor="let user of usersList">
-							<td>{{user.email}}</td>
-							<td>{{user.firstName}}</td>
-							<td>{{user.lastName}}</td>
-							<td>{{user.role}}</td>
-							<td>{{user.lastLogin | date}}</td>
-							<td>{{user.registered | date}}</td>
-						</tr>
-					</tbody>
-				</table>
+
+				<span role="navigation">
+					<ul class="nav nav-tabs nav-justified">
+						<li role="presentation" *ngFor="let tab of dataTabs" [ngClass]="{ 'active': tab === selectedTab }">
+							<a (click)="selectTab(tab)">{{tab}}</a>
+						</li>
+					</ul>
+				</span>
+
+				<div id="data" class="panel panel-default">
+					<div class="panel-body" *ngIf="selectedTab === dataTabs[0]">
+						<nvd3 [options]="chartOptions" [data]="appUsageData"></nvd3>
+						<table class="table table-condensed table-hover">
+							<thead>
+								<tr>
+									<th>Email</th>
+									<th>First name</th>
+									<th>Last name</th>
+									<th>Role</th>
+									<th>Last login</th>
+									<th>Registered</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr *ngFor="let user of usersList">
+									<td>{{user.email}}</td>
+									<td>{{user.firstName}}</td>
+									<td>{{user.lastName}}</td>
+									<td>{{user.role}}</td>
+									<td>{{user.lastLogin | date}}</td>
+									<td>{{user.registered | date}}</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					
+					<div class="panel-body" *ngIf="selectedTab === dataTabs[1]">
+						<nvd3 [options]="chartOptions" [data]="queriesData"></nvd3>
+						<table class="table table-condensed table-hover">
+							<thead>
+								<tr>
+									<th>Name</th>
+									<th>Weight</th>
+									<th>Timestamp</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr *ngFor="let query of queries.queriesList">
+									<td>{{query.name}}</td>
+									<td>{{query.weight}}</td>
+									<td>{{query.timestamp | date}}</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+
 			</span>
 
 			<span id="modal" *ngIf="showModal">
