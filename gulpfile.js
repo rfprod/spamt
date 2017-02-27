@@ -28,7 +28,7 @@ function killProcessByName(name){
 			//console.log('killing running processes:', stdout);
 			const runningProcessesIDs = stdout.match(/\d{3,6}/);
 			runningProcessesIDs.forEach((id) => {
-				exec('kill '+id, (error, stdout, stderr) => {
+				exec('kill -9 '+id, (error, stdout, stderr) => {
 					if (error) throw error;
 					if (stderr) console.log('stdout: ', stdout);
 					if (stdout) console.log('stderr: ', stderr);
@@ -103,7 +103,7 @@ gulp.task('client-unit-test', (done) => {
 
 gulp.task('build-system-js', () => {
 	const builder = systemjsBuilder('/','./systemjs.config.js');
-	builder.buildStatic('app', 'bundle.min.js', {
+	return builder.buildStatic('app', 'bundle.min.js', {
 		minify: true,
 		mangle: true
 	})
@@ -148,6 +148,7 @@ gulp.task('watch', () => {
 	gulp.watch(['./public/app/*.js', './public/app/**/*.js'], ['build-system-js']); // watch app js changes and build system
 	gulp.watch('./public/app/scss/*.scss', ['sass-autoprefix-minify-css']); // watch app css changes, pack css, minify and put in respective folder
 	gulp.watch(['./test/server/test.js'], ['server-test']); // watch server tests changes and run tests
+	gulp.watch(['./public/app/*.ts','./test/client/*.ts'], ['tsc']);
 });
 
 gulp.task('watch-and-lint', () => {
@@ -160,7 +161,7 @@ gulp.task('watch-client-and-test', () => {
 	gulp.watch(['./public/app/*.js','./test/client/*.js','./test/karma.conf.js','./test/karma.test-shim.js'], ['client-unit-test']); //watch unit test changes and run tests
 });
 
-gulp.task('default', ['database','build-system-js','sass-autoprefix-minify-css','lint','server','watch','watch-and-lint']);
+gulp.task('default', ['database','server','lint','build','watch','watch-and-lint']);
 
 gulp.task('build', (done) => {
 	runSequence('sass-autoprefix-minify-css', 'tsc', 'build-system-js', done);
@@ -172,6 +173,7 @@ process.on('exit', () => {
 	if (node) node.kill();
 	if (mongo) mongo.kill();
 	if (tsc) tsc.kill();
+	killProcessByName('gulp');
 });
 
 ['SIGHUP', 'SIGINT', 'SIGQUIT', 'SIGILL', 'SIGTRAP', 'SIGABRT',
