@@ -575,4 +575,34 @@ module.exports = function(app, passport, User, Query, SrvInfo, DataInit, syncRec
 			else { res.status(200).json({message: 'logged out, token reset'}); }
 		});
 	});
+
+/**
+*	social networks authentication
+*/
+	app.get('/auth/soundcloud', passport.authenticate('soundcloud'));
+	app.get('/auth/soundcloud/callback', passport.authenticate('soundcloud', {
+		successRedirect: process.env.APP_URL + '#/user/dashboard',
+		failureRedirect: process.env.APP_URL + '#/user'
+	}));
+	app.get('/auth/twitter', passport.authenticate('twitter'));
+	app.get('/auth/twitter/callback', passport.authenticate('twitter', {
+		successRedirect: process.env.APP_URL + '#/user/dashboard',
+		failureRedirect: process.env.APP_URL + '#/user'
+	}));
+	app.get('/auth/logout', (req, res) => {
+		req.logout();
+		res.status(200).json({message: 'logged out successfully'});
+	});
+
+/**
+*	utility functions for checking social authentication
+*/
+	function isLoggedIn(req, res, next){
+		if (req.isAuthenticated()) return next();
+		else res.redirect(process.env.APP_URL + '#/user');
+	}
+	function isLoggedInBool(req, res){
+		return req.isAuthenticated();
+	}
+
 };

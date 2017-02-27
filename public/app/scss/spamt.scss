@@ -246,4 +246,8 @@ body {
 		to   { transform: rotate(360deg); opacity: 0.2; }
 	}
 
+	#login-buttons a img {
+		height: 24vw;
+		width: auto !important;
+	}
 }
