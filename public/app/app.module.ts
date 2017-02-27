@@ -14,13 +14,14 @@ import { DashboardIntroComponent } from './components/dashboard-intro.component'
 import { DashboardDetailsComponent } from './components/dashboard-details.component';
 import { DashboardControlsComponent } from './components/dashboard-controls.component';
 
+import { nvD3 } from 'ng2-nvd3';
+
 import { AudioPlayerDirective } from './directives/audio-player.directive';
 import { LoadingIndicatorDirective } from './directives/loading-indicator.directive';
 
 import { ConvertDuration } from './pipes/convert-duration.pipe';
 
 import { EventEmitterService } from './services/event-emitter.service';
-import { UsersListService } from './services/users-list.service';
 import { UserService } from './services/user-service.service';
 import { SCgetQueriesService } from './services/sc-get-queries.service';
 import { SCgetUserService } from './services/sc-get-user.service';
@@ -32,14 +33,21 @@ import { PublicDataService } from './services/public-data.service';
 import { ControlsLoginService } from './services/controls-login.service';
 import { ControlsLogoutService } from './services/controls-logout.service';
 import { ControlsMeService } from './services/controls-me.service';
-import { nvD3 } from 'ng2-nvd3';
+import { ControlsUsersListService } from './services/controls-users-list.service';
+import { ControlsQueriesListService } from './services/controls-queries-list.service';
 
 declare let $: JQueryStatic;
 
 @NgModule({
 	declarations: [ AppComponent, AppNavComponent, AppInfoComponent, DashboardIntroComponent, DashboardDetailsComponent, DashboardControlsComponent, nvD3 , AudioPlayerDirective, LoadingIndicatorDirective, ConvertDuration],
 	imports 		: [ BrowserModule, FormsModule, HttpModule, RouterModule.forRoot(APP_ROUTES) ],
-	providers 	: [ {provide: LocationStrategy, useClass: HashLocationStrategy}, {provide: Window, useValue: window}, EventEmitterService, UsersListService, UserService, ServerStaticDataService, PublicDataService, SCgetQueriesService, SCgetUserService, SCgetUserDetailsService, SCgetUserTrackDownloadService, SCgetUserTrackStreamService, ControlsLoginService, ControlsLogoutService, ControlsMeService ],
+	providers 	: [
+									{ provide: LocationStrategy, useClass: HashLocationStrategy },
+									{ provide: Window, useValue: window },
+									EventEmitterService, UserService, ServerStaticDataService, PublicDataService,
+									SCgetQueriesService, SCgetUserService, SCgetUserDetailsService, SCgetUserTrackDownloadService, SCgetUserTrackStreamService,
+									ControlsLoginService, ControlsLogoutService, ControlsMeService, ControlsUsersListService, ControlsQueriesListService,
+								],
 	schemas 		: [ CUSTOM_ELEMENTS_SCHEMA ],
 	bootstrap 	: [ AppComponent ],
 })

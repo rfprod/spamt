@@ -5,7 +5,7 @@ import { Observable } from 'rxjs/Observable';
 import 'rxjs/Rx';
 
 @Injectable()
-export class UsersListService {
+export class ControlsUsersListService {
 	public appDataUrl: string = window.location.origin + '/controls/list/users?user_token=';
 	constructor (private http: Http) {}
 

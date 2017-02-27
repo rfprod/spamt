@@ -50,6 +50,9 @@ body {
 		.router-link-active {
 			background-color: $lightgrey;
 		}
+		.label {
+			display: block;
+		}
 	}
 
 	.app-info {
@@ -81,7 +84,7 @@ body {
 		color: #f0ad4e;
 	}
 
-	dashboard-intro {
+	dashboard-intro, dashboard-controls {
 		#modal {
 			z-index: 10;
 			height: 100vh;
@@ -105,6 +108,24 @@ body {
 					cursor: default;
 				}
 			}
+		}
+		table {
+			font-size: 0.85em;
+			tbody {
+				tr {
+					td {
+						cursor: default;
+					}
+				}
+				.middle { // applied to row to align content inside cells
+					td {
+						vertical-align: middle;
+					}
+				}
+			}
+		}
+		#data {
+			border: 0;
 		}
 	}
 
@@ -190,18 +211,6 @@ body {
 			}
 			.playlist-tracks {
 				font-size: 0.7em;
-			}
-		}
-	}
-
-	dashboard-controls {
-		table {
-			tbody {
-				tr {
-					td {
-						cursor: default;
-					}
-				}
 			}
 		}
 	}

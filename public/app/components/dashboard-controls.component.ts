@@ -3,11 +3,12 @@ import { Router } from '@angular/router';
 import { EventEmitterService } from '../services/event-emitter.service';
 import { ServerStaticDataService } from '../services/server-static-data.service';
 import { PublicDataService } from '../services/public-data.service';
-import { UsersListService } from '../services/users-list.service';
 import { UserService } from '../services/user-service.service';
 import { ControlsLoginService } from '../services/controls-login.service';
 import { ControlsLogoutService } from '../services/controls-logout.service';
 import { ControlsMeService } from '../services/controls-me.service';
+import { ControlsUsersListService } from '../services/controls-users-list.service';
+import { ControlsQueriesListService } from '../services/controls-queries-list.service';
 
 // declare let d3: any;
 
@@ -21,11 +22,12 @@ export class DashboardControlsComponent implements OnInit, OnDestroy {
 		private emitter: EventEmitterService,
 		private serverStaticDataService: ServerStaticDataService,
 		private publicDataService: PublicDataService,
-		private usersListService: UsersListService,
 		private userService: UserService,
 		private controlsLoginService: ControlsLoginService,
 		private controlsLogoutService: ControlsLogoutService,
 		private controlsMeService: ControlsMeService,
+		private controlsUsersListService: ControlsUsersListService,
+		private controlsQueriesListService: ControlsQueriesListService,
 		private router: Router
 	) {
 		console.log('this.el.nativeElement:', this.el.nativeElement);
@@ -68,10 +70,8 @@ export class DashboardControlsComponent implements OnInit, OnDestroy {
 			key: 'Default',
 			y: 1,
 		},
-		{
-			key: 'Default',
-			y: 1,
-		},
+	];
+	public queriesData: any[] = [
 		{
 			key: 'Default',
 			y: 1,
@@ -85,6 +85,10 @@ export class DashboardControlsComponent implements OnInit, OnDestroy {
 		static: [],
 	};
 	public usersList: any[] = [];
+	public queries: any = {
+		qieriesList: 0,
+		page: 0,
+	};
 	public errorMessage: string;
 	public successMessage: string;
 	private dismissMessages() {
@@ -118,7 +122,8 @@ export class DashboardControlsComponent implements OnInit, OnDestroy {
 		);
 	}
 	private getUsersList() {
-		this.usersListService.getData(this.userService.model.user_token).subscribe(
+		this.emitSpinnerStartEvent();
+		this.controlsUsersListService.getData(this.userService.model.user_token).subscribe(
 			data => this.usersList = data,
 			error => {
 				this.errorMessage = <any> error;
@@ -126,6 +131,31 @@ export class DashboardControlsComponent implements OnInit, OnDestroy {
 			},
 			() => {
 				console.log('getUsersList done, data:', this.usersList);
+				this.emitSpinnerStopEvent();
+			}
+		);
+	}
+	private getQueriesList() {
+		this.emitSpinnerStartEvent();
+		this.controlsQueriesListService.getData(this.userService.model.user_token, this.queries.page).subscribe(
+			data => {
+				this.queries.queriesList = data;
+				this.queriesData = [];
+				for (let query of this.queries.queriesList) {
+					console.log('query:', query);
+					const obj: Object = {
+						key: query.name,
+						y: query.weight,
+					};
+					this.queriesData.push(obj);
+				}
+			},
+			error => {
+				this.errorMessage = <any> error;
+				this.emitSpinnerStopEvent();
+			},
+			() => {
+				console.log('getQueriesList done, data:', this.queries.queriesList);
 				this.emitSpinnerStopEvent();
 			}
 		);
@@ -211,10 +241,21 @@ export class DashboardControlsComponent implements OnInit, OnDestroy {
 		this.emitter.emitEvent({spinner: 'stop'});
 	}
 
+// Modal
 	private showModal: boolean = false;
 	private toggleModal() { /* tslint:disable-line */
 		this.showModal = (!this.showModal) ? true : false;
 	};
+
+// Tabs
+	private dataTabs: string[] = ['Users', 'Queries']; // tslint:disable-line
+	private selectedTab: string = this.dataTabs[0];
+	private selectTab(tab): void { // tslint:disable-line
+		this.emitSpinnerStartEvent();
+		console.log('selectTab, tab: ', tab);
+		this.selectedTab = tab;
+		this.emitSpinnerStopEvent();
+	}
 
 // Help
 	private showHelp: boolean = false; // controls help labells visibility, catches events from nav component
@@ -239,6 +280,7 @@ export class DashboardControlsComponent implements OnInit, OnDestroy {
 				this.emitter.emitEvent({appInfo: 'hide'});
 				this.getMe();
 				this.getUsersList();
+				this.getQueriesList();
 			} else {
 				console.log('local storage is empty');
 				this.emitSpinnerStopEvent();
