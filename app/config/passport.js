@@ -78,7 +78,6 @@ module.exports = function(passport) {
 							return done(null, user);
 						}
 					);
-					//return done(null, user);
 				} else {
 					let newUser = new User();
 					newUser.role = 'user';

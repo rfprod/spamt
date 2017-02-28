@@ -586,9 +586,28 @@ module.exports = function(app, passport, User, Query, SrvInfo, DataInit, syncRec
 	}));
 	app.get('/auth/twitter', passport.authenticate('twitter'));
 	app.get('/auth/twitter/callback', passport.authenticate('twitter', {
-		successRedirect: process.env.APP_URL + '#/user/dashboard',
-		failureRedirect: process.env.APP_URL + '#/user'
-	}));
+		//successRedirect: process.env.APP_URL + '#/user/dashboard',
+		//failureRedirect: process.env.APP_URL + '#/user'
+	}), (req, res) => {
+		//console.log('/auth/twitter/callback', req.user._doc);
+		const twitter_token = req.query.oauth_query;
+		const twitter_tokenSecret = req.query.oauth_verifier;
+		let resStatus, msg;
+		if (twitter_token && twitter_tokenSecret) {
+			resStatus = 400;
+			msg = { error: 'twitter authentication error'};
+		} else {
+			resStatus = 200;
+			msg = {};
+			const keys = Object.keys(req.user._doc);
+			for (let key of keys) {
+				if (!key.match(/(token|salt)/ig)) {
+					msg[key] = req.user[key];
+				}
+			}
+		}
+		res.status(resStatus).json(msg);
+	});
 	app.get('/auth/logout', (req, res) => {
 		req.logout();
 		res.status(200).json({message: 'logged out successfully'});
