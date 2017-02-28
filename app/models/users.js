@@ -40,7 +40,9 @@ let User = new Schema({
 			favorite_count: Number,
 			favorited: 			Boolean,
 			retweeted: 			Boolean
-		}
+		},
+		token: 						String,
+		tokenSecret:			String
 	},
 	soundcloud: {				//sync
 		id:								String,
