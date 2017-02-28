@@ -601,8 +601,5 @@ module.exports = function(app, passport, User, Query, SrvInfo, DataInit, syncRec
 		if (req.isAuthenticated()) return next();
 		else res.redirect(process.env.APP_URL + '#/user');
 	}
-	function isLoggedInBool(req, res){
-		return req.isAuthenticated();
-	}
 
 };

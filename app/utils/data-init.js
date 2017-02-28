@@ -7,7 +7,6 @@ module.exports = {
 			if (err) throw err;
 			if (docs.length === 0) {
 				let newUser = new User();
-				newUser.id = 0;
 				newUser.role = 'admin';
 				newUser.registered = new Date().getTime();
 				newUser.lastLogin = new Date().getTime();
@@ -36,7 +35,6 @@ module.exports = {
 			if (err) throw err;
 			if (docs.length === 0) {
 				let newUser = new User();
-				newUser.id = 1;
 				newUser.role = 'user';
 				newUser.registered = new Date().getTime();
 				newUser.lastLogin = new Date().getTime();

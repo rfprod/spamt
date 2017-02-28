@@ -1,11 +1,11 @@
 'use strict';
 
-var TwitterStrategy = require('passport-twitter').Strategy;
-var SoundcloudStrategy = require('passport-soundcloud').Strategy;
-var BearerStrategy = require('passport-http-api-token-bearer').Strategy;
-var User = require('../models/users');
-var configAuthTwitter = require('./auth-twitter');
-var configAuthSoundcloud = require('./auth-soundcloud');
+const TwitterStrategy = require('passport-twitter').Strategy;
+const SoundcloudStrategy = require('passport-soundcloud').Strategy;
+const BearerStrategy = require('passport-http-api-token-bearer').Strategy;
+const User = require('../models/users');
+const configAuthTwitter = require('./auth-twitter');
+const configAuthSoundcloud = require('./auth-soundcloud');
 
 module.exports = function(passport) {
 	passport.serializeUser((user, done) => {
@@ -34,7 +34,9 @@ module.exports = function(passport) {
 		consumerSecret: configAuthTwitter.twitterAuth.clientSecret,
 		callbackURL: configAuthTwitter.twitterAuth.callbackURL
 	}, (token, tokenSecret, profile, done) => {
-		console.log('twitter passport profile:', profile);
+		// console.log('twitter passport profile:', profile);
+		// console.log('twitter token:', token);
+		// console.log('twitter tokenSecret:', tokenSecret);
 		process.nextTick(() => {
 			User.findOne({ 'twitter.id': profile.id }, (err, user) => {
 				if (err) { return done(err); }
@@ -42,30 +44,34 @@ module.exports = function(passport) {
 					User.update(
 						{ 'twitter.id': profile.id },
 						{ $set: {
-								'twitter.username': profile.username,
-								'twitter.displayName': profile.displayName,
-								'twitter.photo': profile.photos[0].value,
-								'twitter.location': profile._json.location,
-								'twitter.description': profile._json.description,
-								'twitter.url': profile._json.url,
-								'twitter.lang': profile._json.lang,
-								'twitter.created_at': new Date(profile._json.created_at).getTime(),
-								'twitter.geo_enabled': profile._json.geo_enabled,
-								'twitter.verified': profile._json.verified,
-								'twitter.followers_count': profile._json.followers_count,
-								'twitter.friends_count': profile._json.friends_count,
-								'twitter.listed_count': profile._json.listed_count,
-								'twitter.favourites_count': profile._json.favourites_count,
-								'twitter.statuses_count': profile._json.statuses_count,
-								'twitter.status.id': profile._json.status.id,
-								'twitter.status.created_at': new Date(profile._json.status.created_at).getTime(),
-								'twitter.status.text': profile._json.status.text,
-								'twitter.status.retweeted': profile._json.status.retweeted,
-								'twitter.status.favorited': profile._json.status.favorited,
-								'twitter.status.retweet_count': profile._json.status.retweet_count,
-								'twitter.status.favorite_count': profile._json.status.favorite_count
-							}
-						},
+							'lastLogin': new Date().getTime(),
+							'salt': '',
+							'jwToken': '',
+							'twitter.username': profile.username,
+							'twitter.displayName': profile.displayName,
+							'twitter.photo': profile.photos[0].value,
+							'twitter.location': profile._json.location,
+							'twitter.description': profile._json.description,
+							'twitter.url': profile._json.url,
+							'twitter.lang': profile._json.lang,
+							'twitter.created_at': new Date(profile._json.created_at).getTime(),
+							'twitter.geo_enabled': profile._json.geo_enabled,
+							'twitter.verified': profile._json.verified,
+							'twitter.followers_count': profile._json.followers_count,
+							'twitter.friends_count': profile._json.friends_count,
+							'twitter.listed_count': profile._json.listed_count,
+							'twitter.favourites_count': profile._json.favourites_count,
+							'twitter.statuses_count': profile._json.statuses_count,
+							'twitter.status.id': profile._json.status.id,
+							'twitter.status.created_at': new Date(profile._json.status.created_at).getTime(),
+							'twitter.status.text': profile._json.status.text,
+							'twitter.status.retweeted': profile._json.status.retweeted,
+							'twitter.status.favorited': profile._json.status.favorited,
+							'twitter.status.retweet_count': profile._json.status.retweet_count,
+							'twitter.status.favorite_count': profile._json.status.favorite_count,
+							'twitter.token': token,
+							'twitter.tokenSecret': tokenSecret
+						}},
 						(err, data) => {
 							if (err) { throw err; }
 							console.log('updated existing twitter user:', JSON.stringify(data));
@@ -74,7 +80,12 @@ module.exports = function(passport) {
 					);
 					//return done(null, user);
 				} else {
-					var newUser = new User();
+					let newUser = new User();
+					newUser.role = 'user';
+					newUser.registered = new Date().getTime();
+					newUser.lastLogin = new Date().getTime();
+					newUser.salt = '';
+					newUser.jwToken = '';
 					newUser.twitter.id = profile.id;
 					newUser.twitter.username = profile.username;
 					newUser.twitter.displayName = profile.displayName;
@@ -98,9 +109,11 @@ module.exports = function(passport) {
 					newUser.twitter.status.favorited = profile._json.status.favorited;
 					newUser.twitter.status.retweet_count = profile._json.status.retweet_count;
 					newUser.twitter.status.favorite_count = profile._json.status.favorite_count;
+					newUser.twitter.token = token;
+					newUser.twitter.tokenSecret = tokenSecret;
 					newUser.save(err => {
 						if (err) throw err;
-						return done(err, newUser);
+						return done(null, newUser);
 					});
 				}
 			});
