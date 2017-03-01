@@ -2,7 +2,7 @@
 
 const path = process.cwd();
 
-module.exports = function(app, passport, User, Query, SrvInfo, DataInit, thenReq, JWT, mailTransporter) { // eslint-disable-line no-unused-vars
+module.exports = function(app, passport, User, Query, SrvInfo, DataInit, thenReq, JWT, mailTransporter, SC) { // eslint-disable-line no-unused-vars
 
 /*
 *	check if data init is needed
@@ -14,33 +14,7 @@ module.exports = function(app, passport, User, Query, SrvInfo, DataInit, thenReq
 /*
 *	Soundcloud API wrapper
 */
-	class SC {
-		constructor() {
-			this.apiUrl = 'https://api.soundcloud.com/';
-			this.regExp = {
-				userDetails: /http(s)?\:\/\/api\.soundcloud\.com\/users\/[0-9]+\/(tracks|playlists|favorites|followers|followings)/,
-				userTrackDownload: /http(s)?\:\/\/api\.soundcloud\.com\/tracks\/[0-9]+\/download/,
-				userTrackStream: /http(s)?\:\/\/api\.soundcloud\.com\/tracks\/[0-9]+\/stream/
-			};
-			this.endpoints = { resolve: 'resolve' };
-			this.clientID = process.env.SOUNDCLOUD_CLIENT_ID;
-			this.clientIDparam = 'client_id=' + this.clientID;
-		}
-
-		resolve(path) {
-			console.log('resolving path: ', path);
-			const url = this.apiUrl + this.endpoints.resolve + '?url=' + path + '&' + this.clientIDparam;
-			return thenReq('GET', url);
-		}
-
-		getURI(apiUri, options) {
-			console.log('getting sc details by apiUri: ', apiUri);
-			const url = apiUri + '?' + this.clientIDparam;
-			return (options) ? thenReq('GET', url, options) : thenReq('GET', url);
-		}
-	}
-
-	const SCapi = new SC();
+	const SCapi = new SC(thenReq);
 
 /*
 *	Twitter API wrapper
