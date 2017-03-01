@@ -5,7 +5,7 @@ import { SCgetUserService } from '../services/sc-get-user.service';
 import { SCgetUserDetailsService } from '../services/sc-get-user-details.service';
 import { SCgetUserTrackDownloadService } from '../services/sc-get-user-track-download.service';
 import { SCgetUserTrackStreamService } from '../services/sc-get-user-track-stream.service';
-import { UserService } from '../services/user-service.service';
+import { UserService } from '../services/user.service';
 
 @Component({
 	selector: 'dashboard-details',
@@ -35,7 +35,7 @@ export class DashboardDetailsComponent implements OnInit, OnDestroy {
 		followings: [],
 	};
 	private publicDataKeys = Object.keys(this.publicData);
-	private displayError: string;
+	private errorMessage: string;
 
 // 03 popular queries
 	private queries: any;
@@ -46,7 +46,7 @@ export class DashboardDetailsComponent implements OnInit, OnDestroy {
 				this.queries = data;
 				console.log('this.queries: ', this.queries);
 			},
-			error => this.displayError = <any> error,
+			error => this.errorMessage = <any> error,
 			() => {
 				console.log('getQueriesService done');
 				this.emitSpinnerStopEvent();
@@ -55,8 +55,8 @@ export class DashboardDetailsComponent implements OnInit, OnDestroy {
 	}
 
 // User
-	private userSelected() { // tslint:disable-line
-		return (this.publicData.user) ? true : false;
+	private userSelected(): boolean { // tslint:disable-line
+		return this.publicData.user;
 	}
 	private resetSelection(): void { // tslint:disable-line
 		for (let key of this.publicDataKeys) {
@@ -69,6 +69,7 @@ export class DashboardDetailsComponent implements OnInit, OnDestroy {
 		this.userService.model.analyser_user_id = '';
 		this.userService.model.analyser_user_uri = '';
 		this.userService.saveUser();
+		this.emitter.emitEvent({appInfo: 'show'});
 	}
 	private scUserName: string = '';
 	private scUserNamePattern: any = /[*]{3,}/; // tslint:disable-line
@@ -81,8 +82,9 @@ export class DashboardDetailsComponent implements OnInit, OnDestroy {
 		this.emitSpinnerStartEvent();
 		this.scGetUserService.getData(this.scUserName).subscribe(
 			data => {
+				this.emitter.emitEvent({appInfo: 'hide'});
 				this.publicData.user = data;
-				this.displayError = undefined;
+				this.errorMessage = undefined;
 				console.log('this.userService: ', this.userService);
 				this.userService.model.analyser_query = this.scUserName;
 				this.userService.model.analyser_user_id = this.publicData.user.id;
@@ -91,7 +93,7 @@ export class DashboardDetailsComponent implements OnInit, OnDestroy {
 				this.userService.saveUser();
 			},
 			error => {
-				this.displayError = <any> error;
+				this.errorMessage = <any> error;
 				this.emitSpinnerStopEvent();
 			},
 			() => {
@@ -100,7 +102,7 @@ export class DashboardDetailsComponent implements OnInit, OnDestroy {
 			}
 		);
 	}
-	private analyseThisUser(permalink) { // tslint:disable-line
+	private analyseThisUser(permalink): void { // tslint:disable-line
 		this.scUserName = permalink;
 		this.selectedTab = '';
 		for (let key in this.publicData) {
@@ -144,10 +146,10 @@ export class DashboardDetailsComponent implements OnInit, OnDestroy {
 						this.displayPlaylistTracks.push(false);
 					}
 				}
-				this.displayError = undefined;
+				this.errorMessage = undefined;
 			},
 			error => {
-				this.displayError = <any> error;
+				this.errorMessage = <any> error;
 				this.emitSpinnerStopEvent();
 			},
 			() => {
@@ -203,10 +205,10 @@ export class DashboardDetailsComponent implements OnInit, OnDestroy {
 				console.log('scGetUserTrackPlayService, data: ', data);
 				this.selectedTrack = data.location;
 				this.selectedTrackURI = uri;
-				this.displayError = undefined;
+				this.errorMessage = undefined;
 			},
 			error => {
-				this.displayError = <any> error;
+				this.errorMessage = <any> error;
 				this.emitSpinnerStopEvent();
 			},
 			() => {
@@ -253,7 +255,7 @@ export class DashboardDetailsComponent implements OnInit, OnDestroy {
 // Help
 	private showHelp: boolean = false; // controls help labells visibility, catches events from nav component
 
-	public ngOnInit() {
+	public ngOnInit(): void {
 		console.log('ngOnInit: DashboardDetailsComponent initialized');
 		this.emitSpinnerStartEvent();
 		this.emitter.emitEvent({route: '/data'});
@@ -268,6 +270,7 @@ export class DashboardDetailsComponent implements OnInit, OnDestroy {
 					this.getUser();
 				} else {
 					console.log('restored user selection, user is not selected');
+					this.emitter.emitEvent({appInfo: 'show'});
 				}
 			});
 		} else {
@@ -327,7 +330,7 @@ export class DashboardDetailsComponent implements OnInit, OnDestroy {
 			}
 		});
 	}
-	public ngOnDestroy() {
+	public ngOnDestroy(): void {
 		console.log('ngOnDestroy: DashboardDetailsComponent destroyed');
 		this.subscription.unsubscribe();
 	}

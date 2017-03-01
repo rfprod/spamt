@@ -11,7 +11,7 @@ export class AppNavComponent implements OnInit, OnDestroy {
 	private subscription: any;
 	public navButtonsState: boolean[] = [false, false, false, false, false];
 	private showHelp: boolean = false;
-	public switchNavButtons(event, isClick: boolean) {
+	public switchNavButtons(event, isClick: boolean): void {
 		let route, index;
 		console.log('switchNavButtons:', event);
 		if (isClick) {
@@ -45,7 +45,7 @@ export class AppNavComponent implements OnInit, OnDestroy {
 		}
 		console.log('navButtonsState:', this.navButtonsState);
 	}
-	public stopWS() {
+	public stopWS(): void {
 		/*
 		*	this function should be executed before user is sent to any external resource
 		*	on click on an anchor object if a resource is loaded in the same tab
@@ -53,7 +53,7 @@ export class AppNavComponent implements OnInit, OnDestroy {
 		console.log('close websocket event emitted');
 		this.emitter.emitEvent({ sys: 'close websocket' });
 	}
-	public ngOnInit() {
+	public ngOnInit(): void {
 		console.log('ngOnInit: AppNavComponent initialized');
 		// check active route on app init - app-nav loads once on app init
 		this.subscription = this.emitter.getEmitter().subscribe((message) => {
@@ -64,7 +64,7 @@ export class AppNavComponent implements OnInit, OnDestroy {
 			}
 		});
 	}
-	public ngOnDestroy() {
+	public ngOnDestroy(): void {
 		console.log('ngOnDestroy: AppNavComponent destroyed');
 	}
 }

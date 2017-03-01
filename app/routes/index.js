@@ -8,7 +8,6 @@ module.exports = function(app, passport, User, Query, SrvInfo, DataInit, thenReq
 *	check if data init is needed
 *	data is initialized with dummy data if the DB is empty on server start
 */
-
 	DataInit.initData();
 
 /*
@@ -580,34 +579,58 @@ module.exports = function(app, passport, User, Query, SrvInfo, DataInit, thenReq
 	}));
 	app.get('/auth/twitter', passport.authenticate('twitter'));
 	app.get('/auth/twitter/callback', passport.authenticate('twitter', {
-		//successRedirect: process.env.APP_URL + '#/user/dashboard',
-		//failureRedirect: process.env.APP_URL + '#/user'
+		//successRedirect: process.env.APP_URL + '#/user?twitter_auth_error=false',
+		//failureRedirect: process.env.APP_URL + '#/user?twitter_auth_error=true'
 	}), (req, res) => {
-		//console.log('/auth/twitter/callback', req.user._doc);
+		/*
+		console.log('/auth/twitter/callback', req.user._doc);
+		let resStatus = 200, msg = {};
+		const keys = Object.keys(req.user._doc);
+		for (let key of keys) {
+			if (!key.match(/(token|salt)/ig)) {
+				msg[key] = req.user[key];
+			}
+		}
+		res.status(resStatus).json(msg);
+		*/
 		const twitter_token = req.query.oauth_token;
 		const twitter_tokenSecret = req.query.oauth_verifier;
-		//let resStatus, msg;
 		if (!twitter_token && !twitter_tokenSecret) {
-			//resStatus = 400;
-			//msg = { error: 'twitter authentication error'};
-			res.redirect(process.env.APP_URL + '#/user?error=true');
+			res.redirect(process.env.APP_URL + '#/user?twitter_auth_error=true');
 		} else {
-			/*
-			resStatus = 200;
-			msg = {};
-			const keys = Object.keys(req.user._doc);
-			for (let key of keys) {
-				if (!key.match(/(token|salt)/ig)) {
-					msg[key] = req.user[key];
-				}
-			}
-			*/
 			res.redirect(process.env.APP_URL + '#/user?oauth_token=' + twitter_token + '&oauth_verifier=' + twitter_tokenSecret);
 		}
-		//res.status(resStatus).json(msg);
 	});
 	app.get('/auth/logout', (req, res) => {
-		req.logout();
+		//console.log('/auth/logout, user:', req.user);
+		// reset oauth tokens
+		if (req.user.twitter.token || req.user.twitter.tokenSecret) {
+			// for Twitter
+			User.update(
+				{'twitter.id': req.user.twitter.id},
+				{$set:{'twitter.token':'', 'twitter.tokenSecret':''}},
+				(err,data) => {
+					if (err) { throw err; }
+					console.log('twitter oauth tokens reset:', JSON.stringify(data));
+				}
+			);
+		} else {
+			// for Soundcloud
+			/*
+			*	TODO
+			*	configure for Soundcloud probably like so
+			*	
+			*	User.update(
+			*		{'soundcloud.id': req.user.soundcloud.id},
+			*		{$set:{'soundcloud.token':'', 'soundcloud.tokenSecret':''}},
+			*		(err,data) => {
+			*			if (err) { throw err; }
+			*			console.log('soundcloud oauth tokens reset:', JSON.stringify(data));
+			*		}
+			*	);
+			*/
+		}
+		req.logout(); // drop session
 		res.status(200).json({message: 'logged out successfully'});
 	});
 

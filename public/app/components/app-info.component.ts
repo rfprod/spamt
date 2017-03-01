@@ -43,7 +43,7 @@ export class AppInfoComponent implements OnInit, OnDestroy {
 		},
 	];
 
-	public ngOnInit() {
+	public ngOnInit(): void {
 		console.log('ngOnInit: AppInfoComponent initialized');
 		this.subscription = this.emitter.getEmitter().subscribe((message) => {
 			if (message.appInfo) {
@@ -53,7 +53,7 @@ export class AppInfoComponent implements OnInit, OnDestroy {
 			}
 		});
 	}
-	public ngOnDestroy() {
+	public ngOnDestroy(): void {
 		console.log('ngOnDestroy: AppInfoComponent destroyed');
 		this.subscription.unsubscribe();
 	}

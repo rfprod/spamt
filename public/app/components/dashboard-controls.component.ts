@@ -3,7 +3,7 @@ import { Router } from '@angular/router';
 import { EventEmitterService } from '../services/event-emitter.service';
 import { ServerStaticDataService } from '../services/server-static-data.service';
 import { PublicDataService } from '../services/public-data.service';
-import { UserService } from '../services/user-service.service';
+import { UserService } from '../services/user.service';
 import { ControlsLoginService } from '../services/controls-login.service';
 import { ControlsLogoutService } from '../services/controls-logout.service';
 import { ControlsMeService } from '../services/controls-me.service';
@@ -91,11 +91,11 @@ export class DashboardControlsComponent implements OnInit, OnDestroy {
 	};
 	public errorMessage: string;
 	public successMessage: string;
-	private dismissMessages() {
+	private dismissMessages(): void {
 		this.errorMessage = '';
 		this.successMessage = '';
 	};
-	private getServerStaticData(callback) {
+	private getServerStaticData(callback): void {
 		this.serverStaticDataService.getData().subscribe(
 			data => this.serverData.static = data,
 			error => {
@@ -104,11 +104,11 @@ export class DashboardControlsComponent implements OnInit, OnDestroy {
 			},
 			() => {
 				console.log('getServerStaticData done, data:', this.serverData.static);
-				if (callback) { callback(this); }
+				if (callback) { callback(); }
 			}
 		);
 	}
-	private getPublicData(callback) {
+	private getPublicData(callback): void {
 		this.publicDataService.getData().subscribe(
 			data => this.appUsageData = data,
 			error => {
@@ -117,11 +117,11 @@ export class DashboardControlsComponent implements OnInit, OnDestroy {
 			},
 			() => {
 				console.log('getPublicData done, data:', this.appUsageData);
-				if (callback) { callback(this); }
+				if (callback) { callback(); }
 			}
 		);
 	}
-	private getUsersList() {
+	private getUsersList(): void {
 		this.emitSpinnerStartEvent();
 		this.controlsUsersListService.getData(this.userService.model.user_token).subscribe(
 			data => this.usersList = data,
@@ -135,7 +135,7 @@ export class DashboardControlsComponent implements OnInit, OnDestroy {
 			}
 		);
 	}
-	private getQueriesList() {
+	private getQueriesList(): void {
 		this.emitSpinnerStartEvent();
 		this.controlsQueriesListService.getData(this.userService.model.user_token, this.queries.page).subscribe(
 			data => {
@@ -161,7 +161,7 @@ export class DashboardControlsComponent implements OnInit, OnDestroy {
 		);
 	}
 
-	private requestControlsAccess() {
+	private requestControlsAccess(): void {
 		this.emitSpinnerStartEvent();
 		this.dismissMessages();
 		this.controlsLoginService.getData(this.userService.model.email).subscribe(
@@ -177,7 +177,7 @@ export class DashboardControlsComponent implements OnInit, OnDestroy {
 		);
 	}
 
-	private getMe() {
+	private getMe(): void {
 		this.emitSpinnerStartEvent();
 		this.dismissMessages();
 		this.controlsMeService.getData(this.userService.model.user_token).subscribe(
@@ -204,13 +204,13 @@ export class DashboardControlsComponent implements OnInit, OnDestroy {
 		);
 	}
 
-	private login() { /* tslint:disable-line */
+	private login(): void { /* tslint:disable-line */
 		console.log('login attempt with email', this.userService.model.email);
 		this.userService.saveUser();
 		this.requestControlsAccess();
 	};
 
-	private logout() { /* tslint:disable-line */
+	private logout(): void { /* tslint:disable-line */
 		console.log('logging out, resetting token');
 		this.emitSpinnerStartEvent();
 		this.dismissMessages();
@@ -232,18 +232,18 @@ export class DashboardControlsComponent implements OnInit, OnDestroy {
 		);
 	}
 
-	private emitSpinnerStartEvent() {
+	private emitSpinnerStartEvent(): void {
 		console.log('root spinner start event emitted');
 		this.emitter.emitEvent({spinner: 'start'});
 	}
-	private emitSpinnerStopEvent() {
+	private emitSpinnerStopEvent(): void {
 		console.log('root spinner stop event emitted');
 		this.emitter.emitEvent({spinner: 'stop'});
 	}
 
 // Modal
 	private showModal: boolean = false;
-	private toggleModal() { /* tslint:disable-line */
+	private toggleModal(): void { /* tslint:disable-line */
 		this.showModal = (!this.showModal) ? true : false;
 	};
 
@@ -260,7 +260,7 @@ export class DashboardControlsComponent implements OnInit, OnDestroy {
 // Help
 	private showHelp: boolean = false; // controls help labells visibility, catches events from nav component
 
-	public ngOnInit() {
+	public ngOnInit(): void {
 		console.log('ngOnInit: DashboardControlsComponent initialized');
 		this.emitSpinnerStartEvent();
 		this.emitter.emitEvent({route: '/controls'});
@@ -300,7 +300,7 @@ export class DashboardControlsComponent implements OnInit, OnDestroy {
 			});
 		});
 	}
-	public ngOnDestroy() {
+	public ngOnDestroy(): void {
 		console.log('ngOnDestroy: DashboardControlsComponent destroyed');
 		this.subscription.unsubscribe();
 	}

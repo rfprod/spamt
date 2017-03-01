@@ -23,7 +23,8 @@ import { LoadingIndicatorDirective } from './directives/loading-indicator.direct
 import { ConvertDuration } from './pipes/convert-duration.pipe';
 
 import { EventEmitterService } from './services/event-emitter.service';
-import { UserService } from './services/user-service.service';
+import { UserService } from './services/user.service';
+import { UserLogoutService } from './services/user-logout.service';
 import { SCgetQueriesService } from './services/sc-get-queries.service';
 import { SCgetUserService } from './services/sc-get-user.service';
 import { SCgetUserDetailsService } from './services/sc-get-user-details.service';
@@ -37,7 +38,7 @@ import { ControlsMeService } from './services/controls-me.service';
 import { ControlsUsersListService } from './services/controls-users-list.service';
 import { ControlsQueriesListService } from './services/controls-queries-list.service';
 
-declare let $: JQueryStatic;
+// declare let $: JQueryStatic;
 
 @NgModule({
 	declarations: [ AppComponent, AppNavComponent, AppInfoComponent, DashboardIntroComponent, DashboardDetailsComponent, DashboardControlsComponent, DashboardUserComponent, nvD3 , AudioPlayerDirective, LoadingIndicatorDirective, ConvertDuration],
@@ -45,7 +46,7 @@ declare let $: JQueryStatic;
 	providers 	: [
 									{ provide: LocationStrategy, useClass: HashLocationStrategy },
 									{ provide: Window, useValue: window },
-									EventEmitterService, UserService, ServerStaticDataService, PublicDataService,
+									EventEmitterService, UserService, UserLogoutService, ServerStaticDataService, PublicDataService,
 									SCgetQueriesService, SCgetUserService, SCgetUserDetailsService, SCgetUserTrackDownloadService, SCgetUserTrackStreamService,
 									ControlsLoginService, ControlsLogoutService, ControlsMeService, ControlsUsersListService, ControlsQueriesListService,
 								],
