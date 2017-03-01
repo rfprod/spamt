@@ -43,6 +43,11 @@ const JWT = require('./app/utils/jwt-methods.js')(crypto, jwt, User);
 */
 const SC = require('./app/utils/soundcloud-api-wrapper.js');
 
+/*
+*	Twitter API wrapper
+*/
+const TWTR = require('./app/utils/twitter-api-wrapper.js');
+
 process.title = 'spamt';
 
 app.use('/public', express.static(process.cwd() + '/public'));
@@ -97,7 +102,7 @@ if (process.env.HOME.indexOf('ruser') != -1) {
 
 const mailTransporter = nodemailer.createTransport(smtpConfig); // reusable transporter object using the default SMTP transport
 
-routes(app, passport, User, Query, SrvInfo, DataInit, thenReq, JWT, mailTransporter, SC);
+routes(app, passport, User, Query, SrvInfo, DataInit, thenReq, JWT, mailTransporter, SC, TWTR);
 
 const port = process.env.PORT || process.env.OPENSHIFT_NODEJS_PORT || 8080,
 	ip = process.env.OPENSHIFT_NODEJS_IP; // "127.0.0.1" is not specified here on purpose, this env var should be included in .openshift.env
