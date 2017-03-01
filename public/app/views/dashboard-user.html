@@ -1,10 +1,29 @@
 <div class="container-fluid">
 	<div class="row">
 		<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
-			<h3>{{title}}</h3>
-			<p>{{description}}</p>
+			<span *ngIf="!isLoggedIn()">
+				<h3>{{title}}</h3>
+				<p>{{description.welcome}}</p>
+			</span>
+			<span *ngIf="isLoggedIn()">
+				<h3>
+					{{title}}
+					<a (click)="toggleModal()"><i class="fa fa-user" [ngClass]="{ 'help-highlight': showHelp }"></i> <span class="label label-warning" *ngIf="showHelp">your SPAMT profile</span></a>
+					<a (click)="logout()"><i class="fa fa-sign-out" [ngClass]="{ 'help-highlight': showHelp }"></i> <span class="label label-warning" *ngIf="showHelp">log out of SPAMT User Panel</span></a>
+				</h3>
+				<p>{{description.authenticated}}</p>
+			</span>
 
-			<div class="btn-group btn-group-justified" role="group" id="login-buttons">
+			<div *ngIf="errorMessage" class="alert alert-danger alert-dismissible" role="alert">
+				<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+				{{errorMessage}}
+			</div>
+			<div *ngIf="successMessage" class="alert alert-success alert-dismissible" role="alert">
+				<button type="button" class="close" (click)="dismissMessages()" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+				<i class="fa fa-check-circle"></i> {{successMessage}}
+			</div>
+
+			<div *ngIf="!isLoggedIn()" class="btn-group btn-group-justified" role="group" id="login-buttons">
 				<div class="btn-group" role="group">
 					<a class="btn btn-default" href="/auth/soundcloud">
 						<img src="/public/img/SoundCloud_logo.svg" alt="github logo" />
@@ -20,7 +39,20 @@
 			</div>
 
 			<div *ngIf="isLoggedIn()">
-				logged in
+				is logged in
+
+				<span id="modal" *ngIf="showModal">
+					<button type="button" class="close" (click)="toggleModal()"><span>&times;</span></button>
+					<h4>User Profile</h4>
+					<table class="table table-condensed table-responsive">
+						<tbody>
+							<tr>
+								<td>dummy</td>
+								<td>dummy</td>
+							</tr>
+						</tbody>
+					</table>
+				</span>
 			</div>
 		</div>
 	</div>

@@ -74,38 +74,41 @@ export class DashboardIntroComponent implements OnInit, OnDestroy {
 	};
 	public ws = new WebSocket(this.wsUrl);
 	public errorMessage: string;
-	private getServerStaticData(callback) {
+
+	private getServerStaticData(callback): void {
 		this.serverStaticDataService.getData().subscribe(
 			data => this.serverData.static = data,
 			error => this.errorMessage = <any> error,
 			() => {
 				console.log('getServerStaticData done, data:', this.serverData.static);
-				if (callback) { callback(this); }
+				if (callback) { callback(); }
 			}
 		);
 	}
-	private getPublicData(callback) {
+	private getPublicData(callback): void {
 		this.publicDataService.getData().subscribe(
 			data => this.appUsageData = data,
 			error => this.errorMessage = <any> error,
 			() => {
 				console.log('getPublicData done, data:', this.appUsageData);
-				if (callback) { callback(this); }
+				if (callback) { callback(); }
 			}
 		);
 	}
 
-	private emitSpinnerStartEvent() {
+// Spinner
+	private emitSpinnerStartEvent(): void {
 		console.log('root spinner start event emitted');
 		this.emitter.emitEvent({spinner: 'start'});
 	}
-	private emitSpinnerStopEvent() {
+	private emitSpinnerStopEvent(): void {
 		console.log('root spinner stop event emitted');
 		this.emitter.emitEvent({spinner: 'stop'});
 	}
 
+// Modal
 	private showModal: boolean = false;
-	private toggleModal() { /* tslint:disable-line */
+	private toggleModal(): void { /* tslint:disable-line */
 		if (this.showModal) {
 			this.ws.send(JSON.stringify({action: 'pause'}));
 		} else { this.ws.send(JSON.stringify({action: 'get'})); }
@@ -115,7 +118,7 @@ export class DashboardIntroComponent implements OnInit, OnDestroy {
 // Help
 	private showHelp: boolean = false; // controls help labells visibility, catches events from nav component
 
-	public ngOnInit() {
+	public ngOnInit(): void {
 		console.log('ngOnInit: DashboardIntroComponent initialized');
 		this.emitSpinnerStartEvent();
 		this.emitter.emitEvent({route: '/intro'});
@@ -161,13 +164,13 @@ export class DashboardIntroComponent implements OnInit, OnDestroy {
 			}
 		});
 
-		this.getPublicData((/*scope*/) => {
-			this.getServerStaticData((/*scope*/) => {
+		this.getPublicData(() => {
+			this.getServerStaticData(() => {
 				this.emitSpinnerStopEvent();
 			});
 		});
 	}
-	public ngOnDestroy() {
+	public ngOnDestroy(): void {
 		console.log('ngOnDestroy: DashboardIntroComponent destroyed');
 		this.subscription.unsubscribe();
 		this.ws.close();
