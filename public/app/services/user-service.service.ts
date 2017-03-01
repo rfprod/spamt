@@ -15,6 +15,8 @@ export class UserService {
 		analyser_query: '',
 		analyser_user_id: '',
 		analyser_user_uri: '',
+		twitter_oauth_token: '',
+		twitter_oauth_verifier: '',
 	};
 
 	public modelKeys(): any[] {

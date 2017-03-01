@@ -12,7 +12,7 @@ import { UserService } from '../services/user-service.service';
 	templateUrl: '/public/app/views/dashboard-details.html',
 })
 export class DashboardDetailsComponent implements OnInit, OnDestroy {
-	constructor(
+	constructor (
 		public el: ElementRef,
 		private emitter: EventEmitterService,
 		private scGetQueriesService: SCgetQueriesService,
@@ -90,7 +90,10 @@ export class DashboardDetailsComponent implements OnInit, OnDestroy {
 				console.log('this.userService.model update:', this.userService.model);
 				this.userService.saveUser();
 			},
-			error => this.displayError = <any> error,
+			error => {
+				this.displayError = <any> error;
+				this.emitSpinnerStopEvent();
+			},
 			() => {
 				console.log('getUserService done');
 				this.emitSpinnerStopEvent();
@@ -143,7 +146,10 @@ export class DashboardDetailsComponent implements OnInit, OnDestroy {
 				}
 				this.displayError = undefined;
 			},
-			error => this.displayError = <any> error,
+			error => {
+				this.displayError = <any> error;
+				this.emitSpinnerStopEvent();
+			},
 			() => {
 				console.log('getUserDetailsService done');
 				this.emitSpinnerStopEvent();
@@ -265,7 +271,9 @@ export class DashboardDetailsComponent implements OnInit, OnDestroy {
 				}
 			});
 		} else {
+			this.scUserName = this.userService.model.analyser_query;
 			console.log('user is selected, this.scUserName:', this.scUserName);
+			this.getUser();
 		}
 		this.subscription = this.emitter.getEmitter().subscribe((message) => {
 			/*

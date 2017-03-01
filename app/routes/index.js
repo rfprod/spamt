@@ -2,7 +2,7 @@
 
 const path = process.cwd();
 
-module.exports = function(app, passport, User, Query, SrvInfo, DataInit, syncRec, JWT, mailTransporter) { // eslint-disable-line no-unused-vars
+module.exports = function(app, passport, User, Query, SrvInfo, DataInit, thenReq, JWT, mailTransporter) { // eslint-disable-line no-unused-vars
 
 /*
 *	check if data init is needed
@@ -30,22 +30,272 @@ module.exports = function(app, passport, User, Query, SrvInfo, DataInit, syncRec
 		resolve(path) {
 			console.log('resolving path: ', path);
 			const url = this.apiUrl + this.endpoints.resolve + '?url=' + path + '&' + this.clientIDparam;
-			return syncRec('GET', url);
+			return thenReq('GET', url);
 		}
 
 		getURI(apiUri, options) {
 			console.log('getting sc details by apiUri: ', apiUri);
 			const url = apiUri + '?' + this.clientIDparam;
-			return (options) ? syncRec('GET', url, options) : syncRec('GET', url);
+			return (options) ? thenReq('GET', url, options) : thenReq('GET', url);
 		}
 	}
 
 	const SCapi = new SC();
 
 /*
+*	Twitter API wrapper
+*/
+	class TWTR {
+		constructor() {
+			this.apiUrl = 'https://api.twitter.com/';
+			this.clientID = process.env.TWITTER_KEY;
+			this.clientSecret = process.env.TWITTER_SECRET;
+			this.endpoints = {
+				oauth: { // https://dev.twitter.com/oauth/reference
+					get : {
+						authenticate: 'oauth/authenticate',
+						authorize: 'oauth/authorize'
+					},
+					post: {
+						access_token: 'oauth/access_token',
+						request_token: 'oauth/request_token',
+						invalidate_token: 'oauth/invalidate_token',
+						token: 'oauth/token' // application only authentication usign bearer token
+					}
+				},
+				rest: { // https://dev.twitter.com/rest/reference
+					version: '1.1/',
+					application: {
+						get: {
+							rate_limit_status: 'application/rate_limit_status'
+						}
+					},
+					account: {
+						get: {
+							settings: 'account/settings.json',
+							verify_credentials: 'account/verify_credentials.json'
+						},
+						post: {
+							remove_profile_banner: 'account/remove_profile_banner.json',
+							settings: 'account/settings.json',
+							update_profile: 'account/update_profile.json',
+							update_profile_background_image: 'account/update_profile_background_image.json',
+							update_profile_banner: 'account/update_profile_banner.json',
+							update_profile_image: 'account/update_profile_image.json'
+						}
+					},
+					blocks: {
+						get: {
+							ids: 'blocks/ids.json',
+							list: 'blocks/list.json'
+						},
+						post: {
+							create: 'blocks/create.json',
+							destroy: 'blocks/destroy.json'
+						}
+					},
+					collections: {
+						get: {
+							entries: 'collections/entries.json',
+							list: 'collections/list.json',
+							show: 'collections/show.json'
+						},
+						post: {
+							create: 'collections/create.json',
+							destroy: 'collections/destroy.json',
+							entries_add: 'collections/entries/add.json',
+							entries_curate: 'collections/entries/curate.json',
+							entries_move: 'collections/entries/move.json',
+							entries_remove: 'collections/entries/remove.json',
+							update: 'collections/update.json'
+						}
+					},
+					direct_messages: {
+						get: {
+							direct_messages: 'direct_messages.json',
+							sent: 'direct_messages/sent.json',
+							show: 'direct_messages/show.json'
+						},
+						post: {
+							destroy: 'direct_messages/destroy.json',
+							new: 'direct_messages/new.json'
+						}
+					},
+					favorites: {
+						get: {
+							list: 'favorites/list.json'
+						},
+						post: {
+							create: 'favorites/create.json',
+							destroy: 'favorites/destroy.json'
+						}
+					},
+					followers: {
+						get: {
+							ids: 'followers/ids.json',
+							list: 'followers/list.json'
+						}
+					},
+					friends: {
+						get: {
+							ids: 'friends/ids.json',
+							list: 'friends/list.json'
+						}
+					},
+					friendships: {
+						get: {
+							incoming: 'friendships/incoming.json',
+							lookup: 'friendships/lookup.json',
+							no_retweets_ids: 'friendships/no_retweets/ids.json',
+							outgoing: 'friendships/outgoing.json',
+							show: 'friendships/show.json'
+						},
+						post: {
+							create: 'friendships/create.json',
+							destroy: 'friendships/destroy.json',
+							update: 'friendships/update.json'
+						}
+					},
+					geo: {
+						get: {
+							id: 'geo/id/', // + :place_id.json
+							reverse_geocode: 'geo/reverse_geocode.json',
+							search: 'geo/search.json'
+						},
+						post: {
+							place: 'geo/place.json'
+						}
+					},
+					help: {
+						get: {
+							configuration: 'help/configuration.json',
+							languages: 'help/languages.json',
+							privacy: 'help/privacy.json',
+							tos: 'help/tos.json'
+						}
+					},
+					lists: {
+						get: {
+							list: 'lists/list.json',
+							members: 'lists/members.json',
+							members_show: 'lists/members/show.json',
+							memberships: 'lists/memberships.json',
+							ownerships: 'lists/ownerships.json',
+							show: 'lists/show.json',
+							statuses: 'lists/statuses.json',
+							subscribers: 'lists/subscribers.json',
+							subscribers_show: 'lists/subscribers/show.json',
+							subscriptions: 'lists/subscriptions.json'
+						},
+						post: {
+							create: 'lists/create.json',
+							destroy: 'lists/destroy.json',
+							members_create: 'lists/members/create.json',
+							members_create_all: 'lists/members/create_all.json',
+							members_destroy: 'lists/members/destroy.json',
+							members_destroy_all: 'lists/members/destroy_all.json',
+							subscribers_create: 'lists/subscribers/create.json',
+							subscribers_destroy: 'lists/subscribers/destroy.json',
+							update: 'lists/update.json'
+						}
+					},
+					media: {
+						get: {
+							upload_status: 'media/upload.json?command=status',
+						},
+						post: {
+							metadata_create: 'media/metadata/create.json',
+							upload_append: 'media/upload.json?command=append',
+							upload_finalize: 'media/upload.json?command=finalize',
+							upload_init: 'media/upload.json?command=init'
+						}
+					},
+					mutes: {
+						get: {
+							users_ids: 'mutes/users/ids.json',
+							users_list: 'mutes/users/list.json'
+						},
+						post: {
+							users_create: 'mutes/users/create.json',
+							users_destroy: 'mutes/users/destroy.json'
+						}
+					},
+					saved_searches: {
+						get: {
+							list: 'saved_searches/list.json',
+							id: 'saved_searches/show/' // + :id.json
+						},
+						post: {
+							create: 'saved_searches/create.json',
+							destroy: 'saved_searches/destroy/' // + :id.json
+						}
+					},
+					search: {
+						get: {
+							tweets: 'search/tweets.json'
+						}
+					},
+					statuses: {
+						get: {
+							home_timeline: 'statuses/home_timeline.json',
+							lookup: 'statuses/lookup.json',
+							mentions_timeline: 'statuses/mentions_timeline.json',
+							oembed: 'statuses/oembed.json',
+							retweeters_ids: 'statuses/retweeters/ids.json',
+							retweets: 'statuses/retweets/', // + :id.json
+							retweets_of_me: 'statuses/retweets_of_me.json',
+							show: 'statuses/show/', // + :id.json
+							user_timeline: 'statuses/user_timeline'
+						},
+						post: {
+							destroy: 'statuses/destroy/', // + :id.json
+							retweet: 'statuses/retweet/', // + :id.json
+							unretweet: 'statuses/unretweet/', // + :id.json
+							update: 'statuses/update'
+						}
+					},
+					trends: {
+						get: {
+							available: 'trends/available.json',
+							closest: 'trends/closest.json',
+							place: 'trends/place.json'
+						}
+					},
+					users: {
+						get: {
+							lookup: 'users/lookup.json',
+							profile_banner: 'users/profile_banner.json',
+							search: 'users/search.json',
+							show: 'users/show.json',
+							suggestions_categories: 'users/suggestions.json',
+							suggestions_cat_users: 'users/suggestions/', // + :slug.json // :slug is category name retrieved from 'suggestions_categories' endpoint
+							suggestins_cat_users_statuses: 'users/suggestions/' // + :slug/members.json
+						},
+						post: {
+							report_spam: 'users/report_spam.json'
+						}
+					}
+				}
+			};
+		}
+
+		request(method = 'GET', endpoint, options) {
+			/**
+			* example arguments
+			* method: GET (default) / POST
+			* endpoint: 'this.endpoints.rest.application.get.rate_limit_status' should resolve to '1.1/application/rate_limit_status'
+			*/
+			if (!method && !endpoint) { return { statusCode: 401, error: 'no endpoint specified' }; }
+			const url = (endpoint.indexOf('oauth') !== -1) ? this.apiUrl + endpoint : this.apiUrl + this.endpoints.rest.version + endpoint;
+			return (options) ? thenReq(method, url, options) : thenReq(method, url);
+		}
+	}
+
+	const TwitterAPI = new TWTR();
+
+/*
 * CORS headers
 */
-
 	app.all('/*', function(req, res, next) {
 		res.header('Access-Control-Allow-Origin', '*');
 		res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS');
@@ -78,7 +328,6 @@ module.exports = function(app, passport, User, Query, SrvInfo, DataInit, syncRec
 /*
 *	routes
 */
-
 	app.get('/', (req, res) => {
 		/**
 		*	serve application page
@@ -91,8 +340,8 @@ module.exports = function(app, passport, User, Query, SrvInfo, DataInit, syncRec
 		*	Resolves soundcloud resource to get user data,
 		*	return response if user
 		*/
-		let scUserName = req.query.name,
-			output = undefined;
+		let scUserName = req.query.name;
+		let output = undefined;
 
 		if (scUserName) {
 			if (scUserName.indexOf('/')) {
@@ -103,75 +352,78 @@ module.exports = function(app, passport, User, Query, SrvInfo, DataInit, syncRec
 				scUserName = scUserName.split('/')[0];
 			}
 
-			const resolveRequest = SCapi.resolve('https://soundcloud.com/' + scUserName);
-
-			if (resolveRequest.statusCode === 200) {
-				output = JSON.parse(resolveRequest.getBody());
-				/*
-				*	update Queries collection
-				*/
-				Query.find({}, (err, docs) => {
-					if (err) throw err;
-					const now = new Date().getTime();
-					if (docs.length === 0) {
-						let newQuery = new Query();
-						newQuery.name = scUserName;
-						newQuery.weight = 1;
-						newQuery.timestamp = now;
-						newQuery.save(err => {
-							if (err) throw err;
-							console.log('new query registered');
-						});
-					} else {
-						console.log('queries exist');
-						searchQueryLoop:
-						for (let i in docs) {
-							const item = docs[i];
-							if (item.name === scUserName) {
-								// update db record
-								const newWeight = item.weight + 1;
-								Query.update(
-									{'name': scUserName},
-									{$set:{'weight':newWeight, 'timestamp':now}},
-									(err,data) => {
-										if (err) { throw err; }
-										console.log('updated existing query:', JSON.stringify(data));
-									}
-								);
-								break searchQueryLoop;
-							}
-							console.log('docs.length, i:', docs.length, i);
-							if (i == docs.length - 1) {
-								// add new query
-								let newQuery = new Query();
-								newQuery.name = scUserName;
-								newQuery.weight = 1;
-								newQuery.timestamp = now;
-								newQuery.save(err => {
-									if (err) throw err;
-									console.log('new query registered');
-								});
+			SCapi.resolve('https://soundcloud.com/' + scUserName).done(SCres => {
+				if (SCres.statusCode < 300) {
+					/*
+					*	update Queries collection
+					*/
+					output = JSON.parse(SCres.getBody());
+					Query.find({}, (err, docs) => {
+						if (err) throw err;
+						const now = new Date().getTime();
+						if (docs.length === 0) {
+							let newQuery = new Query();
+							newQuery.name = scUserName;
+							newQuery.weight = 1;
+							newQuery.timestamp = now;
+							newQuery.save(err => {
+								if (err) throw err;
+								console.log('new query registered');
+							});
+						} else {
+							console.log('queries exist');
+							searchQueryLoop:
+							for (let i in docs) {
+								const item = docs[i];
+								if (item.name === scUserName) { // update db record
+									const newWeight = item.weight + 1;
+									Query.update(
+										{'name': scUserName},
+										{$set:{'weight':newWeight, 'timestamp':now}},
+										(err,data) => {
+											if (err) { throw err; }
+											console.log('updated existing query:', JSON.stringify(data));
+										}
+									);
+									break searchQueryLoop;
+								}
+								console.log('docs.length, i:', docs.length, i);
+								if (i == docs.length - 1) { // add new query
+									let newQuery = new Query();
+									newQuery.name = scUserName;
+									newQuery.weight = 1;
+									newQuery.timestamp = now;
+									newQuery.save(err => {
+										if (err) throw err;
+										console.log('new query registered');
+									});
+								}
 							}
 						}
+					});
+				} else {
+					/*
+					*	proxy errors from soundcloud API
+					*/
+					output = { error: JSON.parse(SCres.body.toString('UTF8')).errors[0] };
+				}
+				res.setHeader('Cache-Control', 'no-cache, no-store');
+				res.format({
+					'application/json': () => {
+						if (output.error) { res.status(SCres.statusCode); }
+						res.send(output);
 					}
 				});
-			} else {
-				/*
-				*	proxy errors from soundcloud API
-				*/
-				output = resolveRequest.body;
-			}
+			});
 		} else {
-			output = { message: 'Missing mandatory request parameter - name.' };
+			output = { error: 'Missing mandatory request parameter - name.' };
+			res.setHeader('Cache-Control', 'no-cache, no-store');
+			res.format({
+				'application/json': () => {
+					res.status(404).send(output);
+				}
+			});
 		}
-
-		res.setHeader('Cache-Control', 'no-cache, no-store');
-		res.format({
-			'application/json': function(){
-				if (output.error) res.status(400);
-				res.send(output);
-			}
-		});
 	});
 
 	app.get('/sc/get/queries', (req, res) => {
@@ -203,35 +455,42 @@ module.exports = function(app, passport, User, Query, SrvInfo, DataInit, syncRec
 		* 'tracks', 'playlists', 'favorites', 'followers', 'followings'
 		*/
 		const scEndpointUri = req.query.endpoint_uri;
-		let output = undefined;
+		let output = undefined, error = false;
 
 		if (scEndpointUri) {
-
 			if (SCapi.regExp.userDetails.test(scEndpointUri)) {
-				const resolveRequest = SCapi.getURI(scEndpointUri);
-
-				if (resolveRequest.statusCode === 200) {
-					output = JSON.parse(resolveRequest.getBody());
-				} else {
-					/*
-					*	proxy errors from soundcloud API
-					*/
-					output = resolveRequest.body;
-				}
+				SCapi.getURI(scEndpointUri).done(SCres => {
+					if (SCres.statusCode < 300) { // parse successful request
+						output = JSON.parse(SCres.getBody());
+					} else { // proxy errors from soundcloud API
+						output = { error: JSON.parse(SCres.body.toString('UTF8')).errors[0] };
+					}
+					res.setHeader('Cache-Control', 'no-cache, no-store');
+					res.format({
+						'application/json': () => {
+							if (output.error) { res.status(SCres.statusCode); }
+							res.send(output);
+						}
+					});
+				});
 			} else {
-				output = { message: 'Wrong mandatory request parameter - endpoint_uri.' };
+				output = { error: 'Wrong mandatory request parameter - endpoint_uri.' };
+				error = true;
 			}
 		} else {
-			output = { message: 'Missing mandatory request parameter - endpoint_uri.' };
+			output = { error: 'Missing mandatory request parameter - endpoint_uri.' };
+			error = true;
 		}
 
-		res.setHeader('Cache-Control', 'no-cache, no-store');
-		res.format({
-			'application/json': function(){
-				if (output.error) res.status(400);
-				res.send(output);
-			}
-		});
+		if (error) {
+			res.setHeader('Cache-Control', 'no-cache, no-store');
+			res.format({
+				'application/json': () => {
+					res.status(404).send(output);
+				}
+			});
+		}
+
 	});
 
 	app.get('/sc/get/user/track/download', (req, res) => {
@@ -239,45 +498,48 @@ module.exports = function(app, passport, User, Query, SrvInfo, DataInit, syncRec
 		*	Requests and returns soundcloud user's downloadable track
 		*/
 		const scEndpointUri = req.query.endpoint_uri;
-		let resolveRequest = undefined;
-		let output = undefined;
+		let output = undefined, error = false;
 
 		if (scEndpointUri) {
-
 			if (SCapi.regExp.userTrackDownload.test(scEndpointUri)) {
-				resolveRequest = SCapi.getURI(scEndpointUri);
-				//console.log('resolveRequest: ', resolveRequest);
+				SCapi.getURI(scEndpointUri).done(SCres => {
+					if (SCres.statusCode < 300) { // parse successful request - return file
+						output = SCres.getBody();
+					} else { // proxy errors from soundcloud API
+						output = { error: JSON.parse(SCres.body.toString('UTF8')).errors[0] };
+					}
 
-				if (resolveRequest.statusCode === 200) {
-					output = resolveRequest.getBody();
-				} else {
-					/*
-					*	proxy errors from soundcloud API
-					*/
-					output = resolveRequest.body;
-				}
+					res.setHeader('Cache-Control', 'no-cache, no-store');
+					if (!output.error) {
+						res.setHeader('Content-Disposition', SCres.headers['content-disposition']);
+						res.setHeader('Accept-Ranges', SCres.headers['accept-ranges']);
+						res.setHeader('Content-Type', SCres.headers['content-type']);
+						res.setHeader('Content-Length', SCres.headers['content-length']);
+						res.setHeader('X-AMZ-Meta-Duration', SCres.headers['x-amz-meta-duration']);
+						res.setHeader('X-AMZ-Meta-File-Type', SCres.headers['x-amz-meta-file-type']);
+					}
+					res.format({
+						'application/json': () => {
+							res.status(SCres.statusCode).send(output);
+						}
+					});
+				});
 			} else {
-				output = { message: 'Wrong mandatory request parameter - endpoint_uri.' };
+				output = { error: 'Wrong mandatory request parameter - endpoint_uri.' };
+				error = true;
 			}
 		} else {
-			output = { message: 'Missing mandatory request parameter - endpoint_uri.' };
+			output = { error: 'Missing mandatory request parameter - endpoint_uri.' };
+			error = true;
 		}
 
-		res.setHeader('Cache-Control', 'no-cache, no-store');
-		if (output.error) {
+		if (error) {
+			res.setHeader('Cache-Control', 'no-cache, no-store');
 			res.format({
-				'application/json': function(){
-					res.status(400).send(output);
+				'application/json': () => {
+					res.status(404).send(output);
 				}
 			});
-		} else {
-			res.setHeader('Content-Disposition', resolveRequest.headers['content-disposition']);
-			res.setHeader('Accept-Ranges', resolveRequest.headers['accept-ranges']);
-			res.setHeader('Content-Type', resolveRequest.headers['content-type']);
-			res.setHeader('Content-Length', resolveRequest.headers['content-length']);
-			res.setHeader('X-AMZ-Meta-Duration', resolveRequest.headers['x-amz-meta-duration']);
-			res.setHeader('X-AMZ-Meta-File-Type', resolveRequest.headers['x-amz-meta-file-type']);
-			res.send(output);
 		}
 	});
 
@@ -286,44 +548,48 @@ module.exports = function(app, passport, User, Query, SrvInfo, DataInit, syncRec
 		*	Requests and returns soundcloud user's track preview url
 		*/
 		const scEndpointUri = req.query.endpoint_uri;
-		let resolveRequest = undefined;
-		let output = undefined;
+		let output = undefined, error = false;
 
 		if (scEndpointUri) {
-
 			if (SCapi.regExp.userTrackStream.test(scEndpointUri)) {
-				resolveRequest = SCapi.getURI(scEndpointUri, { followRedirects: false });
-				//console.log('resolveRequest: ', resolveRequest);
+				SCapi.getURI(scEndpointUri, { followRedirects: false }).done(SCres => {
+					if (SCres.statusCode < 400) { // parse successful request - send client a location to be loaded as <source src='...'>
+						output = { location: SCres.headers['location'] };
+					} else { // proxy errors from soundcloud API
+						output = { error: JSON.parse(SCres.body.toString('UTF8')).errors[0] };
+					}
 
-				if (resolveRequest.statusCode === 200) {
-					/*
-					*	send client a location to be loaded as <source src='...'>
-					*/
-					output = { location: resolveRequest.headers['location'] };
-				} else {
-					/*
-					*	proxy errors from soundcloud API
-					*/
-					output = resolveRequest.body;
-				}
+					res.setHeader('Cache-Control', 'no-cache, no-store');
+					if (!output.error) {
+						res.setHeader('Content-Type', SCres.headers['content-type']);
+						res.setHeader('Location', SCres.headers['location']);
+					}
+					if (SC.statusCode >= 400) {
+						res.format({
+							'application/json': () => {
+								res.status(SCres.statusCode).send(output);
+							}
+						});
+					} else {
+						res.status(200).send(output);
+					}
+				});
 			} else {
-				output = { message: 'Wrong mandatory request parameter - endpoint_uri.' };
+				output = { error: 'Wrong mandatory request parameter - endpoint_uri.' };
+				error = false;
 			}
 		} else {
-			output = { message: 'Missing mandatory request parameter - endpoint_uri.' };
+			output = { error: 'Missing mandatory request parameter - endpoint_uri.' };
+			error = false;
 		}
 
-		res.setHeader('Cache-Control', 'no-cache, no-store');
-		if (output.error) {
+		if (error) {
+			res.setHeader('Cache-Control', 'no-cache, no-store');
 			res.format({
-				'application/json': function(){
-					res.status(400).send(output);
+				'application/json': () => {
+					res.status(404).send(output);
 				}
 			});
-		} else {
-			res.setHeader('Content-Type', resolveRequest.headers['content-type']);
-			res.setHeader('Location', resolveRequest.headers['location']);
-			res.send(output);
 		}
 	});
 
@@ -590,13 +856,15 @@ module.exports = function(app, passport, User, Query, SrvInfo, DataInit, syncRec
 		//failureRedirect: process.env.APP_URL + '#/user'
 	}), (req, res) => {
 		//console.log('/auth/twitter/callback', req.user._doc);
-		const twitter_token = req.query.oauth_query;
+		const twitter_token = req.query.oauth_token;
 		const twitter_tokenSecret = req.query.oauth_verifier;
-		let resStatus, msg;
-		if (twitter_token && twitter_tokenSecret) {
-			resStatus = 400;
-			msg = { error: 'twitter authentication error'};
+		//let resStatus, msg;
+		if (!twitter_token && !twitter_tokenSecret) {
+			//resStatus = 400;
+			//msg = { error: 'twitter authentication error'};
+			res.redirect(process.env.APP_URL + '#/user?error=true');
 		} else {
+			/*
 			resStatus = 200;
 			msg = {};
 			const keys = Object.keys(req.user._doc);
@@ -605,8 +873,10 @@ module.exports = function(app, passport, User, Query, SrvInfo, DataInit, syncRec
 					msg[key] = req.user[key];
 				}
 			}
+			*/
+			res.redirect(process.env.APP_URL + '#/user?oauth_token=' + twitter_token + '&oauth_verifier=' + twitter_tokenSecret);
 		}
-		res.status(resStatus).json(msg);
+		//res.status(resStatus).json(msg);
 	});
 	app.get('/auth/logout', (req, res) => {
 		req.logout();
