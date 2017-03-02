@@ -580,7 +580,7 @@ module.exports = function(app, passport, User, Query, SrvInfo, DataInit, thenReq
 	app.get('/auth/twitter', passport.authenticate('twitter'));
 	app.get('/auth/twitter/callback', passport.authenticate('twitter', {
 		//successRedirect: process.env.APP_URL + '#/user?twitter_auth_error=false',
-		//failureRedirect: process.env.APP_URL + '#/user?twitter_auth_error=true'
+		failureRedirect: process.env.APP_URL + '#/user?twitter_auth_error=true'
 	}), (req, res) => {
 		/*
 		console.log('/auth/twitter/callback', req.user._doc);
@@ -596,6 +596,7 @@ module.exports = function(app, passport, User, Query, SrvInfo, DataInit, thenReq
 		const twitter_token = req.query.oauth_token;
 		const twitter_tokenSecret = req.query.oauth_verifier;
 		if (!twitter_token && !twitter_tokenSecret) {
+			// this check is probably useless because failureRedirect is defined above
 			res.redirect(process.env.APP_URL + '#/user?twitter_auth_error=true');
 		} else {
 			res.redirect(process.env.APP_URL + '#/user?oauth_token=' + twitter_token + '&oauth_verifier=' + twitter_tokenSecret);
