@@ -2,7 +2,7 @@
 
 const path = process.cwd();
 
-module.exports = function(app, passport, User, Query, SrvInfo, DataInit, thenReq, JWT, mailTransporter, SC, TWTR) { // eslint-disable-line no-unused-vars
+module.exports = function(app, passport, User, Query, SrvInfo, DataInit, thenReq, JWT, mailTransporter, crypto, SC, TWTR) { // eslint-disable-line no-unused-vars
 
 /*
 *	check if data init is needed
@@ -18,7 +18,7 @@ module.exports = function(app, passport, User, Query, SrvInfo, DataInit, thenReq
 /*
 *	Twitter API wrapper
 */
-	const TwitterAPI = new TWTR(thenReq);
+	const TwitterAPI = new TWTR(thenReq, crypto);
 
 /*
 * CORS headers
@@ -582,48 +582,57 @@ module.exports = function(app, passport, User, Query, SrvInfo, DataInit, thenReq
 		//successRedirect: process.env.APP_URL + '#/user?twitter_auth_error=false',
 		failureRedirect: process.env.APP_URL + '#/user?twitter_auth_error=true'
 	}), (req, res) => {
-		/*
 		console.log('/auth/twitter/callback', req.user._doc);
-		let resStatus = 200, msg = {};
-		const keys = Object.keys(req.user._doc);
-		for (let key of keys) {
-			if (!key.match(/(token|salt)/ig)) {
-				msg[key] = req.user[key];
-			}
-		}
-		res.status(resStatus).json(msg);
-		*/
-		const twitter_token = req.query.oauth_token;
-		const twitter_tokenSecret = req.query.oauth_verifier;
-		if (!twitter_token && !twitter_tokenSecret) {
+		const oauth_token = req.query.oauth_token;
+		const oauth_verifier = req.query.oauth_verifier;
+		if (!oauth_token && !oauth_verifier) {
 			// this check is probably useless because failureRedirect is defined above
 			res.redirect(process.env.APP_URL + '#/user?twitter_auth_error=true');
 		} else {
-			res.redirect(process.env.APP_URL + '#/user?oauth_token=' + twitter_token + '&oauth_verifier=' + twitter_tokenSecret);
+			User.update(
+				{'twitter.id': req.user._doc.twitter.id},
+				{$set:{'twitter.oauth_token': oauth_token, 'twitter.oauth_verifier': oauth_verifier}},
+				(err, data) => {
+					if (err) {
+						//throw err;
+						console.log(err);
+						res.redirect(process.env.APP_URL + '#/user?twitter_auth_error=true');
+					}
+					console.log('updated twitter tokens for user:', data);
+					res.redirect(process.env.APP_URL + '#/user?twitter_oauth_token=' + oauth_token + '&twitter_oauth_verifier=' + oauth_verifier);
+				}
+			);
 		}
 	});
 	app.get('/auth/logout', (req, res) => {
-		//console.log('/auth/logout, user:', req.user);
+		// console.log('/auth/logout, query:', req.query);
+		const twitterToken = (req.query.twitter_token) ? req.query.twitter_token : '';
+		const soundcloudToken = (req.query.soundcloud_token) ? req.query.soundcloud_token : '';
+		console.log('twitterToken:', twitterToken);
+		console.log('soundcloudToken:', soundcloudToken);
+		if (!twitterToken && !soundcloudToken) {
+			res.status(404).json({error: 'Missing user token'});
+		}
 		// reset oauth tokens
-		if (req.user.twitter.token || req.user.twitter.tokenSecret) {
+		if (twitterToken) {
 			// for Twitter
 			User.update(
-				{'twitter.id': req.user.twitter.id},
-				{$set:{'twitter.token':'', 'twitter.tokenSecret':''}},
+				{'twitter.oauth_token': twitterToken},
+				{$set:{'twitter.oauth_token':'', 'twitter.oauth_verifier':'', access_token:	'', access_secret: ''}},
 				(err,data) => {
 					if (err) { throw err; }
 					console.log('twitter oauth tokens reset:', JSON.stringify(data));
 				}
 			);
-		} else {
+		} else if (soundcloudToken) {
 			// for Soundcloud
 			/*
 			*	TODO
 			*	configure for Soundcloud probably like so
 			*	
 			*	User.update(
-			*		{'soundcloud.id': req.user.soundcloud.id},
-			*		{$set:{'soundcloud.token':'', 'soundcloud.tokenSecret':''}},
+			*		{'soundcloud.oauth_token': soundcloudToken},
+			*		{$set:{'soundcloud.oauth_token':'', 'soundcloud.oauth_verifier':''}},
 			*		(err,data) => {
 			*			if (err) { throw err; }
 			*			console.log('soundcloud oauth tokens reset:', JSON.stringify(data));
@@ -631,16 +640,77 @@ module.exports = function(app, passport, User, Query, SrvInfo, DataInit, thenReq
 			*	);
 			*/
 		}
-		req.logout(); // drop session
-		res.status(200).json({message: 'logged out successfully'});
+		if (twitterToken || soundcloudToken) {
+			req.logout(); // drop session
+			res.status(200).json({message: 'logged out successfully'});
+		}
 	});
 
-/**
-*	utility functions for checking social authentication
+/*
+*	Twitter endpoints
 */
-	function isLoggedIn(req, res, next){
-		if (req.isAuthenticated()) return next();
-		else res.redirect(process.env.APP_URL + '#/user');
-	}
+	app.get('/auth/twitter/access-token', (req, res) => {
+		/**
+		* user signin
+		*	exchange request token (oauth_token and oauth_verifier) for access token (oauth_token and oauth_token_secret)
+		*/
+		//res.status(200).json({success: req.query.oauth_verifier});
+		const oauth_token = (req.query.oauth_token) ? req.query.oauth_token : '';
+		const oauth_verifier = (req.query.oauth_verifier) ? req.query.oauth_verifier : '';
+		console.log('oauth_token:', oauth_token);
+		console.log('oauth_verifier:', oauth_verifier);
+		if (!oauth_token && !oauth_verifier) {
+			res.status(404).json({error: 'Missing mandatory request params: oauth_token and/or oauth_verifier'});
+		} else if (oauth_token && oauth_verifier) {
+			const options = {
+				body: 'oauth_verifier=' + oauth_verifier,
+				qc: { include_entities: true }
+			};
+			TwitterAPI.request('POST', TwitterAPI.endpoints.oauth.post.access_token, oauth_token, oauth_verifier, options).done(TWTRres => {
+				let output;
+				if (TWTRres.statusCode < 300) { // parse successful request
+					output = JSON.parse(TWTRres.getBody());
+				} else { // proxy errors from soundcloud API
+					let err = TWTRres.body.toString('UTF8');
+					err = (err.match(/[{}]/g)) ? JSON.parse(err).split(',') : err; // check if error is an object or string
+					output = { error: err };
+				}
+				console.log('output:', output);
+				res.status(TWTRres.statusCode).json(output);
+			});
+		}
+	});
+	app.get('/auth/twitter/verify-credentials', (req, res) => {
+		/**
+		* log out authenticated user
+		* resets current user token
+		*/
+		console.log('req', req);
+		console.log('req.query:', req.query);
+		const twitter_token = (req.query.twitter_token) ? req.query.twitter_token : '';
+		res.setHeader('Cache-Control', 'no-cache, no-store');
+		if (!twitter_token) {
+			res.status(404).json({ error: 'Missing mandatory request parameter: twitter_token' });
+		} else {
+			User.find({'twitter.token': twitter_token}, (err, docs) => {
+				if (err) { throw err; }
+				if (docs[0]) {
+					const twitter_secret = docs[0].twitter.tokenSecret;
+					//res.status(200).json({ message: 'success ' + twitter_secret });
+					
+					TwitterAPI.request('GET', TwitterAPI.endpoints.rest.account.get.verify_credentials, twitter_token, twitter_secret).done(TWTRres => {
+						let output;
+						if (TWTRres.statusCode < 300) { // parse successful request
+							output = JSON.parse(TWTRres.getBody());
+						} else { // proxy errors from soundcloud API
+							output = { error: JSON.parse(TWTRres.body.toString('UTF8')).errors[0] };
+						}
+						res.status(TWTRres.statusCode).json(output);
+					});
+					
+				}
+			});
+		}
+	});
 
 };
