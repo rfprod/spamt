@@ -22,8 +22,9 @@ export class UserLogoutService {
 		return Observable.throw(errMsg);
 	}
 
-	public getData(): Observable<any> {
-		return this.http.get(this.appDataUrl)
+	public getData(twitterToken: string, soundcloudToken: string): Observable<any> {
+		const query = (twitterToken) ? '?twitter_token=' + twitterToken : (soundcloudToken) ? '?soundcloud_token=' + soundcloudToken : '';
+		return this.http.get(this.appDataUrl + query)
 			.map(this.extractData)
 			.catch(this.handleError);
 	}

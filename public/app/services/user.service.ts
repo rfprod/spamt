@@ -15,8 +15,8 @@ export class UserService {
 		analyser_query: '',
 		analyser_user_id: '',
 		analyser_user_uri: '',
-		twitter_oauth_token: '',
-		twitter_oauth_verifier: '',
+		twitter_token: '',
+		soundcloud_token: '',
 	};
 
 	public modelKeys(): any[] {

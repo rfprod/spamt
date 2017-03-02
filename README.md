@@ -48,6 +48,8 @@ Create a file named `.env` in the root directory. This file should contain:
 ```
 TWITTER_KEY=twitter-key
 TWITTER_SECRET=twitter-secret
+TWITTER_ACCESS_TOKEN=twitter-access-token-for-single-user-app-mode
+TWITTER_TOKEN_SECRET=twitter-token-secret-for-single-user-app-mode
 SOUNDCLOUD_SECRET=soundcloud-secret
 SOUNDCLOUD_CLIENT_ID=soundcloud-client-id
 MONGO_URI=mongodb://localhost:27017/spamt
@@ -81,6 +83,8 @@ required vars
 ```
 TWITTER_KEY=twitter-key
 TWITTER_SECRET=twitter-secret
+TWITTER_ACCESS_TOKEN=twitter-access-token-for-single-user-app-mode
+TWITTER_TOKEN_SECRET=twitter-token-secret-for-single-user-app-mode
 SOUNDCLOUD_SECRET=soundcloud-secret
 SOUNDCLOUD_CLIENT_ID=soundcloud-client-id
 APP_URL=application-url

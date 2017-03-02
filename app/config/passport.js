@@ -69,8 +69,8 @@ module.exports = function(passport) {
 							'twitter.status.favorited': profile._json.status.favorited,
 							'twitter.status.retweet_count': profile._json.status.retweet_count,
 							'twitter.status.favorite_count': profile._json.status.favorite_count,
-							'twitter.token': token,
-							'twitter.tokenSecret': tokenSecret
+							'twitter.oauth_token': '',
+							'twitter.oauth_verifier': ''
 						}},
 						(err, data) => {
 							if (err) { throw err; }
@@ -108,8 +108,8 @@ module.exports = function(passport) {
 					newUser.twitter.status.favorited = profile._json.status.favorited;
 					newUser.twitter.status.retweet_count = profile._json.status.retweet_count;
 					newUser.twitter.status.favorite_count = profile._json.status.favorite_count;
-					newUser.twitter.token = token;
-					newUser.twitter.tokenSecret = tokenSecret;
+					newUser.twitter.oauth_token = '';
+					newUser.twitter.oauth_verifier = '';
 					newUser.save(err => {
 						if (err) throw err;
 						return done(null, newUser);

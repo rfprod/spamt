@@ -4,11 +4,14 @@
 *	Twitter API wrapper
 */
 class TWTR {
-	constructor(thenReq) {
+	constructor(thenReq, crypto) {
 		this.apiUrl = 'https://api.twitter.com/';
 		this.clientID = process.env.TWITTER_KEY;
 		this.clientSecret = process.env.TWITTER_SECRET;
+		this.accessToken = process.env.TWITTER_ACCESS_TOKEN;
+		this.tokenSecret = process.env.TWITTER_TOKEN_SECRET;
 		this.thenReq = thenReq; // synchronous request method - is provided as param
+		this.crypto = crypto; // node crypto is used to generate random sequence for Twitter auth
 		this.endpoints = {
 			oauth: { // https://dev.twitter.com/oauth/reference
 				get : {
@@ -238,15 +241,104 @@ class TWTR {
 		};
 	}
 
-	request(method = 'GET', endpoint, options) {
+	request(method, endpoint, oauth_token, oauth_secret, query_obj = {}) {
 		/**
 		* example arguments
 		* method: GET (default) / POST
-		* endpoint: 'this.endpoints.rest.application.get.rate_limit_status' should resolve to '1.1/application/rate_limit_status'
+		* endpoint: 'this.endpoints.rest.application.get.rate_limit_status'
+		*	endpoint resolves to '1.1/application/rate_limit_status'
+		*	oauth_token: <...>
+		* query_obj: { param_1:'value1', 'param-2':'value2' }
 		*/
-		if (!method && !endpoint) { return { statusCode: 401, error: 'no endpoint specified' }; }
-		const url = (endpoint.indexOf('oauth') !== -1) ? this.apiUrl + endpoint : this.apiUrl + this.endpoints.rest.version + endpoint;
-		return (options) ? this.thenReq(method, url, options) : this.thenReq(method, url);
+		if (!method && !endpoint) { return { statusCode: 404, error: 'no endpoint specified' }; }
+		let url = (endpoint.indexOf('oauth') !== -1) ? this.apiUrl + endpoint : this.apiUrl + this.endpoints.rest.version + endpoint;
+		url += '?include_entities=true';
+		let authParam = {
+			oauth_consumer_key: this.clientID,
+			oauth_nonce: this.crypto.randomBytes(32).toString('base64'),
+			// oauth_signature: oauthSignature,
+			oauth_signature_method: 'HMAC-SHA1',
+			oauth_timestamp: new Date().getTime(),
+			oauth_token: oauth_token,
+			oauth_version: '1.0'
+		};
+		for (let key in query_obj.qc) {
+			/*
+			*	if authParam key exists, it can not be overwritten with the same key from query_obj
+			*	this is both security and reliability measure
+			*/
+			console.log('query_obj.qc:', query_obj.qc, '| key', key);
+			authParam[key] = (!authParam[key]) ? query_obj.qc[key] : authParam[key];
+		}
+		const bodyParams = query_obj.body.split('&').filter(item => item).map(item => item.split('='));
+		for (let p of bodyParams) {
+			authParam[p[0]] = (!authParam[p[0]]) ? p[1] : authParam[p[0]];
+		}
+		console.log('authParam:', authParam);
+		/*
+		*	Twitter oauth signature generation
+		*	https://dev.twitter.com/oauth/overview/creating-signatures
+		*	1. Percent encode every key and value that will be matchUnsigned
+		* 2. Sort the list of params alphabetically
+		*	3. For each key/value pair:
+		*	3.1 append the encoded key to the output
+		*	3.2 append '=' to the output
+		*	3.3 append the encoded value to the output
+		*	3.4 separate key/value pairs with '&'
+		*/
+		let params = [];
+		for (let key in authParam) {
+			params.push([ encodeURIComponent(key), encodeURIComponent(authParam[key]) ]);
+		}
+		params.sort((a, b) => a - b);
+		console.log('params:', params);
+		let encodedParamsString = '';
+		for (let param of params) {
+			encodedParamsString += param[0] + '=' + param[1] + '&';
+		}
+		encodedParamsString = encodedParamsString.substring(0, encodedParamsString.length - 1);
+		console.log('encodedParamsString:', encodedParamsString);
+		/*
+		*	create signature base string
+		*	1. add method name in uppercase to output string
+		*	2. add '&' to output string
+		*	3. percent encode and add url to output string
+		* 4. add '&' to output string
+		* 5. percent encode and add encodedParamsString to output string
+		*
+		*	resulting string should contain only two '&'
+		*/
+		const signatureBaseString = method + '&' + encodeURIComponent(url) + '&' + encodeURIComponent(encodedParamsString);
+		/*
+		*	create signing string
+		*	1. add percent encoded Twitter App Client Secret to output string
+		*	2. add '&' to output string
+		*	3. add percent encoded User oAuth Secret to output string
+		*/
+		const signingString = encodeURIComponent(this.clientSecret) + '&' + encodeURIComponent(oauth_secret);
+		/*
+		*	generate HMAC-SHA1 oauth signature string
+		*/
+		const oauthSignature = this.crypto.createHmac('sha1', signingString).update(signatureBaseString).digest('base64');
+		console.log('oauthSignature:', oauthSignature);
+
+		let options = {
+			headers: {
+				'Authorization': 'OAuth ' +
+					'oauth_consumer_key=' + authParam.oauth_consumer_key + ',' +
+					'oauth_nonce=' + authParam.oauth_nonce + ',' +
+					'oauth_signature=' + oauthSignature + ',' +
+					'oauth_signature_method=' + authParam.oauth_signature_method + ',' +
+					'oauth_timestamp=' + authParam.oauth_timestamp + ',' +
+					'oauth_token=' + authParam.oauth_token + ',' +
+					'oauth_version=' + authParam.oauth_version
+			}
+		};
+		console.log('method:', method);
+		if (/*method === 'GET'*/query_obj.qc) { options.qc = query_obj.qc; }
+		if (/*method === 'POST' || method === 'PUT' || method === 'DELETE'*/query_obj.body) { options.body = encodeURIComponent(query_obj.body); }
+		console.log('options:', options);
+		return this.thenReq(method, url, options);
 	}
 }
 
