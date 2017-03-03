@@ -15,8 +15,19 @@ export class UserService {
 		analyser_query: '',
 		analyser_user_id: '',
 		analyser_user_uri: '',
-		twitter_token: '',
-		soundcloud_token: '',
+		/*
+		*	Note on OAuth tokens
+		*
+		*	following OAuth tokens are not access tokens, these are OAuth request tokens
+		*
+		*	request tokens are stored in db for each user session,
+		*	as well as a key pair: access_token / token_secret,
+		*	which are actually used to make requests to Twitter API
+		*
+		*	request tokens identify further user requests
+		*/
+		twitter_oauth_token: '',
+		soundcloud_oauth_token: '',
 	};
 
 	public modelKeys(): any[] {

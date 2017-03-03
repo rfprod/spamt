@@ -34,9 +34,9 @@ module.exports = function(passport) {
 		consumerSecret: configAuthTwitter.twitterAuth.clientSecret,
 		callbackURL: configAuthTwitter.twitterAuth.callbackURL
 	}, (token, tokenSecret, profile, done) => {
-		// console.log('twitter passport profile:', profile);
-		// console.log('twitter token:', token);
-		// console.log('twitter tokenSecret:', tokenSecret);
+		// console.log('twitter passport profile:', profile, '\n');
+		// console.log('twitter token:', token, '\n');
+		// console.log('twitter tokenSecret:', tokenSecret, '\n');
 		process.nextTick(() => {
 			User.findOne({ 'twitter.id': profile.id }, (err, user) => {
 				if (err) { return done(err); }
@@ -70,7 +70,9 @@ module.exports = function(passport) {
 							'twitter.status.retweet_count': profile._json.status.retweet_count,
 							'twitter.status.favorite_count': profile._json.status.favorite_count,
 							'twitter.oauth_token': '',
-							'twitter.oauth_verifier': ''
+							'twitter.oauth_verifier': '',
+							'twitter.access_token': token,
+							'twitter.token_secret': tokenSecret,
 						}},
 						(err, data) => {
 							if (err) { throw err; }
@@ -110,6 +112,8 @@ module.exports = function(passport) {
 					newUser.twitter.status.favorite_count = profile._json.status.favorite_count;
 					newUser.twitter.oauth_token = '';
 					newUser.twitter.oauth_verifier = '';
+					newUser.twitter.access_token = token;
+					newUser.twitter.token_secret = tokenSecret;
 					newUser.save(err => {
 						if (err) throw err;
 						return done(null, newUser);

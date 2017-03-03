@@ -44,7 +44,7 @@ let User = new Schema({
 		oauth_token:			String,
 		oauth_verifier:		String,
 		access_token:			String,
-		access_secret: 		String
+		token_secret: 		String
 	},
 	soundcloud: {				//sync
 		id:								String,

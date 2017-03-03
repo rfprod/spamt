@@ -50,7 +50,7 @@ export class DashboardUserComponent implements OnInit, OnDestroy {
 				if (param[0] === 'twitter_auth_error' && param[1] === 'true') {
 					this.errorMessage = 'Failed to log in with Twitter credentials. Please, try again.';
 					// reset existing tokens if any in case of twitter_auth_error is present and truthy
-					this.userService.model.twitter_token = '';
+					this.userService.model.twitter_oauth_token = '';
 					this.userService.saveUser();
 					break getError;
 				}
@@ -62,7 +62,7 @@ export class DashboardUserComponent implements OnInit, OnDestroy {
 			console.log(params);
 			for (let param of params) {
 				if (param[0] === 'twitter_oauth_token') {
-					this.userService.model.twitter_token = param[1];
+					this.userService.model.twitter_oauth_token = param[1];
 				}
 			}
 			this.dismissMessages();
@@ -73,17 +73,17 @@ export class DashboardUserComponent implements OnInit, OnDestroy {
 	}
 
 	public isLoggedIn(): boolean {
-		return this.userService.model.twitter_token || this.userService.model.soundcloud_token;
+		return this.userService.model.twitter_oauth_token || this.userService.model.soundcloud_oauth_token;
 	}
 
 	private logout(): void { /* tslint:disable-line */
 		console.log('logging out, resetting token');
 		this.emitSpinnerStartEvent();
 		this.dismissMessages();
-		this.userLogoutService.getData(this.userService.model.twitter_token, null).subscribe(
+		this.userLogoutService.getData(this.userService.model.twitter_oauth_token, null).subscribe(
 			data => {
 				this.successMessage = 'Logout success';
-				this.userService.model.twitter_token = '';
+				this.userService.model.twitter_oauth_token = '';
 				this.userService.saveUser();
 				this.emitter.emitEvent({appInfo: 'show'});
 				this.router.navigateByUrl('/user');
@@ -126,9 +126,9 @@ export class DashboardUserComponent implements OnInit, OnDestroy {
 
 		this.checkUrlParams();
 
-		if (!this.userService.model.twitter_token) {
+		if (!this.userService.model.twitter_oauth_token) {
 			this.userService.restoreUser(() => {
-				if (this.userService.model.twitter_token !== '') {
+				if (this.userService.model.twitter_oauth_token !== '') {
 					console.log('restored auth credentials: user is logged in');
 					this.dismissMessages();
 					this.successMessage = 'Successful login';
