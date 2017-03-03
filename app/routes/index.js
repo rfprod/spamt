@@ -605,6 +605,10 @@ module.exports = function(app, passport, User, Query, SrvInfo, DataInit, thenReq
 		}
 	});
 	app.get('/auth/logout', (req, res) => {
+		/**
+		* log out authenticated user
+		* resets current user token
+		*/
 		// console.log('/auth/logout, query:', req.query);
 		const twitterToken = (req.query.twitter_token) ? req.query.twitter_token : '';
 		const soundcloudToken = (req.query.soundcloud_token) ? req.query.soundcloud_token : '';
@@ -618,7 +622,7 @@ module.exports = function(app, passport, User, Query, SrvInfo, DataInit, thenReq
 			// for Twitter
 			User.update(
 				{'twitter.oauth_token': twitterToken},
-				{$set:{'twitter.oauth_token':'', 'twitter.oauth_verifier':'', access_token:	'', access_secret: ''}},
+				{$set:{'twitter.oauth_token':'', 'twitter.oauth_verifier':'', access_token:	'', token_secret: ''}},
 				(err,data) => {
 					if (err) { throw err; }
 					console.log('twitter oauth tokens reset:', JSON.stringify(data));
@@ -649,68 +653,47 @@ module.exports = function(app, passport, User, Query, SrvInfo, DataInit, thenReq
 /*
 *	Twitter endpoints
 */
-	app.get('/auth/twitter/access-token', (req, res) => {
-		/**
-		* user signin
-		*	exchange request token (oauth_token and oauth_verifier) for access token (oauth_token and oauth_token_secret)
-		*/
-		//res.status(200).json({success: req.query.oauth_verifier});
-		const oauth_token = (req.query.oauth_token) ? req.query.oauth_token : '';
-		const oauth_verifier = (req.query.oauth_verifier) ? req.query.oauth_verifier : '';
-		console.log('oauth_token:', oauth_token);
-		console.log('oauth_verifier:', oauth_verifier);
-		if (!oauth_token && !oauth_verifier) {
-			res.status(404).json({error: 'Missing mandatory request params: oauth_token and/or oauth_verifier'});
-		} else if (oauth_token && oauth_verifier) {
-			const options = {
-				body: 'oauth_verifier=' + oauth_verifier,
-				qc: { include_entities: true }
-			};
-			TwitterAPI.request('POST', TwitterAPI.endpoints.oauth.post.access_token, oauth_token, oauth_verifier, options).done(TWTRres => {
-				let output;
-				if (TWTRres.statusCode < 300) { // parse successful request
-					output = JSON.parse(TWTRres.getBody());
-				} else { // proxy errors from soundcloud API
-					let err = TWTRres.body.toString('UTF8');
-					err = (err.match(/[{}]/g)) ? JSON.parse(err).split(',') : err; // check if error is an object or string
-					output = { error: err };
-				}
-				console.log('output:', output);
-				res.status(TWTRres.statusCode).json(output);
-			});
-		}
-	});
 	app.get('/auth/twitter/verify-credentials', (req, res) => {
 		/**
 		* log out authenticated user
 		* resets current user token
 		*/
-		console.log('req', req);
 		console.log('req.query:', req.query);
-		const twitter_token = (req.query.twitter_token) ? req.query.twitter_token : '';
+		const oauth_token = (req.query.oauth_token) ? req.query.oauth_token : '';
 		res.setHeader('Cache-Control', 'no-cache, no-store');
-		if (!twitter_token) {
+		if (!oauth_token) {
 			res.status(404).json({ error: 'Missing mandatory request parameter: twitter_token' });
 		} else {
-			User.find({'twitter.token': twitter_token}, (err, docs) => {
+			User.find({'twitter.oauth_token': oauth_token}, (err, docs) => {
 				if (err) { throw err; }
 				if (docs[0]) {
-					const twitter_secret = docs[0].twitter.tokenSecret;
-					//res.status(200).json({ message: 'success ' + twitter_secret });
-					
-					TwitterAPI.request('GET', TwitterAPI.endpoints.rest.account.get.verify_credentials, twitter_token, twitter_secret).done(TWTRres => {
+					const access_token = docs[0].twitter.access_token;
+					const token_secret = docs[0].twitter.token_secret;
+					//res.status(200).json({ message: 'success ' + twitter_secret });					
+					TwitterAPI.request('GET', TwitterAPI.endpoints.rest.account.get.verify_credentials, access_token, token_secret).done(TWTRres => {
 						let output;
 						if (TWTRres.statusCode < 300) { // parse successful request
 							output = JSON.parse(TWTRres.getBody());
-						} else { // proxy errors from soundcloud API
-							output = { error: JSON.parse(TWTRres.body.toString('UTF8')).errors[0] };
+						} else { // proxy errors Twitter API
+							let err = TWTRres.body.toString('UTF8');
+							output = ((err.match(/[{}]/g))) ? { error: JSON.parse(err).errors[0] } : { error: err };
 						}
+						console.log('output:', output);
 						res.status(TWTRres.statusCode).json(output);
 					});
-					
 				}
 			});
 		}
 	});
 
+	app.post('/test', (req, res) => {
+		/*
+		*	endpoint for testing of requests proxied to third pary APIs
+		*/
+		console.log('\n', ' >> TEST ENDPOINT CALL', '\n');
+		console.log(' > req.headers:', req.headers);
+		console.log(' > req.query:', req.query);
+		console.log(' > req.body:', req.body);
+		res.status(200).json({message: 'test finished'});
+	});
 };
