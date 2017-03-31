@@ -34,6 +34,7 @@ System.config({
 	// Assume npm: is set in `paths` in systemjs.config
 	// Map the angular testing umd bundles
 	map: {
+		'@angular/animations/testing': '/base/node_modules/@angular/animations/bundles/animations-browser-testing.umd.js',
 		'@angular/core/testing': '/base/node_modules/@angular/core/bundles/core-testing.umd.js',
 		'@angular/common/testing': '/base/node_modules/@angular/common/bundles/common-testing.umd.js',
 		'@angular/compiler/testing': '/base/node_modules/@angular/compiler/bundles/compiler-testing.umd.js',

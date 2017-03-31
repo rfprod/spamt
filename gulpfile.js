@@ -1,19 +1,23 @@
 'use strict';
 
 const gulp = require('gulp'),
+	runSequence = require('run-sequence'),
 	util = require('gulp-util'),
 	concat = require('gulp-concat'),
 	rename = require('gulp-rename'),
+	del = require('del'),
 	eslint = require('gulp-eslint'),
 	tslint = require('gulp-tslint'),
 	plumber = require('gulp-plumber'),
+	uglify = require('gulp-uglify'),
 	mocha = require('gulp-mocha'),
 	karmaServer = require('karma').Server,
 	sass = require('gulp-sass'),
 	cssnano = require('gulp-cssnano'),
 	autoprefixer = require('gulp-autoprefixer'),
 	systemjsBuilder = require('gulp-systemjs-builder'),
-	runSequence = require('run-sequence'),
+	gulpFilter = require('gulp-filter'),
+	mainBowerFiles = require('main-bower-files'),
 	spawn = require('child_process').spawn,
 	exec = require('child_process').exec;
 let node,
@@ -101,6 +105,46 @@ gulp.task('client-unit-test', (done) => {
 	server.start();
 });
 
+/* BOWER FILES */
+gulp.task('bower-files', () => {
+	const filterJS = gulpFilter('**/*.js', { restore: true });
+	return gulp.src(mainBowerFiles(
+		{
+			paths: {
+				bowerJson: './bower.json',
+				bowerrc: './.bowerrc'
+			}
+		}))
+		.pipe(filterJS)
+		.pipe(plumber())
+		.pipe(concat('bower-pack.js'))
+		.pipe(uglify())
+		.pipe(plumber.stop())
+		.pipe(rename('bower-pack.min.js'))
+		.pipe(filterJS.restore)
+		.pipe(gulp.dest('./public/js'));
+});
+
+gulp.task('pack-bower-css', () => { // packs vendor css files which bowerFiles put into public/js folder on bower-files task execution
+	return gulp.src('./public/js/*.css')
+		.pipe(plumber())
+		.pipe(concat('bower-pack.css'))
+		.pipe(cssnano())
+		.pipe(plumber.stop())
+		.pipe(rename('bower-pack.min.css'))
+		.pipe(gulp.dest('./public/css'));
+});
+
+gulp.task('move-bower-fonts', () => { // move vendor font files which bowerFiles puts into public/fonts folder on bower-files task execution
+	return gulp.src(['./public/js/*.otf', './public/js/*.eot', './public/js/*.svg', './public/js/*.ttf', './public/js/*.woff', './public/js/*.woff2'])
+		.pipe(gulp.dest('./public/fonts'));
+});
+
+gulp.task('bower-files-build-clean', () => { // remove vendor css and fonts from public/js
+	return del(['./public/js/*.css', './public/js/*.otf', './public/js/*.eot', './public/js/*.svg', './public/js/*.ttf', './public/js/*.woff', './public/js/*.woff2']);
+});
+/* BOWER FILES */
+
 gulp.task('build-system-js', () => {
 	const builder = systemjsBuilder('/','./systemjs.config.js');
 	return builder.buildStatic('app', 'bundle.min.js', {
@@ -164,7 +208,7 @@ gulp.task('watch-client-and-test', () => {
 gulp.task('default', ['database','server','lint','build','watch','watch-and-lint']);
 
 gulp.task('build', (done) => {
-	runSequence('sass-autoprefix-minify-css', 'tsc', 'build-system-js', done);
+	runSequence('bower-files', 'pack-bower-css', 'move-bower-fonts', 'bower-files-build-clean', 'sass-autoprefix-minify-css', 'tsc', 'build-system-js', done);
 });
 
 gulp.task('production-start', ['build', 'database', 'server']);

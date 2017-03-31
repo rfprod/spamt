@@ -1,6 +1,6 @@
 import { NgModule, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 
-import { LocationStrategy, HashLocationStrategy } from '@angular/common';
+import { LocationStrategy, HashLocationStrategy, CommonModule  } from '@angular/common';
 import { BrowserModule } from '@angular/platform-browser';
 import { FormsModule } from '@angular/forms';
 import { HttpModule } from '@angular/http';
@@ -41,16 +41,16 @@ import { ControlsQueriesListService } from './services/controls-queries-list.ser
 // declare let $: JQueryStatic;
 
 @NgModule({
-	declarations: [ AppComponent, AppNavComponent, AppInfoComponent, DashboardIntroComponent, DashboardDetailsComponent, DashboardControlsComponent, DashboardUserComponent, nvD3 , AudioPlayerDirective, LoadingIndicatorDirective, ConvertDuration],
+	declarations: [ AppComponent, AppNavComponent, AppInfoComponent, DashboardIntroComponent, DashboardDetailsComponent, DashboardControlsComponent, DashboardUserComponent, nvD3, AudioPlayerDirective, LoadingIndicatorDirective, ConvertDuration],
 	imports 		: [ BrowserModule, FormsModule, HttpModule, RouterModule.forRoot(APP_ROUTES) ],
 	providers 	: [
 									{ provide: LocationStrategy, useClass: HashLocationStrategy },
 									{ provide: Window, useValue: window },
 									EventEmitterService, UserService, UserLogoutService, ServerStaticDataService, PublicDataService,
 									SCgetQueriesService, SCgetUserService, SCgetUserDetailsService, SCgetUserTrackDownloadService, SCgetUserTrackStreamService,
-									ControlsLoginService, ControlsLogoutService, ControlsMeService, ControlsUsersListService, ControlsQueriesListService,
+									ControlsLoginService, ControlsLogoutService, ControlsMeService, ControlsUsersListService, ControlsQueriesListService
 								],
 	schemas 		: [ CUSTOM_ELEMENTS_SCHEMA ],
-	bootstrap 	: [ AppComponent ],
+	bootstrap 	: [ AppComponent ]
 })
 export class AppModule {}

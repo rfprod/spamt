@@ -4,7 +4,7 @@ module.exports = function(config){
 		basePath : '../',
 		
 		files : [
-			'public/bower_components/jquery-2.2.4.min/index.js',
+			'public/bower_components/jquery/dist/jquery.js',
 			'public/bower_components/d3/d3.js',
 			'public/bower_components/nvd3/build/nv.d3.js',
 
@@ -16,11 +16,11 @@ module.exports = function(config){
 			'node_modules/zone.js/dist/fake-async-test.js',
 
 			'node_modules/reflect-metadata/Reflect.js',
-			{ pattern: 'node_modules/reflect-metadata/Reflect.js.map', included: false, watched: false },
+			{ pattern: 'node_modules/reflect-metadata/Reflect.js', included: false, watched: false },
 
 			'node_modules/systemjs/dist/system.src.js',
 			'node_modules/systemjs/dist/system-polyfills.js',
-			{ pattern: 'node_modules/systemjs/dist/system-polyfills.js.map', included: false, watched: false },
+			{ pattern: 'node_modules/systemjs/dist/system-polyfills.js', included: false, watched: false },
 
 			{ pattern: 'systemjs.config.js', included: false, watched: false },
 			{ pattern: 'systemjs.karma.config.js', included: false, watched: false },

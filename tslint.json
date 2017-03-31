@@ -12,7 +12,7 @@
 		"no-console": false,
 		"no-require-imports": true,
 		"no-trailing-whitespace": true,
-		"no-unused variable": true,
+		"no-unused-variable": true,
 		"no-var-requires": true,
 		"object-literal-sort-keys": false,
 		"one-variable-per-declaration": false,
