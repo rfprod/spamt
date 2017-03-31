@@ -5,7 +5,11 @@ public/app/*.js.map
 public/app/**/*.js
 public/app/**/*.js.map
 public/css/bundle.min.css
+public/css/bower-pack.min.css
 public/js/bundle.min.js
+public/js/bower-pack.min.js
+public/fonts/*.*
+!public/fonts/*.gitkeep
 test/client/*.js
 test/client/*.js.map
 *.env

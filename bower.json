@@ -1,14 +1,49 @@
 {
-  "name": "spamt",
-  "version": "1.0.0",
-  "description": "Social Profile Analysis and Management Tool",
-  "license": "MIT",
-  "private": true,
-  "dependencies": {
-    "jquery-2.2.4.min": "https://code.jquery.com/jquery-2.2.4.min.js",
-    "bootstrap-css": "~3.3.6",
-    "d3": ">3.4.4",
-    "nvd3": ">1.8.1",
-    "components-font-awesome": "^4.6.3"
-  }
+	"name": "spamt",
+	"version": "1.0.0",
+	"description": "Social Profile Analysis and Management Tool",
+	"license": "MIT",
+	"private": true,
+	"dependencies": {
+		"jquery": "^2.2.4",
+		"bootstrap-css": "~3.3.6",
+		"d3": ">3.4.4",
+		"nvd3": ">1.8.1",
+		"font-awesome": "fontawesome#^4.7.0"
+	},
+	"overrides": {
+		"bootstrap-css": {
+			"main": [
+				"js/bootstrap.js",
+				"css/bootstrap.css",
+				"fonts/glyphicons-halflings-regular.eot",
+				"fonts/glyphicons-halflings-regular.svg",
+				"fonts/glyphicons-halflings-regular.ttf",
+				"fonts/glyphicons-halflings-regular.woff",
+				"fonts/glyphicons-halflings-regular.woff2"
+			]
+		},
+		"font-awesome": {
+			"main": [
+				"css/font-awesome.css",
+				"fonts/FontAwesome.otf",
+				"fonts/fontawesome-webfont.eot",
+				"fonts/fontawesome-webfont.svg",
+				"fonts/fontawesome-webfont.ttf",
+				"fonts/fontawesome-webfont.woff",
+				"fonts/fontawesome-webfont.woff2"
+			]
+		},
+		"nvd3": {
+			"main": [
+				"build/nv.d3.js",
+				"build/nv.d3.css"
+			]
+		},
+		"d3": {
+			"main": [
+				"d3.js"
+			]
+		}
+	}
 }

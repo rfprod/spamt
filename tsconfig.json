@@ -6,8 +6,10 @@
 		"sourceMap": true,
 		"emitDecoratorMetadata": true,
 		"experimentalDecorators": true,
+		"lib": ["es2015", "dom"],
 		"removeComments": false,
-		"noImplicitAny": false
+		"noImplicitAny": false,
+		"suppressImplicitAnyIndexErrors": true
 	},
 	"include": [
 		"public/app",
@@ -23,15 +25,6 @@
 		"public/js",
 		"test/*",
 		"test/server",
-		"test/e2e",
-		"typings/main",
-		"typings/main.d.ts"
-	],
-
-	"atom": {
-		"rewriteTsconfig": false,
-		"formatOnSave": false
-	},
-	"compileOnSave": false,
-	"buildOnSave": false
+		"test/e2e"
+	]
 }
