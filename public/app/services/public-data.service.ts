@@ -9,12 +9,12 @@ export class PublicDataService {
 	constructor(private http: Http) {}
 
 	public extractData(res: Response) {
-		let body = res.json();
+		const body = res.json();
 		return body || {};
 	}
 
 	public handleError(error: any) {
-		let errMsg = (error.message) ? error.message :
+		const errMsg = (error.message) ? error.message :
 			error.status ? `${error.status} - ${error.statusText}` : 'Server error';
 		console.log(errMsg);
 		return Observable.throw(errMsg);

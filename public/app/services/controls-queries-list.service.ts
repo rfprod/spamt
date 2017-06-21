@@ -7,16 +7,16 @@ import 'rxjs/Rx';
 @Injectable()
 export class ControlsQueriesListService {
 	public appDataUrl: string = window.location.origin + '/controls/list/queries?user_token=';
-	constructor (private http: Http) {}
+	constructor(private http: Http) {}
 
 	public extractData(res: Response) {
-		let body = res.json();
+		const body = res.json();
 		return body || {};
 	}
 
 	public handleError(error: any) {
-		let errBody = (error._body) ? JSON.parse(error._body).message : '';
-		let errMsg = (error.message) ? error.message :
+		const errBody = (error._body) ? JSON.parse(error._body).message : '';
+		const errMsg = (error.message) ? error.message :
 			(error.status && errBody) ? `${error.status} - ${error.statusText}: ${errBody}` :
 			error.status ? `${error.status} - ${error.statusText}` : 'Server error';
 		return Observable.throw(errMsg);

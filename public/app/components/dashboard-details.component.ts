@@ -12,7 +12,7 @@ import { UserService } from '../services/user.service';
 	templateUrl: '/public/app/views/dashboard-details.html',
 })
 export class DashboardDetailsComponent implements OnInit, OnDestroy {
-	constructor (
+	constructor(
 		public el: ElementRef,
 		private emitter: EventEmitterService,
 		private scGetQueriesService: SCgetQueriesService,
@@ -42,11 +42,11 @@ export class DashboardDetailsComponent implements OnInit, OnDestroy {
 	private getQueries(): void { // tslint:disable-line
 		this.emitSpinnerStartEvent();
 		this.scGetQueriesService.getData().subscribe(
-			data => {
+			(data) => {
 				this.queries = data;
 				console.log('this.queries: ', this.queries);
 			},
-			error => this.errorMessage = <any> error,
+			(error) => this.errorMessage = error as any,
 			() => {
 				console.log('getQueriesService done');
 				this.emitSpinnerStopEvent();
@@ -59,7 +59,7 @@ export class DashboardDetailsComponent implements OnInit, OnDestroy {
 		return this.publicData.user;
 	}
 	private resetSelection(): void { // tslint:disable-line
-		for (let key of this.publicDataKeys) {
+		for (const key of this.publicDataKeys) {
 			this.publicData[key] = '';
 		}
 		this.scUserName = '';
@@ -81,7 +81,7 @@ export class DashboardDetailsComponent implements OnInit, OnDestroy {
 	private getUser(): void { // tslint:disable-line
 		this.emitSpinnerStartEvent();
 		this.scGetUserService.getData(this.scUserName).subscribe(
-			data => {
+			(data) => {
 				this.emitter.emitEvent({appInfo: 'hide'});
 				this.publicData.user = data;
 				this.errorMessage = undefined;
@@ -92,8 +92,8 @@ export class DashboardDetailsComponent implements OnInit, OnDestroy {
 				console.log('this.userService.model update:', this.userService.model);
 				this.userService.saveUser();
 			},
-			error => {
-				this.errorMessage = <any> error;
+			(error) => {
+				this.errorMessage = error as any;
 				this.emitSpinnerStopEvent();
 			},
 			() => {
@@ -105,7 +105,7 @@ export class DashboardDetailsComponent implements OnInit, OnDestroy {
 	private analyseThisUser(permalink): void { // tslint:disable-line
 		this.scUserName = permalink;
 		this.selectedTab = '';
-		for (let key in this.publicData) {
+		for (const key in this.publicData) {
 			if (this.publicData[key] !== 'user') { this.publicData[key] = []; }
 		}
 		this.getUser();
@@ -127,7 +127,7 @@ export class DashboardDetailsComponent implements OnInit, OnDestroy {
 		}
 
 		this.selectedTab = tab;
-		for (let i in this.dataTabs) {
+		for (const i in this.dataTabs) {
 			if (this.dataTabs[i] === tab) { this.selectedEndpoint = this.endpoints[i]; }
 		}
 		console.log('this.selectedEndpoint: ', this.selectedEndpoint);
@@ -142,14 +142,14 @@ export class DashboardDetailsComponent implements OnInit, OnDestroy {
 					this.publicData[this.selectedEndpoint] = data.collection;
 				} else { this.publicData[this.selectedEndpoint] = data; }
 				if (this.selectedEndpoint === 'playlists') {
-					for (let i of data) { // tslint:disable-line
+					for (const i of data) { // tslint:disable-line
 						this.displayPlaylistTracks.push(false);
 					}
 				}
 				this.errorMessage = undefined;
 			},
-			error => {
-				this.errorMessage = <any> error;
+			(error) => {
+				this.errorMessage = error as any;
 				this.emitSpinnerStopEvent();
 			},
 			() => {
@@ -201,14 +201,14 @@ export class DashboardDetailsComponent implements OnInit, OnDestroy {
 		this.selectedTrack = undefined;
 		this.emitSpinnerStartEvent();
 		this.scGetUserTrackStreamService.getData(uri).subscribe(
-			data => {
+			(data) => {
 				console.log('scGetUserTrackPlayService, data: ', data);
 				this.selectedTrack = data.location;
 				this.selectedTrackURI = uri;
 				this.errorMessage = undefined;
 			},
-			error => {
-				this.errorMessage = <any> error;
+			(error) => {
+				this.errorMessage = error as any;
 				this.emitSpinnerStopEvent();
 			},
 			() => {
@@ -284,8 +284,8 @@ export class DashboardDetailsComponent implements OnInit, OnDestroy {
 			*/
 			if (message.search || message.search === '') {
 				console.log('/data consuming message:', message);
-				let domTitleObjects = this.el.nativeElement.querySelectorAll('#data')[this.dataTabs.indexOf(this.selectedTab)].querySelectorAll('.media-heading');
-				for (let domObj of domTitleObjects) {
+				const domTitleObjects = this.el.nativeElement.querySelectorAll('#data')[this.dataTabs.indexOf(this.selectedTab)].querySelectorAll('.media-heading');
+				for (const domObj of domTitleObjects) {
 					if (domObj.innerHTML.toLowerCase().indexOf(message.search.toLowerCase()) !== -1) {
 						domObj.parentElement.parentElement.style.display = 'block';
 					} else {
