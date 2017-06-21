@@ -9,7 +9,7 @@ import { UserLogoutService } from '../services/user-logout.service';
 	templateUrl: '/public/app/views/dashboard-user.html',
 })
 export class DashboardUserComponent implements OnInit, OnDestroy {
-	constructor (
+	constructor(
 		private el: ElementRef,
 		private router: Router,
 		private activatedRoute: ActivatedRoute,
@@ -22,16 +22,16 @@ export class DashboardUserComponent implements OnInit, OnDestroy {
 	private subscription: any;
 
 	public title: string = 'User Panel';
-	public description: Object = {
-		'welcome': 'Login to User Panel with your Twitter or Soundcloud account.',
-		'authenticated': 'Social Profile Analysis and Management Tool User Panel',
+	public description: object = {
+		welcome: 'Login to User Panel with your Twitter or Soundcloud account.',
+		authenticated: 'Social Profile Analysis and Management Tool User Panel',
 	};
 	public errorMessage: string = '';
 	public successMessage: string = '';
 	private dismissMessages(): void {
 		this.errorMessage = '';
 		this.successMessage = '';
-	};
+	}
 	private routerSubscription: any;
 
 // Authentication checker
@@ -44,9 +44,9 @@ export class DashboardUserComponent implements OnInit, OnDestroy {
 		console.log('this.router.url:', url);
 		// Twitter error
 		if (url.match(/twitter\_auth\_error/)) {
-			const params = url.split('?')[1].split('&').map(item => item.split('='));
+			const params = url.split('?')[1].split('&').map((item) => item.split('='));
 			getError:
-			for (let param of params) {
+			for (const param of params) {
 				if (param[0] === 'twitter_auth_error' && param[1] === 'true') {
 					this.errorMessage = 'Failed to log in with Twitter credentials. Please, try again.';
 					// reset existing tokens if any in case of twitter_auth_error is present and truthy
@@ -58,9 +58,9 @@ export class DashboardUserComponent implements OnInit, OnDestroy {
 		} else
 		// Twitter success
 		if (url.match(/twitter\_oauth\_token/)) {
-			const params = url.split('?')[1].split('&').map(item => item.split('='));
+			const params = url.split('?')[1].split('&').map((item) => item.split('='));
 			console.log(params);
-			for (let param of params) {
+			for (const param of params) {
 				if (param[0] === 'twitter_oauth_token') {
 					this.userService.model.twitter_oauth_token = param[1];
 				}
@@ -81,15 +81,15 @@ export class DashboardUserComponent implements OnInit, OnDestroy {
 		this.emitSpinnerStartEvent();
 		this.dismissMessages();
 		this.userLogoutService.getData(this.userService.model.twitter_oauth_token, null).subscribe(
-			data => {
+			(data) => {
 				this.successMessage = 'Logout success';
 				this.userService.model.twitter_oauth_token = '';
 				this.userService.saveUser();
 				this.emitter.emitEvent({appInfo: 'show'});
 				this.router.navigateByUrl('/user');
 			},
-			error => {
-				this.errorMessage = <any> error;
+			(error) => {
+				this.errorMessage = error as any;
 				this.emitSpinnerStopEvent();
 			},
 			() => {
@@ -113,7 +113,7 @@ export class DashboardUserComponent implements OnInit, OnDestroy {
 	private showModal: boolean = false;
 	private toggleModal(): void { /* tslint:disable-line */
 		this.showModal = (!this.showModal) ? true : false;
-	};
+	}
 
 // Help
 	private showHelp: boolean = false; // controls help labells visibility, catches events from nav component

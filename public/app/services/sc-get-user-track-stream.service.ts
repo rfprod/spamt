@@ -7,16 +7,16 @@ import 'rxjs/Rx';
 @Injectable()
 export class SCgetUserTrackStreamService {
 	public appDataUrl: string = window.location.origin + '/sc/get/user/track/stream?endpoint_uri=';
-	constructor (private http: Http) {}
+	constructor(private http: Http) {}
 
 	public extractData(res: Response) {
 		console.log('extractData: ', res);
-		let body = res.json();
+		const body = res.json();
 		return body || {};
 	}
 
 	public handleError(error: any) {
-		let errMsg = (error.message) ? error.message :
+		const errMsg = (error.message) ? error.message :
 			error.status ? `${error.status} - ${error.statusText}` : 'Server error';
 		console.log(errMsg);
 		return Observable.throw(errMsg);

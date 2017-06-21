@@ -23,17 +23,17 @@ export class DashboardIntroComponent implements OnInit, OnDestroy {
 	public description: string = 'Social Profile Analysis and Management Tool';
 	public host: string = window.location.host;
 	public wsUrl: string = (this.host.indexOf('localhost') !== -1) ? 'ws://' + this.host + '/app-diag/dynamic' : (window.location.origin.indexOf('https') === -1) ? 'ws://' + this.host + ':8000/app-diag/dynamic' : 'wss://' + this.host + ':8443/app-diag/dynamic';
-	public chartOptions: Object = {
+	public chartOptions: object = {
 		chart: {
 			type: 'pieChart',
 			height: 450,
 			donut: true,
-			x: (d) => { return d.key; },
-			y: (d) => { return d.y; },
+			x: (d) => d.key,
+			y: (d) => d.y,
 			showLabels: true,
 			pie: {
-				startAngle: (d) => { return d.startAngle / 2 - Math.PI / 2; },
-				endAngle: (d) => { return d.endAngle / 2 - Math.PI / 2; },
+				startAngle: (d) => d.startAngle / 2 - Math.PI / 2,
+				endAngle: (d) => d.endAngle / 2 - Math.PI / 2,
 			},
 			duration: 1000,
 			legend: {
@@ -77,8 +77,8 @@ export class DashboardIntroComponent implements OnInit, OnDestroy {
 
 	private getServerStaticData(callback): void {
 		this.serverStaticDataService.getData().subscribe(
-			data => this.serverData.static = data,
-			error => this.errorMessage = <any> error,
+			(data) => this.serverData.static = data,
+			(error) => this.errorMessage = error as any,
 			() => {
 				console.log('getServerStaticData done, data:', this.serverData.static);
 				if (callback) { callback(); }
@@ -87,8 +87,8 @@ export class DashboardIntroComponent implements OnInit, OnDestroy {
 	}
 	private getPublicData(callback): void {
 		this.publicDataService.getData().subscribe(
-			data => this.appUsageData = data,
-			error => this.errorMessage = <any> error,
+			(data) => this.appUsageData = data,
+			(error) => this.errorMessage = error as any,
 			() => {
 				console.log('getPublicData done, data:', this.appUsageData);
 				if (callback) { callback(); }
@@ -113,7 +113,7 @@ export class DashboardIntroComponent implements OnInit, OnDestroy {
 			this.ws.send(JSON.stringify({action: 'pause'}));
 		} else { this.ws.send(JSON.stringify({action: 'get'})); }
 		this.showModal = (!this.showModal) ? true : false;
-	};
+	}
 
 // Help
 	private showHelp: boolean = false; // controls help labells visibility, catches events from nav component
@@ -136,8 +136,8 @@ export class DashboardIntroComponent implements OnInit, OnDestroy {
 		this.ws.onmessage = (message) => {
 			console.log('websocket incoming message:', message);
 			this.serverData.dynamic = [];
-			let data = JSON.parse(message.data);
-			for (let d in data) {
+			const data = JSON.parse(message.data);
+			for (const d in data) {
 				if (data[d]) { this.serverData.dynamic.push(data[d]); }
 			}
 			console.log('this.serverData.dynamic:', this.serverData.dynamic);

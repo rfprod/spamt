@@ -34,21 +34,21 @@ export class DashboardControlsComponent implements OnInit, OnDestroy {
 	}
 	private subscription: any;
 	public title: string = 'SPAMT Controls';
-	public description: Object = {
-		'welcome': 'In order to gain access to Social Profile Analysis and Management Tool Controls you should have an account associated with an email address. Provide this email address to get an authentication link.',
-		'authenticated': 'Social Profile Analysis and Management Tool Controls',
+	public description: object = {
+		welcome: 'In order to gain access to Social Profile Analysis and Management Tool Controls you should have an account associated with an email address. Provide this email address to get an authentication link.',
+		authenticated: 'Social Profile Analysis and Management Tool Controls',
 	};
-	public chartOptions: Object = {
+	public chartOptions: object = {
 		chart: {
 			type: 'pieChart',
 			height: 450,
 			donut: true,
-			x: (d) => { return d.key; },
-			y: (d) => { return d.y; },
+			x: (d) => d.key,
+			y: (d) => d.y,
 			showLabels: true,
 			pie: {
-				startAngle: (d) => { return d.startAngle / 2 - Math.PI / 2; },
-				endAngle: (d) => { return d.endAngle / 2 - Math.PI / 2; },
+				startAngle: (d) => d.startAngle / 2 - Math.PI / 2,
+				endAngle: (d) => d.endAngle / 2 - Math.PI / 2,
 			},
 			duration: 1000,
 			legend: {
@@ -94,12 +94,12 @@ export class DashboardControlsComponent implements OnInit, OnDestroy {
 	private dismissMessages(): void {
 		this.errorMessage = '';
 		this.successMessage = '';
-	};
+	}
 	private getServerStaticData(callback): void {
 		this.serverStaticDataService.getData().subscribe(
-			data => this.serverData.static = data,
-			error => {
-				this.errorMessage = <any> error;
+			(data) => this.serverData.static = data,
+			(error) => {
+				this.errorMessage = error as any;
 				this.emitSpinnerStopEvent();
 			},
 			() => {
@@ -110,9 +110,9 @@ export class DashboardControlsComponent implements OnInit, OnDestroy {
 	}
 	private getPublicData(callback): void {
 		this.publicDataService.getData().subscribe(
-			data => this.appUsageData = data,
-			error => {
-				this.errorMessage = <any> error;
+			(data) => this.appUsageData = data,
+			(error) => {
+				this.errorMessage = error as any;
 				this.emitSpinnerStopEvent();
 			},
 			() => {
@@ -124,9 +124,9 @@ export class DashboardControlsComponent implements OnInit, OnDestroy {
 	private getUsersList(): void {
 		this.emitSpinnerStartEvent();
 		this.controlsUsersListService.getData(this.userService.model.user_token).subscribe(
-			data => this.usersList = data,
-			error => {
-				this.errorMessage = <any> error;
+			(data) => this.usersList = data,
+			(error) => {
+				this.errorMessage = error as any;
 				this.emitSpinnerStopEvent();
 			},
 			() => {
@@ -138,20 +138,20 @@ export class DashboardControlsComponent implements OnInit, OnDestroy {
 	private getQueriesList(): void {
 		this.emitSpinnerStartEvent();
 		this.controlsQueriesListService.getData(this.userService.model.user_token, this.queries.page).subscribe(
-			data => {
+			(data) => {
 				this.queries.queriesList = data;
 				this.queriesData = [];
-				for (let query of this.queries.queriesList) {
+				for (const query of this.queries.queriesList) {
 					console.log('query:', query);
-					const obj: Object = {
+					const obj: object = {
 						key: query.name,
 						y: query.weight,
 					};
 					this.queriesData.push(obj);
 				}
 			},
-			error => {
-				this.errorMessage = <any> error;
+			(error) => {
+				this.errorMessage = error as any;
 				this.emitSpinnerStopEvent();
 			},
 			() => {
@@ -165,9 +165,9 @@ export class DashboardControlsComponent implements OnInit, OnDestroy {
 		this.emitSpinnerStartEvent();
 		this.dismissMessages();
 		this.controlsLoginService.getData(this.userService.model.email).subscribe(
-			data => this.successMessage = data.message,
-			error => {
-				this.errorMessage = <any> error;
+			(data) => this.successMessage = data.message,
+			(error) => {
+				this.errorMessage = error as any;
 				this.emitSpinnerStopEvent();
 			},
 			() => {
@@ -181,7 +181,7 @@ export class DashboardControlsComponent implements OnInit, OnDestroy {
 		this.emitSpinnerStartEvent();
 		this.dismissMessages();
 		this.controlsMeService.getData(this.userService.model.user_token).subscribe(
-			data => {
+			(data) => {
 				this.userService.model.role = data.role;
 				this.userService.model.login = data.login;
 				this.userService.model.full_name = data.full_name;
@@ -190,8 +190,8 @@ export class DashboardControlsComponent implements OnInit, OnDestroy {
 				this.successMessage = 'Successful login';
 				this.userService.saveUser();
 			},
-			error => {
-				this.errorMessage = <any> error;
+			(error) => {
+				this.errorMessage = error as any;
 				this.userService.resetUser();
 				this.emitter.emitEvent({appInfo: 'show'});
 				this.emitSpinnerStopEvent();
@@ -208,21 +208,21 @@ export class DashboardControlsComponent implements OnInit, OnDestroy {
 		console.log('login attempt with email', this.userService.model.email);
 		this.userService.saveUser();
 		this.requestControlsAccess();
-	};
+	}
 
 	private logout(): void { /* tslint:disable-line */
 		console.log('logging out, resetting token');
 		this.emitSpinnerStartEvent();
 		this.dismissMessages();
 		this.controlsLogoutService.getData(this.userService.model.user_token).subscribe(
-			data => {
+			(data) => {
 				this.successMessage = 'Logout success';
 				this.userService.resetUser();
 				this.emitter.emitEvent({appInfo: 'show'});
 				this.router.navigateByUrl('/controls');
 			},
-			error => {
-				this.errorMessage = <any> error;
+			(error) => {
+				this.errorMessage = error as any;
 				this.emitSpinnerStopEvent();
 			},
 			() => {
@@ -245,7 +245,7 @@ export class DashboardControlsComponent implements OnInit, OnDestroy {
 	private showModal: boolean = false;
 	private toggleModal(): void { /* tslint:disable-line */
 		this.showModal = (!this.showModal) ? true : false;
-	};
+	}
 
 // Tabs
 	private dataTabs: string[] = ['Users', 'Queries']; // tslint:disable-line

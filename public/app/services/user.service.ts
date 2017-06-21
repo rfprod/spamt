@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 
 @Injectable()
 export class UserService {
-	constructor (public window: Window) {}
+	constructor(public window: Window) {}
 
 	public model: any = {
 		email: '',
@@ -50,7 +50,7 @@ export class UserService {
 	}
 
 	public resetUser(): void {
-		for (let key of this.modelKeys()) {
+		for (const key of this.modelKeys()) {
 			this.model[key] = '';
 		}
 		this.saveUser();
