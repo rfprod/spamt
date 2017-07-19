@@ -5,7 +5,6 @@ const gulp = require('gulp'),
 	util = require('gulp-util'),
 	concat = require('gulp-concat'),
 	rename = require('gulp-rename'),
-	del = require('del'),
 	eslint = require('gulp-eslint'),
 	tslint = require('gulp-tslint'),
 	plumber = require('gulp-plumber'),
@@ -16,8 +15,6 @@ const gulp = require('gulp'),
 	cssnano = require('gulp-cssnano'),
 	autoprefixer = require('gulp-autoprefixer'),
 	systemjsBuilder = require('gulp-systemjs-builder'),
-	gulpFilter = require('gulp-filter'),
-	mainBowerFiles = require('main-bower-files'),
 	spawn = require('child_process').spawn,
 	exec = require('child_process').exec;
 let node,
@@ -105,53 +102,66 @@ gulp.task('client-unit-test', (done) => {
 	server.start();
 });
 
-/* BOWER FILES */
-gulp.task('bower-files', () => {
-	const filterJS = gulpFilter('**/*.js', { restore: true });
-	return gulp.src(mainBowerFiles(
-		{
-			paths: {
-				bowerJson: './bower.json',
-				bowerrc: './.bowerrc'
-			}
-		}))
-		.pipe(filterJS)
-		.pipe(plumber())
-		.pipe(concat('bower-pack.js'))
-		.pipe(uglify())
-		.pipe(plumber.stop())
-		.pipe(rename('bower-pack.min.js'))
-		.pipe(filterJS.restore)
-		.pipe(gulp.dest('./public/js'));
-});
-
-gulp.task('pack-bower-css', () => { // packs vendor css files which bowerFiles put into public/js folder on bower-files task execution
-	return gulp.src('./public/js/*.css')
-		.pipe(plumber())
-		.pipe(concat('bower-pack.css'))
-		.pipe(cssnano())
-		.pipe(plumber.stop())
-		.pipe(rename('bower-pack.min.css'))
-		.pipe(gulp.dest('./public/css'));
-});
-
-gulp.task('move-bower-fonts', () => { // move vendor font files which bowerFiles puts into public/fonts folder on bower-files task execution
-	return gulp.src(['./public/js/*.otf', './public/js/*.eot', './public/js/*.svg', './public/js/*.ttf', './public/js/*.woff', './public/js/*.woff2'])
-		.pipe(gulp.dest('./public/fonts'));
-});
-
-gulp.task('bower-files-build-clean', () => { // remove vendor css and fonts from public/js
-	return del(['./public/js/*.css', './public/js/*.otf', './public/js/*.eot', './public/js/*.svg', './public/js/*.ttf', './public/js/*.woff', './public/js/*.woff2']);
-});
-/* BOWER FILES */
-
 gulp.task('build-system-js', () => {
+	/*
+	*	this task builds angular application
+	*	components, angular modules, and some dependencies
+	*
+	*	nonangular components related to design, styling, data visualization etc.
+	*	are built by another task
+	*/
 	const builder = systemjsBuilder('/','./systemjs.config.js');
 	return builder.buildStatic('app', 'bundle.min.js', {
 		minify: true,
 		mangle: true
 	})
 		.pipe(gulp.dest('./public/js'));
+});
+
+gulp.task('pack-vendor-js', () => {
+	/*
+	*	nonangular js bundle
+	*	components related to design, styling, data visualization etc.
+	*/
+	return gulp.src([
+		// sequence is essential
+		'./node_modules/jquery/dist/jquery.js',
+		'./node_modules/bootstrap/dist/js/bootstrap.js',
+		'./node_modules/d3/d3.js',
+		'./node_modules/nvd3/build/nv.d3.js',
+		// angular dependencies start here
+		'./node_modules/zone.js/dist/zone.min.js',
+		'./node_modules/reflect-metadata/Reflect.js',
+		'./node-modules/web-animations-js/web-animations.min.js'
+	])
+		.pipe(plumber())
+		.pipe(concat('vendor-bundle.js'))
+		.pipe(uglify())
+		.pipe(plumber.stop())
+		.pipe(rename('vendor-bundle.min.js'))
+		.pipe(gulp.dest('./public/js'));
+});
+
+gulp.task('pack-vendor-css', () => {
+	return gulp.src([
+		'./node_modules/bootstrap/dist/css/bootstrap.css',
+		'./node_modules/nvd3/build/nv.d3.css',
+		'./node_modules/components-font-awesome/css/font-awesome.css'
+	])
+		.pipe(plumber())
+		.pipe(concat('vendor-bundle.css'))
+		.pipe(cssnano())
+		.pipe(plumber.stop())
+		.pipe(rename('vendor-bundle.min.css'))
+		.pipe(gulp.dest('./public/css'));
+});
+
+gulp.task('move-vendor-fonts', () => {
+	return gulp.src([
+		'./node_modules/bootstrap/dist/fonts/*.*',
+		'./node_modules/components-font-awesome/fonts/*.*'
+	])
+		.pipe(gulp.dest('./public/fonts'));
 });
 
 gulp.task('sass-autoprefix-minify-css', () => {
@@ -184,15 +194,14 @@ gulp.task('tslint', () => {
 		}));
 });
 
-gulp.task('lint', ['eslint','tslint']);
-
 gulp.task('watch', () => {
 	gulp.watch(['./server.js', './app/config/*.js', './app/routes/*.js', './app/utils/*.js'], ['server']); // watch server and database changes and restart server
 	gulp.watch(['./server.js', './app/models/*.js'], ['database']); // watch database changes and restart database
 	gulp.watch(['./public/app/*.js', './public/app/**/*.js'], ['build-system-js']); // watch app js changes and build system
 	gulp.watch('./public/app/scss/*.scss', ['sass-autoprefix-minify-css']); // watch app css changes, pack css, minify and put in respective folder
 	gulp.watch(['./test/server/test.js'], ['server-test']); // watch server tests changes and run tests
-	gulp.watch(['./public/app/*.ts','./test/client/*.ts'], ['tsc']);
+	gulp.watch(['./app/**', './public/js/*.js', './*.js', './.eslintignore', './.eslintrc.json'], ['eslint']); // watch js files to be linted or eslint config and lint on change
+	gulp.watch(['./public/app/*.ts', './public/app/**/*.ts', './tslint.json'], ['tslint']); // watch ts files to be linted or tslint config and lint on change
 });
 
 gulp.task('watch-and-lint', () => {
@@ -205,13 +214,21 @@ gulp.task('watch-client-and-test', () => {
 	gulp.watch(['./public/app/*.js','./test/client/*.js','./test/karma.conf.js','./test/karma.test-shim.js'], ['client-unit-test']); //watch unit test changes and run tests
 });
 
-gulp.task('default', ['database','server','lint','build','watch','watch-and-lint']);
-
 gulp.task('build', (done) => {
-	runSequence('bower-files', 'pack-bower-css', 'move-bower-fonts', 'bower-files-build-clean', 'sass-autoprefix-minify-css', 'tsc', 'build-system-js', done);
+	runSequence('build-system-js', 'pack-vendor-js', 'pack-vendor-css', 'move-vendor-fonts', 'sass-autoprefix-minify-css', done);
 });
 
-gulp.task('production-start', ['build', 'database', 'server']);
+gulp.task('lint', (done) => {
+	runSequence('eslint', 'tslint', done);
+});
+
+gulp.task('default', (done) => {
+	runSequence('database', 'server', 'build', 'lint', 'watch', done);
+});
+
+gulp.task('production-start', (done) => {
+	runSequence('database', 'server', 'build', done);
+});
 
 process.on('exit', () => {
 	if (node) node.kill();
