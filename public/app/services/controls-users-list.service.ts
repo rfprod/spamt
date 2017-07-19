@@ -6,7 +6,7 @@ import 'rxjs/Rx';
 
 @Injectable()
 export class ControlsUsersListService {
-	public appDataUrl: string = window.location.origin + '/controls/list/users?user_token=';
+	public appDataUrl: string = window.location.origin + '/api/controls/list/users?user_token=';
 	constructor(private http: Http) {}
 
 	public extractData(res: Response) {

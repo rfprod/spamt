@@ -5,7 +5,7 @@ import { Observable } from 'rxjs/Rx';
 
 @Injectable()
 export class ServerStaticDataService {
-	public appDataUrl: string = window.location.origin + '/app-diag/static';
+	public appDataUrl: string = window.location.origin + '/api/app-diag/static';
 	constructor(private http: Http) {
 		console.log('window.location:', window.location);
 		console.log('window.location.origin:', window.location.origin);

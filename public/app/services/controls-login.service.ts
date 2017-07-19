@@ -6,7 +6,7 @@ import 'rxjs/Rx';
 
 @Injectable()
 export class ControlsLoginService {
-	public appDataUrl: string = window.location.origin + '/request/access?email=';
+	public appDataUrl: string = window.location.origin + '/api/request/access?email=';
 	constructor(private http: Http) {}
 
 	public extractData(res: Response) {

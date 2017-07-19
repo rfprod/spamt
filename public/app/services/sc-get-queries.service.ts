@@ -6,7 +6,7 @@ import 'rxjs/Rx';
 
 @Injectable()
 export class SCgetQueriesService {
-	public appDataUrl: string = window.location.origin + '/sc/get/queries';
+	public appDataUrl: string = window.location.origin + '/api/sc/get/queries';
 	constructor(private http: Http) {}
 
 	public extractData(res: Response) {

@@ -6,7 +6,7 @@ import 'rxjs/Rx';
 
 @Injectable()
 export class SCgetUserTrackStreamService {
-	public appDataUrl: string = window.location.origin + '/sc/get/user/track/stream?endpoint_uri=';
+	public appDataUrl: string = window.location.origin + '/api/sc/get/user/track/stream?endpoint_uri=';
 	constructor(private http: Http) {}
 
 	public extractData(res: Response) {

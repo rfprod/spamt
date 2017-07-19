@@ -20,18 +20,6 @@ module.exports = function(app, passport, User, Query, SrvInfo, DataInit, thenReq
 	const TwitterAPI = new TWTR(thenReq, crypto);
 // eslint-disable-next-line
 /**
-* CORS headers
-*/
-	app.all('/*', function(req, res, next) {
-		res.header('Access-Control-Allow-Origin', '*');
-		res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS');
-		res.header('Access-Control-Allow-Headers', 'Content-type,Accept,X-Access-Token,X-Key');
-		res.header('Access-Control-Expose-Headers', 'userTokenUpdate');
-		if (req.method == 'OPTIONS') res.status(200).end();
-		else next();
-	});
-// eslint-disable-next-line
-/**
 *	Mailer config
 */
 	function sendAccessLink(recipientEmail, accessLink, callback) {
@@ -61,7 +49,7 @@ module.exports = function(app, passport, User, Query, SrvInfo, DataInit, thenReq
 		res.sendFile(path + '/public/index.html');
 	});
 
-	app.get('/sc/get/user', (req, res) => {
+	app.get('/api/sc/get/user', (req, res) => {
 		/**
 		*	Resolves soundcloud resource to get user data,
 		*	return response if user
@@ -152,7 +140,7 @@ module.exports = function(app, passport, User, Query, SrvInfo, DataInit, thenReq
 		}
 	});
 
-	app.get('/sc/get/queries', (req, res) => {
+	app.get('/api/sc/get/queries', (req, res) => {
 		/**
 		*	get most popular queries
 		*/
@@ -175,7 +163,7 @@ module.exports = function(app, passport, User, Query, SrvInfo, DataInit, thenReq
 		});
 	});
 
-	app.get('/sc/get/user/details', (req, res) => {
+	app.get('/api/sc/get/user/details', (req, res) => {
 		/**
 		*	Requests and returns soundcloud users details by type:
 		* 'tracks', 'playlists', 'favorites', 'followers', 'followings'
@@ -219,7 +207,7 @@ module.exports = function(app, passport, User, Query, SrvInfo, DataInit, thenReq
 
 	});
 
-	app.get('/sc/get/user/track/download', (req, res) => {
+	app.get('/api/sc/get/user/track/download', (req, res) => {
 		/**
 		*	Requests and returns soundcloud user's downloadable track
 		*/
@@ -269,7 +257,7 @@ module.exports = function(app, passport, User, Query, SrvInfo, DataInit, thenReq
 		}
 	});
 
-	app.get('/sc/get/user/track/stream', (req, res) => {
+	app.get('/api/sc/get/user/track/stream', (req, res) => {
 		/**
 		*	Requests and returns soundcloud user's track preview url
 		*/
@@ -319,7 +307,7 @@ module.exports = function(app, passport, User, Query, SrvInfo, DataInit, thenReq
 		}
 	});
 
-	app.get('/app-diag/usage', (req, res) => {
+	app.get('/api/app-diag/usage', (req, res) => {
 		/**
 		*	number of users and administrators 
 		*/
@@ -345,7 +333,7 @@ module.exports = function(app, passport, User, Query, SrvInfo, DataInit, thenReq
 		});
 	});
 
-	app.get('/app-diag/static', (req, res) => {
+	app.get('/api/app-diag/static', (req, res) => {
 		/**
 		* static server information
 		*/
@@ -357,7 +345,7 @@ module.exports = function(app, passport, User, Query, SrvInfo, DataInit, thenReq
 		});
 	});
 
-	app.ws('/app-diag/dynamic', (ws) => {
+	app.ws('/api/app-diag/dynamic', (ws) => {
 		/**
 		* dynamic server information
 		*/
@@ -393,7 +381,7 @@ module.exports = function(app, passport, User, Query, SrvInfo, DataInit, thenReq
 /**
 *	Administration endpoints
 */
-	app.get('/request/access', (req, res) => {
+	app.get('/api/request/access', (req, res) => {
 		/**
 		* request controls access
 		* generates token and sends link to user email
@@ -436,7 +424,7 @@ module.exports = function(app, passport, User, Query, SrvInfo, DataInit, thenReq
 		}
 	});
 
-	app.all('/controls/*', (req, res, next) => {
+	app.all('/api/controls/*', (req, res, next) => {
 		/**
 		* /controls endpoint access restriction
 		* based on bearer token
@@ -469,7 +457,7 @@ module.exports = function(app, passport, User, Query, SrvInfo, DataInit, thenReq
 		})(req,res);
 	});
 
-	app.get('/controls/me', (req, res) => {
+	app.get('/api/controls/me', (req, res) => {
 		/**
 		* get authenticated user details
 		*/
@@ -488,7 +476,7 @@ module.exports = function(app, passport, User, Query, SrvInfo, DataInit, thenReq
 		});
 	});
 
-	app.get('/controls/list/users', (req, res) => {
+	app.get('/api/controls/list/users', (req, res) => {
 		/**
 		* get users list
 		* returns all records for now
@@ -527,7 +515,7 @@ module.exports = function(app, passport, User, Query, SrvInfo, DataInit, thenReq
 		});
 	});
 
-	app.get('/controls/list/queries', (req, res) => {
+	app.get('/api/controls/list/queries', (req, res) => {
 		/**
 		* get queries list
 		* returns 20 records per request
@@ -560,7 +548,7 @@ module.exports = function(app, passport, User, Query, SrvInfo, DataInit, thenReq
 		});
 	});
 
-	app.get('/controls/logout', (req, res) => {
+	app.get('/api/controls/logout', (req, res) => {
 		/**
 		* log out authenticated user
 		* resets current user token
@@ -575,13 +563,13 @@ module.exports = function(app, passport, User, Query, SrvInfo, DataInit, thenReq
 /**
 *	social networks authentication
 */
-	app.get('/auth/soundcloud', passport.authenticate('soundcloud'));
-	app.get('/auth/soundcloud/callback', passport.authenticate('soundcloud', {
+	app.get('/api/auth/soundcloud', passport.authenticate('soundcloud'));
+	app.get('/api/auth/soundcloud/callback', passport.authenticate('soundcloud', {
 		successRedirect: process.env.APP_URL + '#/user/dashboard',
 		failureRedirect: process.env.APP_URL + '#/user'
 	}));
-	app.get('/auth/twitter', passport.authenticate('twitter'));
-	app.get('/auth/twitter/callback', passport.authenticate('twitter', {
+	app.get('/api/auth/twitter', passport.authenticate('twitter'));
+	app.get('/api/auth/twitter/callback', passport.authenticate('twitter', {
 		//successRedirect: process.env.APP_URL + '#/user?twitter_auth_error=false',
 		failureRedirect: process.env.APP_URL + '#/user?twitter_auth_error=true'
 	}), (req, res) => {
@@ -607,7 +595,7 @@ module.exports = function(app, passport, User, Query, SrvInfo, DataInit, thenReq
 			);
 		}
 	});
-	app.get('/auth/logout', (req, res) => {
+	app.get('/api/auth/logout', (req, res) => {
 		/**
 		* log out authenticated user
 		* resets current user token
@@ -656,7 +644,7 @@ module.exports = function(app, passport, User, Query, SrvInfo, DataInit, thenReq
 /*
 *	Twitter endpoints
 */
-	app.get('/auth/twitter/verify-credentials', (req, res) => {
+	app.get('/api/auth/twitter/verify-credentials', (req, res) => {
 		/**
 		* log out authenticated user
 		* resets current user token
@@ -689,7 +677,7 @@ module.exports = function(app, passport, User, Query, SrvInfo, DataInit, thenReq
 		}
 	});
 
-	app.post('/test', (req, res) => {
+	app.post('/api/test', (req, res) => {
 		/*
 		*	endpoint for testing of requests proxied to third pary APIs
 		*/

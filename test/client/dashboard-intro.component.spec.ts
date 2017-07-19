@@ -87,7 +87,7 @@ describe('DashboardIntroComponent', () => {
 			expect(c.host).toEqual(jasmine.any(String));
 			expect(c.host).toEqual(window.location.host);
 			expect(c.wsUrl).toEqual(jasmine.any(String));
-			expect(c.wsUrl).toEqual('ws://' + c.host + '/app-diag/dynamic');
+			expect(c.wsUrl).toEqual('ws://' + c.host + '/api/app-diag/dynamic');
 			expect(c.chartOptions).toBeDefined();
 			expect(c.chartOptions).toEqual(jasmine.any(Object));
 			expect(c.chartOptions.chart).toEqual(jasmine.any(Object));
