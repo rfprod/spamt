@@ -50,10 +50,44 @@ const TWTR = require('./app/utils/twitter-api-wrapper.js');
 
 process.title = 'spamt';
 
-app.use('/public', express.static(process.cwd() + '/public'));
-app.use('/node_modules', express.static(process.cwd() + '/node_modules'));
-app.use('/systemjs.config.js', express.static(process.cwd() + '/systemjs.config.js'));
-app.use('/systemjs.config.extras.js', express.static(process.cwd() + '/systemjs.config.extras.js'));
+const cwd = process.cwd();
+
+app.use('/public', express.static(cwd + '/public'));
+app.use('/node_modules', express.static(cwd + '/node_modules'));
+app.use('/systemjs.config.js', express.static(cwd + '/systemjs.config.js'));
+app.use('/systemjs.config.extras.js', express.static(cwd + '/systemjs.config.extras.js'));
+app.use((req, res, next) => {
+	/*
+	*	this is required for angular to load urls properly when user requests url directly, e.g.
+	*	current conditions: client index page is served fro all request
+	*	which do not include control words: api, css, fonts, img, js
+	*	control words explanation:
+	*	api - is part of path that returnd data over REST API
+	* css, fonts, img, js - are directories containing client files
+	*/
+	// console.log('req.path:', req.path);
+	if (/(api|css|fonts|img|js|node_modules)/.test(req.path)) {
+		return next();
+	} else {
+		res.sendFile(cwd + '/public/index.html');
+	}
+});
+// headers config for all Express routes
+app.all('/*', function(req, res, next) {
+	// CORS headers
+	res.header('Access-Control-Allow-Origin', '*'); // restrict it to the required domain if needed
+	res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS');
+	res.header('Access-Control-Allow-Headers', 'Content-type,Accept,X-Access-Token,X-Key');
+	// add headers to be exposed
+	res.header('Access-Control-Expose-Headers', 'userTokenUpdate');
+	// cache control
+	res.header('Cache-Control', 'public, no-cache, no-store, must-ravalidate, max-age=0');
+	res.header('Expires', '-1');
+	res.header('Pragma', 'no-cache');
+	// handle OPTIONS method
+	if (req.method == 'OPTIONS') res.status(200).end();
+	else next();
+});
 
 if (process.env.OPENSHIFT_MONGODB_DB_HOST) {
 	const store = new MongoStore({

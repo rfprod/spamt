@@ -6,7 +6,7 @@ import 'rxjs/Rx';
 
 @Injectable()
 export class UserLogoutService {
-	public appDataUrl: string = window.location.origin + '/auth/logout';
+	public appDataUrl: string = window.location.origin + '/api/auth/logout';
 	constructor(private http: Http) {}
 
 	public extractData(res: Response) {

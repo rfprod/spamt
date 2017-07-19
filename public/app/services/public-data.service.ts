@@ -5,7 +5,7 @@ import { Observable } from 'rxjs/Rx';
 
 @Injectable()
 export class PublicDataService {
-	public appDataUrl: string = window.location.origin + '/app-diag/usage';
+	public appDataUrl: string = window.location.origin + '/api/app-diag/usage';
 	constructor(private http: Http) {}
 
 	public extractData(res: Response) {

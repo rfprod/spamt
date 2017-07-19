@@ -6,7 +6,7 @@ import 'rxjs/Rx';
 
 @Injectable()
 export class SCgetUserService {
-	public appDataUrl: string = window.location.origin + '/sc/get/user?name=';
+	public appDataUrl: string = window.location.origin + '/api/sc/get/user?name=';
 	constructor(private http: Http) {}
 
 	public extractData(res: Response) {

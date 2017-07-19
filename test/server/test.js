@@ -35,9 +35,9 @@ describe('/ endpoint', function() {
 	});
 });
 
-describe('/app-diag/static endpoint', function() {
+describe('/api/app-diag/static endpoint', function() {
 	it('should deliver static diagnostic information about the app platform', function (done){
-		request(baseUrl+'/app-diag/static', function (error,response,body) {
+		request(baseUrl+'/api/app-diag/static', function (error,response,body) {
 			
 			expect(error).to.be.not.ok;
 			expect(response).to.be.not.a('undefined');
@@ -59,10 +59,10 @@ describe('/app-diag/static endpoint', function() {
 	});
 });
 
-describe('/app-diag/dynamic endpoint', function() {
+describe('/api/app-diag/dynamic endpoint', function() {
 	it('should deliver dynamic diagnostic information about the app platform', function (done){
 
-		const ws = new webSocket('ws://localhost:8080/app-diag/dynamic');
+		const ws = new webSocket('ws://localhost:8080/api/app-diag/dynamic');
 
 		ws.on('open', (data) => {
 			console.log('ws connection opened', data);

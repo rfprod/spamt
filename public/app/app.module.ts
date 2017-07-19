@@ -1,6 +1,6 @@
 import { NgModule, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 
-import { LocationStrategy, HashLocationStrategy, CommonModule  } from '@angular/common';
+import { LocationStrategy, PathLocationStrategy, CommonModule  } from '@angular/common';
 
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
@@ -47,7 +47,7 @@ import { ControlsQueriesListService } from './services/controls-queries-list.ser
 	declarations: [ AppComponent, AppNavComponent, AppInfoComponent, DashboardIntroComponent, DashboardDetailsComponent, DashboardControlsComponent, DashboardUserComponent, nvD3, AudioPlayerDirective, LoadingIndicatorDirective, ConvertDuration],
 	imports 		: [ BrowserModule, BrowserAnimationsModule, FormsModule, ReactiveFormsModule, HttpModule, RouterModule.forRoot(APP_ROUTES) ],
 	providers 	: [
-									{ provide: LocationStrategy, useClass: HashLocationStrategy },
+									{ provide: LocationStrategy, useClass: PathLocationStrategy },
 									{ provide: Window, useValue: window },
 									EventEmitterService, UserService, UserLogoutService, ServerStaticDataService, PublicDataService,
 									SCgetQueriesService, SCgetUserService, SCgetUserDetailsService, SCgetUserTrackDownloadService, SCgetUserTrackStreamService,
