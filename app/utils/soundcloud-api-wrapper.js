@@ -7,9 +7,9 @@ class SC {
 	constructor(thenReq) {
 		this.apiUrl = 'https://api.soundcloud.com/';
 		this.regExp = {
-			userDetails: /http(s)?\:\/\/api\.soundcloud\.com\/users\/[0-9]+\/(tracks|playlists|favorites|followers|followings)/,
-			userTrackDownload: /http(s)?\:\/\/api\.soundcloud\.com\/tracks\/[0-9]+\/download/,
-			userTrackStream: /http(s)?\:\/\/api\.soundcloud\.com\/tracks\/[0-9]+\/stream/
+			userDetails: /http(s)?:\/\/api\.soundcloud\.com\/users\/[0-9]+\/(tracks|playlists|favorites|followers|followings)/,
+			userTrackDownload: /http(s)?:\/\/api\.soundcloud\.com\/tracks\/[0-9]+\/download/,
+			userTrackStream: /http(s)?:\/\/api\.soundcloud\.com\/tracks\/[0-9]+\/stream/
 		};
 		this.endpoints = { resolve: 'resolve' };
 		this.clientID = process.env.SOUNDCLOUD_CLIENT_ID;
