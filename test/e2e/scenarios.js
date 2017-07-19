@@ -2,25 +2,29 @@
 
 /*global browser, expect, element, by */
 
-describe('WhoAmI microservice: ', function() {
+describe('SPAMT: ', function() {
 
-	it('should have only index view and must redirect properly', function() {
-		browser.ignoreSynchronization = false;
-		browser.get('public/index.html');
-		browser.getLocationAbsUrl().then(function(url) {
-			expect(url).toEqual('/');
+	it('should load index view', function() {
+		//browser.ignoreSynchronization = false;
+
+		//browser.waitForAngularEnabled(true);
+		browser.getCurrentUrl().then(function(url) {
+			expect(url).toMatch('\/intro$');
 		});
+
+		var navButtons = element.all(by.css('#flex-nav'));
+		expect(navButtons.count()).toBe(1);
 	});
 
+/*
+*   some old tests as a quick example
+*
 	describe('indexCtrl', function() {
 
 		beforeEach(function() {
 			browser.get('/');
 		});
 
-/*
-*   some old tests as a quick example
-*
 		it('should filter the labels list as a user types into the search box', function() {
 
 			var labelsList = element.all(by.repeater('label in publicData[1].labels'));
@@ -50,6 +54,7 @@ describe('WhoAmI microservice: ', function() {
 
 			expect(getNames()).toMatch(/^B/);
 		});
-*/
+
 	});
+*/
 });

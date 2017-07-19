@@ -44,9 +44,9 @@ describe('AppInfoComponent', () => {
 				img: '/public/img/MongoDB_logo.svg'
 			}));
 			expect(c.badges[2]).toEqual(jasmine.objectContaining({
-				title: 'AngularJS - an open-source web application framework mainly maintained by Google and by a community of individuals and corporations.',
-				link: 'https://en.wikipedia.org/wiki/AngularJS',
-				img: '/public/img/AngularJS_logo.svg'
+				title: 'Angular - (commonly referred to as "Angular 2+" or "Angular 2") is a TypeScript-based open-source front-end web application platform led by the Angular Team at Google and by a community of individuals and corporations to address all of the parts of the developer\'s workflow while building complex web applications. Angular is a complete rewrite from the same team that built AngularJS.',
+				link: 'https://en.wikipedia.org/wiki/Angular_(application_platform)',
+				img: '/public/img/Angular_logo.svg'
 			}));
 			expect(c.badges[3]).toEqual(jasmine.objectContaining({
 				title: 'Soundcloud - a global online audio distribution platform based in Berlin, Germany, that enables its users to upload, record, promote, and share their originally-created sounds.',

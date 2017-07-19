@@ -15,15 +15,24 @@ import { DashboardIntroComponent } from '../../public/app/components/dashboard-i
 
 describe('DashboardIntroComponent', () => {
 
-		class MockWebsocket extends WebSocket {
+		class MockWebsocket {
+			public ws: WebSocket;
 			constructor(wsUrl) {
-				super(wsUrl);
-			}
-			send(message): Object {
-				return message;
-			}
-			close(): boolean {
-				return true;
+				this.ws = new WebSocket(wsUrl);
+				this.ws.onopen = (evt) => {
+					console.log('websocket opened:', evt);
+				};
+				this.ws.onmessage = (message) => {
+					return message;
+				};
+				this.ws.onerror = (evt) => {
+					console.log('websocket error:', evt);
+					this.ws.close();
+				};
+				this.ws.onclose = (evt) => {
+					console.log('websocket closed:', evt);
+					return true;
+				};
 			}
 		}
 
