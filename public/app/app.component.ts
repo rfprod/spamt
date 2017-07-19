@@ -1,5 +1,6 @@
 import { Component, OnInit, OnDestroy, ElementRef } from '@angular/core';
 import { EventEmitterService } from './services/event-emitter.service';
+import { trigger, state, style, transition, animate } from '@angular/animations';
 
 declare let $: JQueryStatic;
 
@@ -11,6 +12,9 @@ declare let $: JQueryStatic;
 		<router-outlet></router-outlet>
 		<app-info></app-info>
 	`,
+	animations: [
+		trigger('empty', [])
+	]
 })
 export class AppComponent implements OnInit, OnDestroy {
 	private subscription: any;
