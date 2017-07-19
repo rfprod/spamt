@@ -151,7 +151,7 @@ gulp.task('build-system-js', () => {
 		minify: true,
 		mangle: true
 	})
-	.pipe(gulp.dest('./public/js'));
+		.pipe(gulp.dest('./public/js'));
 });
 
 gulp.task('sass-autoprefix-minify-css', () => {

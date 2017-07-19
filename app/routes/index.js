@@ -3,24 +3,23 @@
 const path = process.cwd();
 
 module.exports = function(app, passport, User, Query, SrvInfo, DataInit, thenReq, JWT, mailTransporter, crypto, SC, TWTR) { // eslint-disable-line no-unused-vars
-
-/*
+/**
 *	check if data init is needed
 *	data is initialized with dummy data if the DB is empty on server start
 */
 	DataInit.initData();
-
-/*
+// eslint-disable-next-line
+/**
 *	Soundcloud API wrapper
 */
 	const SCapi = new SC(thenReq);
-
-/*
+// eslint-disable-next-line
+/**
 *	Twitter API wrapper
 */
 	const TwitterAPI = new TWTR(thenReq, crypto);
-
-/*
+// eslint-disable-next-line
+/**
 * CORS headers
 */
 	app.all('/*', function(req, res, next) {
@@ -31,8 +30,8 @@ module.exports = function(app, passport, User, Query, SrvInfo, DataInit, thenReq
 		if (req.method == 'OPTIONS') res.status(200).end();
 		else next();
 	});
-
-/*
+// eslint-disable-next-line
+/**
 *	Mailer config
 */
 	function sendAccessLink(recipientEmail, accessLink, callback) {
@@ -51,8 +50,8 @@ module.exports = function(app, passport, User, Query, SrvInfo, DataInit, thenReq
 			});
 		}
 	}
-
-/*
+// eslint-disable-next-line
+/**
 *	routes
 */
 	app.get('/', (req, res) => {
@@ -72,7 +71,7 @@ module.exports = function(app, passport, User, Query, SrvInfo, DataInit, thenReq
 
 		if (scUserName) {
 			if (scUserName.indexOf('/')) {
-				/*
+				/**
 				*	if provided param contains at least one slash,
 				*	split and take only first part
 				*/
@@ -81,7 +80,7 @@ module.exports = function(app, passport, User, Query, SrvInfo, DataInit, thenReq
 
 			SCapi.resolve('https://soundcloud.com/' + scUserName).done(SCres => {
 				if (SCres.statusCode < 300) {
-					/*
+					/**
 					*	update Queries collection
 					*/
 					output = JSON.parse(SCres.getBody());
@@ -129,7 +128,7 @@ module.exports = function(app, passport, User, Query, SrvInfo, DataInit, thenReq
 						}
 					});
 				} else {
-					/*
+					/**
 					*	proxy errors from soundcloud API
 					*/
 					output = { error: JSON.parse(SCres.body.toString('UTF8')).errors[0] };
@@ -390,8 +389,10 @@ module.exports = function(app, passport, User, Query, SrvInfo, DataInit, thenReq
 		});
 		ws.on('error', () => {console.log('Persistent websocket: ERROR');});
 	});
-
-// Administration endpoints
+// eslint-disable-next-line
+/**
+*	Administration endpoints
+*/
 	app.get('/request/access', (req, res) => {
 		/**
 		* request controls access
@@ -570,7 +571,7 @@ module.exports = function(app, passport, User, Query, SrvInfo, DataInit, thenReq
 			else { res.status(200).json({message: 'logged out, token reset'}); }
 		});
 	});
-
+// eslint-disable-next-line
 /**
 *	social networks authentication
 */
@@ -651,7 +652,7 @@ module.exports = function(app, passport, User, Query, SrvInfo, DataInit, thenReq
 			res.status(200).json({message: 'logged out successfully'});
 		}
 	});
-
+// eslint-disable-next-line
 /*
 *	Twitter endpoints
 */
