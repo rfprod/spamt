@@ -5,9 +5,10 @@ import { DashboardControlsComponent } from './components/dashboard-controls.comp
 import { DashboardUserComponent } from './components/dashboard-user.component';
 
 export const APP_ROUTES: Routes = [
-	{ path: '', redirectTo: 'intro', pathMatch: 'full' },
 	{ path: 'intro', component: DashboardIntroComponent },
 	{ path: 'data', component: DashboardDetailsComponent },
 	{ path: 'controls', component: DashboardControlsComponent },
 	{ path: 'user', component: DashboardUserComponent },
+	{ path: '', redirectTo: 'intro', pathMatch: 'full' },
+	{ path: '**', redirectTo: 'intro' }
 ];
