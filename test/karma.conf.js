@@ -4,30 +4,32 @@ module.exports = function(config){
 		basePath : '../',
 		
 		files : [
-			'public/bower_components/jquery/dist/jquery.js',
-			'public/bower_components/d3/d3.js',
-			'public/bower_components/nvd3/build/nv.d3.js',
+			'node_modules/jquery/dist/jquery.js',
+			'node_modules/d3/d3.js',
+			'node_modules/nvd3/build/nv.d3.js',
+
+			'node_modules/core-js/client/shim.js',
+			'node_modules/reflect-metadata/Reflect.js',
 
 			'node_modules/zone.js/dist/zone.js',
+			'node_modules/zone.js/dist/long-stack-trace-zone.js',
 			'node_modules/zone.js/dist/proxy.js',
 			'node_modules/zone.js/dist/sync-test.js',
 			'node_modules/zone.js/dist/jasmine-patch.js',
 			'node_modules/zone.js/dist/async-test.js',
 			'node_modules/zone.js/dist/fake-async-test.js',
 
-			'node_modules/reflect-metadata/Reflect.js',
-			{ pattern: 'node_modules/reflect-metadata/Reflect.js', included: false, watched: false },
-
 			'node_modules/systemjs/dist/system.src.js',
-			'node_modules/systemjs/dist/system-polyfills.js',
-			{ pattern: 'node_modules/systemjs/dist/system-polyfills.js', included: false, watched: false },
 
 			{ pattern: 'systemjs.config.js', included: false, watched: false },
 			{ pattern: 'systemjs.karma.config.js', included: false, watched: false },
 			{ pattern: 'systemjs.config.extras.js', included: false, watched: false },
 			{ pattern: 'node_modules/traceur/bin/traceur.js', included: false, watched: false },
+			
 			{ pattern: 'node_modules/@angular/**', included: false, watched: false },
+			
 			{ pattern: 'node_modules/rxjs/**', included: false, watched: false },
+
 			'test/karma.test-shim.js',
 			{ pattern: 'test/client/*.js', included: false, watched: false },
 
@@ -40,22 +42,30 @@ module.exports = function(config){
 
 		// preprocessors: {},
 
-		browserNoActivityTimeout: 25000,
-		browsers: ['PhantomJS'],
+		browserNoActivityTimeout: 20000,
+		customLaunchers: {
+			/*
+			*	this custom launcher requires setting env var CHROME_BIN=chromium-browser
+			*	possible options for env var value depending on what you have installed:
+			*	chromium-browser, chromium, google-chrome
+			*/
+			ChromeHeadless: {
+				base: 'Chrome',
+				flags: [
+					'--headless',
+					'--disable-gpu',
+					// Without a remote debugging port Chrome exits immediately
+					'--remote-debugging-port=9222'
+				]
+			}
+		},
+		browsers: ['ChromeHeadless'],
 		// browsers: ['Chrome'],
 		// browsers : ['Firefox'],
-		phantomjsLauncher: {
-			/*
-			*	exit phantomjs if a ResourceError is encountered
-			*	useful if karma exits without killing phantomjs)
-			*/
-			exitOnResourceError: true
-		},
 		
 		plugins : [
-		//    'karma-chrome-launcher',
+		    'karma-chrome-launcher',
 		//    'karma-firefox-launcher',
-			'karma-phantomjs-launcher',
 			'karma-jasmine'
 		],
 

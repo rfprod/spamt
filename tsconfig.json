@@ -23,7 +23,7 @@
 		"public/css",
 		"public/img",
 		"public/js",
-		"test/*",
+		"test/*.*",
 		"test/server",
 		"test/e2e"
 	]

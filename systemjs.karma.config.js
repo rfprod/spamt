@@ -29,7 +29,7 @@
 	var packages = {
 		'app':                        { main: 'app', defaultExtension: 'js' },
 		'ng2-nvd3':                   { main: 'ng2-nvd3', defaultExtension: 'js' },
-		'rxjs':                       { defaultExtension: 'js' },
+		'rxjs':                       { main: 'Rx', defaultExtension: 'js' },
 		'traceur':                    { main: 'traceur', defaultExtension: 'js' }
 	};
 
