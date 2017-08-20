@@ -1,4 +1,6 @@
 import { Component, OnInit, OnDestroy, ElementRef } from '@angular/core';
+import { FormBuilder, FormGroup, FormControl, Validators } from '@angular/forms';
+import { Location } from '@angular/common';
 import { Router } from '@angular/router';
 import { EventEmitterService } from '../services/event-emitter.service';
 import { ServerStaticDataService } from '../services/server-static-data.service';
@@ -23,14 +25,17 @@ export class DashboardControlsComponent implements OnInit, OnDestroy {
 		private serverStaticDataService: ServerStaticDataService,
 		private publicDataService: PublicDataService,
 		private userService: UserService,
+		private fb: FormBuilder,
 		private controlsLoginService: ControlsLoginService,
 		private controlsLogoutService: ControlsLogoutService,
 		private controlsMeService: ControlsMeService,
 		private controlsUsersListService: ControlsUsersListService,
 		private controlsQueriesListService: ControlsQueriesListService,
-		private router: Router
+		private router: Router,
+		private location: Location
 	) {
 		console.log('this.el.nativeElement:', this.el.nativeElement);
+		this.resetForm();
 	}
 	private subscription: any;
 	public title: string = 'SPAMT Controls';
@@ -54,10 +59,10 @@ export class DashboardControlsComponent implements OnInit, OnDestroy {
 			legend: {
 				margin: {
 					top: 5,
-					right: 140,
+					right: 0,
 					bottom: 5,
 					left: 0,
-				},
+				}
 			},
 		},
 	};
@@ -204,7 +209,31 @@ export class DashboardControlsComponent implements OnInit, OnDestroy {
 		);
 	}
 
+	private authForm: FormGroup;
+	private activate: any = {
+		form: true as boolean
+	};
+	private resetForm(reinitForm?: boolean): void {
+		/*
+		*	resets user local storage and register form
+		*/
+		this.userService.restoreUser(() => {
+			this.authForm = this.fb.group({
+				email: [this.userService.model.email, Validators.compose([Validators.required, Validators.email, Validators.minLength(5)])],
+			});
+			if (reinitForm) {
+				/*
+				*	this is needed to reset form completely after submission
+				*	or it will be touched and not pristine
+				*/
+				this.activate.form = false;
+				setTimeout(() => this.activate.form = true, 0);
+			}
+		});
+	}
+
 	private login(): void { /* tslint:disable-line */
+		this.userService.model.email = this.authForm.controls.email.value;
 		console.log('login attempt with email', this.userService.model.email);
 		this.userService.saveUser();
 		this.requestControlsAccess();
@@ -218,6 +247,8 @@ export class DashboardControlsComponent implements OnInit, OnDestroy {
 			(data) => {
 				this.successMessage = 'Logout success';
 				this.userService.resetUser();
+				this.resetForm();
+				this.activate.form = true;
 				this.emitter.emitEvent({appInfo: 'show'});
 				this.router.navigateByUrl('/controls');
 			},
@@ -233,11 +264,11 @@ export class DashboardControlsComponent implements OnInit, OnDestroy {
 	}
 
 	private emitSpinnerStartEvent(): void {
-		console.log('root spinner start event emitted');
+		// console.log('root spinner start event emitted');
 		this.emitter.emitEvent({spinner: 'start'});
 	}
 	private emitSpinnerStopEvent(): void {
-		console.log('root spinner stop event emitted');
+		// console.log('root spinner stop event emitted');
 		this.emitter.emitEvent({spinner: 'stop'});
 	}
 
@@ -263,7 +294,6 @@ export class DashboardControlsComponent implements OnInit, OnDestroy {
 	public ngOnInit(): void {
 		console.log('ngOnInit: DashboardControlsComponent initialized');
 		this.emitSpinnerStartEvent();
-		this.emitter.emitEvent({route: '/controls'});
 		this.emitter.emitEvent({appInfo: 'show'});
 
 		const route = this.router.url;
@@ -273,14 +303,21 @@ export class DashboardControlsComponent implements OnInit, OnDestroy {
 			console.log('user got token, save it:', token);
 			this.userService.model.user_token = token;
 			this.userService.saveUser();
+			this.location.replaceState('controls');
 		}
 
 		this.userService.restoreUser(() => {
 			if (this.userService.model.user_token) {
 				this.emitter.emitEvent({appInfo: 'hide'});
+				this.activate.form = false;
 				this.getMe();
 				this.getUsersList();
 				this.getQueriesList();
+				this.getPublicData(() => {
+					this.getServerStaticData(() => {
+						this.emitSpinnerStopEvent();
+					});
+				});
 			} else {
 				console.log('local storage is empty');
 				this.emitSpinnerStopEvent();
@@ -292,12 +329,6 @@ export class DashboardControlsComponent implements OnInit, OnDestroy {
 				console.log('/controls consuming event:', message, ' | toggling help labels visibility', this.showHelp);
 				this.showHelp = (this.showHelp) ? false : true;
 			}
-		});
-
-		this.getPublicData(() => {
-			this.getServerStaticData(() => {
-				this.emitSpinnerStopEvent();
-			});
 		});
 	}
 	public ngOnDestroy(): void {

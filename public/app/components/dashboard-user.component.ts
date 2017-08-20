@@ -121,7 +121,6 @@ export class DashboardUserComponent implements OnInit, OnDestroy {
 	public ngOnInit(): void {
 		console.log('ngOnInit: UserComponent initialized');
 		this.emitSpinnerStartEvent();
-		this.emitter.emitEvent({route: '/user'});
 		this.emitter.emitEvent({appInfo: 'hide'});
 
 		this.checkUrlParams();

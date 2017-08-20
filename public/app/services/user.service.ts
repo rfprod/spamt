@@ -38,7 +38,7 @@ export class UserService {
 		this.window.localStorage.setItem('SPAMT', JSON.stringify(this.model));
 	}
 
-	public restoreUser(callback): void {
+	public restoreUser(callback?: any): void {
 		if (this.window.localStorage.getItem('SPAMT') && this.window.localStorage.getItem('SPAMT') !== 'null' && typeof this.window.localStorage.getItem('SPAMT') !== 'undefined') {
 			this.model = JSON.parse(this.window.localStorage.getItem('SPAMT'));
 			/*

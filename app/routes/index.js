@@ -407,7 +407,7 @@ module.exports = function(app, passport, User, Query, SrvInfo, DataInit, thenReq
 					const tokenObj = JWT.generateJWToken(payload, storedSalt);
 					// console.log(payload, tokenObj);
 					JWT.setUserJWToken(user._id, tokenObj, () => {
-						let accessLink = process.env.APP_URL + '#/controls?user_token=' + tokenObj.token;
+						let accessLink = process.env.APP_URL + 'controls?user_token=' + tokenObj.token;
 						sendAccessLink(userEmail, accessLink, () => {
 							res.status(200).json({message: 'access link was sent to provided email address'});
 						});
