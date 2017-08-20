@@ -565,20 +565,20 @@ module.exports = function(app, passport, User, Query, SrvInfo, DataInit, thenReq
 */
 	app.get('/api/auth/soundcloud', passport.authenticate('soundcloud'));
 	app.get('/api/auth/soundcloud/callback', passport.authenticate('soundcloud', {
-		successRedirect: process.env.APP_URL + '#/user/dashboard',
-		failureRedirect: process.env.APP_URL + '#/user'
+		successRedirect: process.env.APP_URL + 'user/dashboard',
+		failureRedirect: process.env.APP_URL + 'user'
 	}));
 	app.get('/api/auth/twitter', passport.authenticate('twitter'));
 	app.get('/api/auth/twitter/callback', passport.authenticate('twitter', {
 		//successRedirect: process.env.APP_URL + '#/user?twitter_auth_error=false',
-		failureRedirect: process.env.APP_URL + '#/user?twitter_auth_error=true'
+		failureRedirect: process.env.APP_URL + 'user?twitter_auth_error=true'
 	}), (req, res) => {
-		console.log('/auth/twitter/callback', req.user._doc);
+		console.log('api/auth/twitter/callback', req.user._doc);
 		const oauth_token = req.query.oauth_token;
 		const oauth_verifier = req.query.oauth_verifier;
 		if (!oauth_token && !oauth_verifier) {
 			// this check is probably useless because failureRedirect is defined above
-			res.redirect(process.env.APP_URL + '#/user?twitter_auth_error=true');
+			res.redirect(process.env.APP_URL + 'user?twitter_auth_error=true');
 		} else {
 			User.update(
 				{'twitter.id': req.user._doc.twitter.id},
@@ -587,10 +587,10 @@ module.exports = function(app, passport, User, Query, SrvInfo, DataInit, thenReq
 					if (err) {
 						//throw err;
 						console.log(err);
-						res.redirect(process.env.APP_URL + '#/user?twitter_auth_error=true');
+						res.redirect(process.env.APP_URL + 'user?twitter_auth_error=true');
 					}
 					console.log('updated twitter tokens for user:', data);
-					res.redirect(process.env.APP_URL + '#/user?twitter_oauth_token=' + oauth_token + '&twitter_oauth_verifier=' + oauth_verifier);
+					res.redirect(process.env.APP_URL + 'user?twitter_oauth_token=' + oauth_token + '&twitter_oauth_verifier=' + oauth_verifier);
 				}
 			);
 		}
