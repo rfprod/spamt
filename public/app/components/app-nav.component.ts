@@ -1,4 +1,4 @@
-import { Router } from '@angular/router';
+import { Router, NavigationEnd } from '@angular/router';
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { EventEmitterService } from '../services/event-emitter.service';
 
@@ -7,30 +7,24 @@ import { EventEmitterService } from '../services/event-emitter.service';
 	templateUrl: '/public/app/views/dashboard-nav.html',
 })
 export class AppNavComponent implements OnInit, OnDestroy {
-	constructor( private emitter: EventEmitterService, private router: Router ) {}
+	constructor(
+		private emitter: EventEmitterService,
+		private router: Router
+	) {}
 	private subscription: any;
 	public navButtonsState: boolean[] = [false, false, false, false, false];
 	private showHelp: boolean = false;
-	public switchNavButtons(event, isClick: boolean): void {
-		let route, index;
-		console.log('switchNavButtons:', event);
-		if (isClick) {
-			if (event.target.localName === 'i') {
-				// button icon clicked
-				route = event.target.parentElement.href;
-			} else {
-				// button anchor clicked
-				route = event.target.href;
-			}
-		} else { route = event.route; }
-		if (!route) {
-			// help button does not have href property
-			console.log('help click');
+	public switchNavButtons(event: any, path?: string) {
+		let index;
+		// console.log('switchNavButtons:', event);
+		const route = (event.route) ? event.route : (typeof event.urlAfterRedirects === 'string') ? event.urlAfterRedirects : event.url;
+		path = (!path) ? route.substring(route.lastIndexOf('/') + 1, route.length) : path;
+		// console.log(' >> PATH', path);
+		if (!event.route && path === 'help') {
+			// console.log('help click');
 			this.emitter.emitEvent({ help: 'toggle' });
 			this.showHelp = (this.showHelp) ? false : true;
-			route = this.router.url; // set current route
 		}
-		const path = route.substring(route.lastIndexOf('/') + 1, route.length);
 		if (path === 'intro') {
 			index = '1';
 		} else if (path === 'data') {
@@ -40,10 +34,15 @@ export class AppNavComponent implements OnInit, OnDestroy {
 		} else if (path === 'user') {
 			index = '4';
 		}
-		for (const b in this.navButtonsState) {
-			if (b === index) { this.navButtonsState[b] = true; } else { this.navButtonsState[b] = false; }
+		if (index) {
+			/*
+			*	if help is clicked index stays undefined
+			*/
+			for (const b in this.navButtonsState) {
+				if (b === index) { this.navButtonsState[b] = true; } else { this.navButtonsState[b] = false; }
+			}
 		}
-		console.log('navButtonsState:', this.navButtonsState);
+		// console.log('navButtonsState:', this.navButtonsState);
 	}
 	public stopWS(): void {
 		/*
@@ -56,15 +55,24 @@ export class AppNavComponent implements OnInit, OnDestroy {
 	public ngOnInit(): void {
 		console.log('ngOnInit: AppNavComponent initialized');
 		// check active route on app init - app-nav loads once on app init
-		this.subscription = this.emitter.getEmitter().subscribe((message) => {
-			if (typeof message.route !== 'undefined') {
-				console.log('/app-nav consuming event:', message);
-				this.switchNavButtons(message, false);
-				this.subscription.unsubscribe();
+		this.subscription = this.router.events.subscribe((event) => {
+			// console.log(' > ROUTER EVENT:', event);
+			if (event instanceof NavigationEnd) {
+				if (!event.hasOwnProperty('reason')) {
+					/*
+					*	router returns reason with empty string as a value if guard rejects access
+					*/
+					this.switchNavButtons(event);
+				} else {
+					// switch to login
+					this.switchNavButtons({route: 'login'});
+				}
+				this.showHelp = false;
 			}
 		});
 	}
 	public ngOnDestroy(): void {
 		console.log('ngOnDestroy: AppNavComponent destroyed');
+		this.subscription.unsubscribe();
 	}
 }

@@ -1,13 +1,12 @@
 /*
-*	SystemJS configuration for Angular 2
-*	Override at the last minute with global.filterSystemConfig (as plunkers do)
+*	SystemJS configuration for Angular 4+
 */
 (function (global) { // eslint-disable-line no-unused-vars
 
 	var paths = {
 		'npm:': './base/node_modules/'
 	};
-	// external packages locations
+	// packages locations
 	var map = {
 		'app': 																	'./base/public/app',
 		'ng2-nvd3': 														'npm:ng2-nvd3/build/lib',
@@ -23,9 +22,12 @@
 		'@angular/platform-browser': 						'npm:@angular/platform-browser/bundles/platform-browser.umd.js',
 		'@angular/platform-browser/animations':	'npm:@angular/platform-browser/bundles/platform-browser-animations.umd.js',
 		'@angular/platform-browser-dynamic': 		'npm:@angular/platform-browser-dynamic/bundles/platform-browser-dynamic.umd.js',
-		'@angular/router': 											'npm:@angular/router/bundles/router.umd.js'
+		'@angular/router': 											'npm:@angular/router/bundles/router.umd.js',
+		'@angular/flex-layout': 								'npm:@angular/flex-layout/bundles/flex-layout.umd.js',
+		'@angular/material': 										'npm:@angular/material/bundles/material.umd.js',
+		'@angular/cdk': 												'npm:@angular/cdk/bundles/cdk.umd.js'
 	};
-	// external packages main files
+	// how to load packages
 	var packages = {
 		'app':                        { main: 'app', defaultExtension: 'js' },
 		'ng2-nvd3':                   { main: 'ng2-nvd3', defaultExtension: 'js' },
@@ -36,7 +38,8 @@
 	var config = {
 		paths: paths,
 		map: map,
-		packages: packages
+		packages: packages,
+		transplier: 'babel'
 	};
 
 	System.config(config);

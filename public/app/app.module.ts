@@ -5,10 +5,19 @@ import { LocationStrategy, PathLocationStrategy, CommonModule  } from '@angular/
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
+import { FlexLayoutModule } from '@angular/flex-layout';
+
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { HttpModule } from '@angular/http';
 import { RouterModule } from '@angular/router';
 import { APP_ROUTES } from './app.routes';
+
+/*
+*	Some material components rely on hammerjs
+*	CustomMaterialModule loads exact material modules
+*/
+import '../../node_modules/hammerjs/hammer.js';
+import { MaterialModule } from '@angular/material';
 
 import { AppComponent } from './app.component';
 import { AppNavComponent } from './components/app-nav.component';
@@ -45,7 +54,7 @@ import { ControlsQueriesListService } from './services/controls-queries-list.ser
 
 @NgModule({
 	declarations: [ AppComponent, AppNavComponent, AppInfoComponent, DashboardIntroComponent, DashboardDetailsComponent, DashboardControlsComponent, DashboardUserComponent, nvD3, AudioPlayerDirective, LoadingIndicatorDirective, ConvertDuration],
-	imports 		: [ BrowserModule, BrowserAnimationsModule, FormsModule, ReactiveFormsModule, HttpModule, RouterModule.forRoot(APP_ROUTES) ],
+	imports 		: [ BrowserModule, BrowserAnimationsModule, FormsModule, FlexLayoutModule, MaterialModule, ReactiveFormsModule, HttpModule, RouterModule.forRoot(APP_ROUTES) ],
 	providers 	: [
 									{ provide: LocationStrategy, useClass: PathLocationStrategy },
 									{ provide: Window, useValue: window },

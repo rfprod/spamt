@@ -146,7 +146,14 @@ gulp.task('pack-vendor-css', () => {
 	return gulp.src([
 		'./node_modules/bootstrap/dist/css/bootstrap.css',
 		'./node_modules/nvd3/build/nv.d3.css',
-		'./node_modules/components-font-awesome/css/font-awesome.css'
+		'./node_modules/components-font-awesome/css/font-awesome.css',
+		/*
+		*	Angular material theme should be chosen and loaded here
+		*/
+		'./node_modules/@angular/material/prebuilt-themes/deeppurple-amber.css'
+		//'./node_modules/@angular/material/prebuilt-themes/indigo-pink.css'
+		//'./node_modules/@angular/material/prebuilt-themes/pink-bluegrey.css'
+		//'./node_modules/@angular/material/prebuilt-themes/purple-green.css'
 	])
 		.pipe(plumber())
 		.pipe(concat('vendor-bundle.css'))
