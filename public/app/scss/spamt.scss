@@ -13,6 +13,9 @@ $danger: #d9534f;
 
 $boxPadding: 0.5em;
 
+.warning { color: $warning; }
+.success { color: $success; }
+
 html {
 	height: 100vh;
 	width: 100vw;
@@ -35,6 +38,12 @@ body {
 	font-family: 'Play', sans-serif;
 	font-size: 1.75em;
 	overflow-x: hidden;
+
+	a {
+		&:hover {
+			text-decoration: none;
+		}
+	}
 	
 	form {
 		legend {
@@ -47,6 +56,25 @@ body {
 		}
 		textarea {
 			resize: vertical;
+		}
+	}
+
+	.feedback {
+		@media(max-width: 767px) {
+			margin-left: 10vw;
+			margin-right: 10vw;
+		}
+		@media(min-width: 768px) {
+			margin-left: 25vw;
+			margin-right: 25vw;
+		}
+		@media(min-width: 992px) {
+			margin-left: 25vw;
+			margin-right: 25vw;
+		}
+		@media(mix-width: 1200px) {
+			margin-left: 25vw;
+			margin-right: 25vw;
 		}
 	}
 
