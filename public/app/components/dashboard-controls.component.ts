@@ -1,7 +1,8 @@
-import { Component, OnInit, OnDestroy, ElementRef } from '@angular/core';
+import { Component, OnInit, OnDestroy, ElementRef, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, FormControl, Validators } from '@angular/forms';
 import { Location } from '@angular/common';
 import { Router } from '@angular/router';
+import { MdTabGroup } from '@angular/material';
 import { EventEmitterService } from '../services/event-emitter.service';
 import { ServerStaticDataService } from '../services/server-static-data.service';
 import { PublicDataService } from '../services/public-data.service';
@@ -281,13 +282,7 @@ export class DashboardControlsComponent implements OnInit, OnDestroy {
 
 // Tabs
 	private dataTabs: string[] = ['Users', 'Queries']; // tslint:disable-line
-	private selectedTab: string = this.dataTabs[0];
-	private selectTab(tab): void { // tslint:disable-line
-		this.emitSpinnerStartEvent();
-		console.log('selectTab, tab: ', tab);
-		this.selectedTab = tab;
-		this.emitSpinnerStopEvent();
-	}
+	@ViewChild('tabGroup') private tabGroup: MdTabGroup;
 
 // Help
 	private showHelp: boolean = false; // controls help labells visibility, catches events from nav component
