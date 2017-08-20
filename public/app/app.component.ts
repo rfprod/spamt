@@ -10,7 +10,7 @@ declare let $: JQueryStatic;
 		<app-nav></app-nav>
 		<loading-indicator></loading-indicator>
 		<router-outlet></router-outlet>
-		<app-info></app-info>
+		<app-info fxFlex="0 1 auto"></app-info>
 	`,
 	animations: [
 		trigger('empty', [])

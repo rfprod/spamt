@@ -39,10 +39,10 @@ export class DashboardIntroComponent implements OnInit, OnDestroy {
 			legend: {
 				margin: {
 					top: 5,
-					right: 140,
+					right: 0,
 					bottom: 5,
 					left: 0,
-				},
+				}
 			},
 		},
 	};
