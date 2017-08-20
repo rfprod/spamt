@@ -1,10 +1,10 @@
 <div fxLayout="column" fxLayoutFill>
-	<span *ngIf="!userService.model.user_token">
+	<span *ngIf="!userService.model.user_token" fxFlex>
 		<h3>{{title}}</h3>
 		<p>{{description.welcome}}</p>
 	</span>
-	<span *ngIf="userService.model.user_token">
-		<h3>
+	<span *ngIf="userService.model.user_token" fxFlex>
+		<h3 fxLayout="row" fxLayoutAlign="start center">
 			{{title}}
 			<a md-button (click)="toggleModal()" mdTooltip="Application stats">
 				<i class="fa fa-bar-chart" [ngClass]="{ 'help-highlight': showHelp }"></i>
@@ -16,16 +16,22 @@
 		<p>{{description.authenticated}}</p>
 	</span>
 
-	<div *ngIf="errorMessage" class="feedback warning">
-		<button type="button" class="close" (click)="dismissMessages()" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-		<i class="fa fa-warning"></i> {{errorMessage}}
-	</div>
-	<div *ngIf="successMessage" class="feedback success">
-		<button type="button" class="close" (click)="dismissMessages()" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-		<i class="fa fa-check-circle"></i> {{successMessage}}
+	<div fxFlex *ngIf="errorMessage || successMessage">
+		<div *ngIf="errorMessage" class="feedback warning" fxLayout="row" fxLayoutAlign="start stretch">
+			<span fxFlex="90" fxLayout="row" fxLayoutAlign="start center">
+				<i class="fa fa-warning"></i> {{errorMessage}}
+			</span>
+			<button type="button" class="close" (click)="dismissMessages()" aria-label="Close">&times;</button>
+		</div>
+		<div *ngIf="successMessage" class="feedback success" fxLayout="row" fxLayoutAlign="start stretch">
+			<span fxFlex="90"  fxLayout="row" fxLayoutAlign="start center">
+				<i class="fa fa-check-circle"></i> {{successMessage}}
+			</span>
+			<button fxFlex="10" type="button" class="close" (click)="dismissMessages()" aria-label="Close">&times;</button>
+		</div>
 	</div>
 
-	<form fxLayout="column" fxLayoutAlign="start stretch" id="auth-form" [formGroup]="authForm" (ngSubmit)="login()" *ngIf="!userService.model.user_token && activate.form" novalidate>
+	<form id="auth-form" fxFlex fxLayout="column" fxLayoutAlign="start stretch" [formGroup]="authForm" (ngSubmit)="login()" *ngIf="!userService.model.user_token && activate.form" novalidate>
 		<md-input-container>
 			<input mdInput type="email" id="email" name="email" [formControl]="authForm.controls.email" pattern="^[\w%+-]+@[\w.-]+" title="email" placeholder="email" required novalidate />
 			<md-icon mdSuffix class="fa fa-envelope"></md-icon>
@@ -44,29 +50,17 @@
 		</div>
 	</form>
 
-	<span *ngIf="userService.model.user_token">
-		<table>
-			<tbody>
-				<tr>
-					<td><i class="fa fa-address-card fa-2x"></i></td>
-					<td title="login">{{userService.model.login}}</td>
-					<td title="role">{{userService.model.role}}</td>
-					<td title="full name">{{userService.model.full_name}}</td>
-				</tr>
-			</tbody>
-		</table>
+	<span *ngIf="userService.model.user_token" fxFlex>
+		<div fxLayout="row" fxLayoutAlign="start center">
+			<p fxFlex>Logged in as:</p>
+			<p fxFlex mdTooltip="Login">{{userService.model.login}}</p>
+			<p fxFlex mdTooltip="Role">{{userService.model.role}}</p>
+			<p fxFlex mdTooltip="Full Name">{{userService.model.full_name}}</p>
+		</div>
 
-		<span>
-			<ul>
-				<li *ngFor="let tab of dataTabs" [ngClass]="{ 'active': tab === selectedTab }">
-					<a (click)="selectTab(tab)">{{tab}}</a>
-				</li>
-			</ul>
-		</span>
-
-		<div id="data">
-			<div *ngIf="selectedTab === dataTabs[0]">
-				<nvd3 [options]="chartOptions" [data]="appUsageData"></nvd3>
+		<md-tab-group #tabGroup>
+			<md-tab label="{{dataTabs[0]}}">
+				<nvd3 *ngIf="tabGroup.selectedIndex === 0" [options]="chartOptions" [data]="appUsageData"></nvd3>
 				<table>
 					<thead>
 						<tr>
@@ -89,10 +83,9 @@
 						</tr>
 					</tbody>
 				</table>
-			</div>
-
-			<div *ngIf="selectedTab === dataTabs[1]">
-				<nvd3 [options]="chartOptions" [data]="queriesData"></nvd3>
+			</md-tab>
+			<md-tab label="{{dataTabs[1]}}">
+				<nvd3 *ngIf="tabGroup.selectedIndex === 1" [options]="chartOptions" [data]="queriesData"></nvd3>
 				<table>
 					<thead>
 						<tr>
@@ -109,9 +102,8 @@
 						</tr>
 					</tbody>
 				</table>
-			</div>
-		</div>
-
+			</md-tab>
+		</md-tab-group>
 	</span>
 
 	<span id="modal" *ngIf="showModal">

@@ -17,14 +17,17 @@ $boxPadding: 0.5em;
 .success { color: $success; }
 
 html {
-	height: 100vh;
-	width: 100vw;
+	height: 100%;
+	width: 100%;
+	overflow-x: hidden;
+	overflow-y: auto;
 }
 
 spamt {
 	height: 100%;
-	width: 100%;
-	overflow: hidden;
+	width: 100%;	
+	overflow-x: hidden;
+	overflow-y: auto;
 	display: flex;
 	flex-direction: column;
 	align-items: stretch;
@@ -34,6 +37,8 @@ spamt {
 body {
 	height: 100%;
 	width: 100%;
+	overflow-x: hidden;
+	overflow-y: auto;
 	color: $black;
 	font-family: 'Play', sans-serif;
 	font-size: 1.75em;
@@ -59,14 +64,55 @@ body {
 		}
 	}
 
+	table {
+		border-collapse: collapse;
+		background: transparent;
+		width: 100%;
+		line-height: 0.9em;
+		border-color: transparent;
+		thead {
+			display: table-row-group;
+			vertical-align: middle;
+		}
+		tbody {
+			display: table-row-group;
+			vertical-align: middle;
+			border-color: transparent;
+		}
+		tr {
+			display: table-row;
+			border: 1px solid;
+			border-left: 0;
+			border-right: 0;
+			border-top: 0;
+		}
+		th {
+			display: table-cell;
+			font-size: 1em;
+			padding: 0.5em;
+			font-weight: bold;
+			&:hover {
+				cursor: default;
+			}
+		}
+		td {
+			display: table-cell;
+			font-size: 0.8em;
+			padding: 0.5em;
+			&:hover {
+				cursor: default;
+			}
+		}
+	}
+
 	.feedback {
 		@media(max-width: 767px) {
-			margin-left: 10vw;
-			margin-right: 10vw;
+			margin-left: 5vw;
+			margin-right: 5vw;
 		}
 		@media(min-width: 768px) {
-			margin-left: 25vw;
-			margin-right: 25vw;
+			margin-left: 20vw;
+			margin-right: 20vw;
 		}
 		@media(min-width: 992px) {
 			margin-left: 25vw;
@@ -76,6 +122,20 @@ body {
 			margin-left: 25vw;
 			margin-right: 25vw;
 		}
+	}
+
+	.close {
+		/* close button */
+		float: right;
+		font-size: 4vh;
+		color: $grey;
+		text-shadow: 0 1px 0 $white;
+		opacity: 0.2;
+		-webkit-appearance: none;
+		padding: 0;
+		cursor: pointer;
+		background: transparent;
+		border: 0;
 	}
 
 	#auth-form {
@@ -171,35 +231,7 @@ body {
 			}
 
 			table {
-				border-collapse: collapse;
-				background: transparent;
-				width: 100%;
 				line-height: 1.8em;
-				border-color: transparent;
-				thead {
-					display: table-row-group;
-					vertical-align: middle;
-				}
-				tbody {
-					display: table-row-group;
-					vertical-align: middle;
-					border-color: transparent;
-				}
-				tr {
-					display: table-row;
-					border: 1px solid;
-					border-left: 0;
-					border-right: 0;
-					border-top: 0;
-				}
-				td {
-					display: table-cell;
-					font-size: 1.1em;
-					padding: 0.5em;
-					&:hover {
-						cursor: default;
-					}
-				}
 			}
 		}
 		#data {
