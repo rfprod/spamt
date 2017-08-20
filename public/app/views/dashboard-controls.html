@@ -1,127 +1,123 @@
-<div class="container-fluid">
-	<div class="row">
-		<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
-			<span *ngIf="!userService.model.user_token">
-				<h3>{{title}}</h3>
-				<p>{{description.welcome}}</p>
-			</span>
-			<span *ngIf="userService.model.user_token">
-				<h3>
-					{{title}}
-					<a (click)="toggleModal()"><i class="fa fa-bar-chart" [ngClass]="{ 'help-highlight': showHelp }"></i> <span class="label label-warning" *ngIf="showHelp">application stats</span></a>
-					<a (click)="logout()"><i class="fa fa-sign-out" [ngClass]="{ 'help-highlight': showHelp }"></i> <span class="label label-warning" *ngIf="showHelp">log out of SPAMT Controls</span></a>
-				</h3>
-				<p>{{description.authenticated}}</p>
-			</span>
+<div fxLayout="column" fxLayoutFill>
+	<span *ngIf="!userService.model.user_token">
+		<h3>{{title}}</h3>
+		<p>{{description.welcome}}</p>
+	</span>
+	<span *ngIf="userService.model.user_token">
+		<h3>
+			{{title}}
+			<a md-button (click)="toggleModal()" mdTooltip="Application stats">
+				<i class="fa fa-bar-chart" [ngClass]="{ 'help-highlight': showHelp }"></i>
+			</a>
+			<a md-button (click)="logout()" mdTooltip="Log out of SPAMT Controls">
+				<i class="fa fa-sign-out" [ngClass]="{ 'help-highlight': showHelp }"></i>
+			</a>
+		</h3>
+		<p>{{description.authenticated}}</p>
+	</span>
 
-			<div *ngIf="errorMessage" class="alert alert-danger alert-dismissible" role="alert">
-				<button type="button" class="close" (click)="dismissMessages()" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-				<i class="fa fa-warning"></i> {{errorMessage}}
-			</div>
-			<div *ngIf="successMessage" class="alert alert-success alert-dismissible" role="alert">
-				<button type="button" class="close" (click)="dismissMessages()" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-				<i class="fa fa-check-circle"></i> {{successMessage}}
-			</div>
-			
-			<span *ngIf="!userService.model.user_token" class="row">
-				<span class="hidden-xs col-sm-1 col-md-2 col-lg-3"></span>
-				<form class="col-xs-12 col-sm-10 col-md-8 col-lg-6" name="authForm" (ngSubmit)="login()" novalidate>
-					<div class="form-group has-feedback" [ngClass]="{ 'has-error': !authEmail.valid && !authEmail.pristine }">
-						<input type="email" id="email" class="form-control" pattern="^[\w%+-]+@[\w.-]+" [(ngModel)]="userService.model.email" name="email" #authEmail="ngModel" title="email" placeholder="email" required novalidate>
-						<span class="glyphicon glyphicon-envelope form-control-feedback"></span>
-						<p *ngIf="!authEmail.valid && !authEmail.pristine" class="help-block">invalid email</p>
-					</div>
-					<div class="btn-group btn-group-justified">
-						<div class="btn-group">
-							<input type="submit" class="btn btn-lg btn-primary" value="Authenticate" [disabled]="!authEmail.valid">
-						</div>
-					</div>
-				</form>
-				<span class="hidden-xs col-sm-1 col-md-2 col-lg-3"></span>
-			</span>
-
-			<span *ngIf="userService.model.user_token">
-				<table class="table table-condensed">
-					<tbody>
-						<tr class="middle">
-							<td><i class="fa fa-address-card fa-2x"></i></td>
-							<td title="login">{{userService.model.login}}</td>
-							<td title="role">{{userService.model.role}}</td>
-							<td title="full name">{{userService.model.full_name}}</td>
-						</tr>
-					</tbody>
-				</table>
-
-				<span role="navigation">
-					<ul class="nav nav-tabs nav-justified">
-						<li role="presentation" *ngFor="let tab of dataTabs" [ngClass]="{ 'active': tab === selectedTab }">
-							<a (click)="selectTab(tab)">{{tab}}</a>
-						</li>
-					</ul>
-				</span>
-
-				<div id="data" class="panel panel-default">
-					<div class="panel-body" *ngIf="selectedTab === dataTabs[0]">
-						<nvd3 [options]="chartOptions" [data]="appUsageData"></nvd3>
-						<table class="table table-condensed table-hover">
-							<thead>
-								<tr>
-									<th>Email</th>
-									<th>First name</th>
-									<th>Last name</th>
-									<th>Role</th>
-									<th>Last login</th>
-									<th>Registered</th>
-								</tr>
-							</thead>
-							<tbody>
-								<tr *ngFor="let user of usersList">
-									<td>{{user.email}}</td>
-									<td>{{user.firstName}}</td>
-									<td>{{user.lastName}}</td>
-									<td>{{user.role}}</td>
-									<td>{{user.lastLogin | date}}</td>
-									<td>{{user.registered | date}}</td>
-								</tr>
-							</tbody>
-						</table>
-					</div>
-					
-					<div class="panel-body" *ngIf="selectedTab === dataTabs[1]">
-						<nvd3 [options]="chartOptions" [data]="queriesData"></nvd3>
-						<table class="table table-condensed table-hover">
-							<thead>
-								<tr>
-									<th>Name</th>
-									<th>Weight</th>
-									<th>Timestamp</th>
-								</tr>
-							</thead>
-							<tbody>
-								<tr *ngFor="let query of queries.queriesList">
-									<td>{{query.name}}</td>
-									<td>{{query.weight}}</td>
-									<td>{{query.timestamp | date}}</td>
-								</tr>
-							</tbody>
-						</table>
-					</div>
-				</div>
-
-			</span>
-
-			<span id="modal" *ngIf="showModal">
-				<button type="button" class="close" (click)="toggleModal()"><span>&times;</span></button>
-				<h4>Platform Diagnostics</h4>
-				<table class="table table-condensed table-responsive">
-					<tbody>
-						<tr *ngFor="let unit of serverData.static">
-							<td>{{unit.name}}</td>
-							<td>{{unit.value}}</td>
-						</tr>
-					</tbody>
-				</table>
-			</span>
-		</div>
+	<div *ngIf="errorMessage" class="md-warn">
+		<button type="button" class="close" (click)="dismissMessages()" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+		<i class="fa fa-warning"></i> {{errorMessage}}
 	</div>
+	<div *ngIf="successMessage" class="md-primary">
+		<button type="button" class="close" (click)="dismissMessages()" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+		<i class="fa fa-check-circle"></i> {{successMessage}}
+	</div>
+
+	<form fxLayout="column" fxLayoutAlign="start stretch" id="auth-form" [formGroup]="authForm" (ngSubmit)="login()" *ngIf="!userService.model.user_token && activate.form" novalidate>
+		<md-input-container>
+			<input mdInput type="email" id="email" name="email" [formControl]="authForm.controls.email" pattern="^[\w%+-]+@[\w.-]+" title="email" placeholder="email" required novalidate />
+			<md-icon mdSuffix class="fa fa-envelope"></md-icon>
+			<md-error *ngIf="!authForm.controls.email.error">
+				Invalid value, should be email
+			</md-error>
+		</md-input-container>
+		<div fxLayout="row" fxLayoutAlign="start stretch" class="controls">
+			<button md-button fxFlex type="submit" [disabled]="authForm.pristine || authForm.invalid" [attr.aria-label]="submit">Submit</button>
+		</div>
+	</form>
+
+	<span *ngIf="userService.model.user_token">
+		<table>
+			<tbody>
+				<tr>
+					<td><i class="fa fa-address-card fa-2x"></i></td>
+					<td title="login">{{userService.model.login}}</td>
+					<td title="role">{{userService.model.role}}</td>
+					<td title="full name">{{userService.model.full_name}}</td>
+				</tr>
+			</tbody>
+		</table>
+
+		<span>
+			<ul>
+				<li *ngFor="let tab of dataTabs" [ngClass]="{ 'active': tab === selectedTab }">
+					<a (click)="selectTab(tab)">{{tab}}</a>
+				</li>
+			</ul>
+		</span>
+
+		<div id="data">
+			<div *ngIf="selectedTab === dataTabs[0]">
+				<nvd3 [options]="chartOptions" [data]="appUsageData"></nvd3>
+				<table>
+					<thead>
+						<tr>
+							<th>Email</th>
+							<th>First name</th>
+							<th>Last name</th>
+							<th>Role</th>
+							<th>Last login</th>
+							<th>Registered</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr *ngFor="let user of usersList">
+							<td>{{user.email}}</td>
+							<td>{{user.firstName}}</td>
+							<td>{{user.lastName}}</td>
+							<td>{{user.role}}</td>
+							<td>{{user.lastLogin | date}}</td>
+							<td>{{user.registered | date}}</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+
+			<div *ngIf="selectedTab === dataTabs[1]">
+				<nvd3 [options]="chartOptions" [data]="queriesData"></nvd3>
+				<table>
+					<thead>
+						<tr>
+							<th>Name</th>
+							<th>Weight</th>
+							<th>Timestamp</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr *ngFor="let query of queries.queriesList">
+							<td>{{query.name}}</td>
+							<td>{{query.weight}}</td>
+							<td>{{query.timestamp | date}}</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</div>
+
+	</span>
+
+	<span id="modal" *ngIf="showModal">
+		<button type="button" class="close" (click)="toggleModal()"><span>&times;</span></button>
+		<h4>Platform Diagnostics</h4>
+		<table>
+			<tbody>
+				<tr *ngFor="let unit of serverData.static">
+					<td>{{unit.name}}</td>
+					<td>{{unit.value}}</td>
+				</tr>
+			</tbody>
+		</table>
+	</span>
 </div>

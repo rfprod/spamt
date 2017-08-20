@@ -1,6 +1,7 @@
 $black: #000000;
 $white: #ffffff;
 $grey: #949494;
+$darkgrey: #505050;
 $lightgrey: #f0f0f0;
 $red: #ff0000;
 
@@ -34,7 +35,53 @@ body {
 	font-family: 'Play', sans-serif;
 	font-size: 1.75em;
 	overflow-x: hidden;
-	textarea {resize: vertical;}
+	
+	form {
+		legend {
+			color: $darkgrey;
+			padding-top: $boxPadding;
+			padding-bottom: $boxPadding;
+			&:hover {
+				cursor: default;
+			}
+		}
+		textarea {
+			resize: vertical;
+		}
+	}
+
+	#auth-form {
+		margin-bottom: 0.5em;
+		font-size: 1.5em;
+		@media(max-width: 767px) {
+			margin-left: 10vw;
+			margin-right: 10vw;
+		}
+		@media(min-width: 768px) {
+			margin-left: 25vw;
+			margin-right: 25vw;
+		}
+		@media(min-width: 992px) {
+			margin-left: 25vw;
+			margin-right: 25vw;
+		}
+		@media(mix-width: 1200px) {
+			margin-left: 25vw;
+			margin-right: 25vw;
+		}
+
+		.md-select-container {
+			margin: 2em 0 1em 0;
+			md-select {
+				margin-bottom: 0.3em;
+			}
+		}
+
+		.controls {
+			padding-top: $boxPadding;
+			padding-bottom: $boxPadding;
+		}
+	}
 
 	a:hover, a:focus {outline: none;}
 	a:hover {
@@ -50,40 +97,15 @@ body {
 	.inactive {
 		background: none;
 	}
+	.help-highlight {
+		color: $warning;
+	}
 
 	h3:hover, h4:hover, p:hover {cursor: default;}
 
-	app-info {
-		//position:fixed;
-		//bottom:0;
-		height: 10vh;
-		width: 100%;
-		.app-info {
-			display: flex;
-			justify-content: space-around;
-			align-items: center;
-			.flex-item {
-				flex: 1;
-				text-align: center;
-				text-decoration: none;
-				&:hover{
-					background: $lightgrey;
-				}
-				img {
-					min-height: 5vh;
-					height: 10vh;
-					max-height: 10vh;
-					width: auto !important;
-					max-width: 24vw;
-				}
-			}
-		}
-	}
-
-	.help-highlight {
-		color: #f0ad4e;
-	}
-
+/*
+*	genera styling for view containers
+*/
 	dashboard-intro, dashboard-details, dashboard-controls, dashboard-user {
 		flex: 1 1 auto;
 		align-self: stretch;
@@ -154,6 +176,34 @@ body {
 		}
 		#data {
 			border: 0;
+		}
+	}
+
+/*
+*	specific styling for view containers
+*/
+	app-info {
+		height: 10vh;
+		width: 100%;
+		.app-info {
+			display: flex;
+			justify-content: space-around;
+			align-items: center;
+			.flex-item {
+				flex: 1;
+				text-align: center;
+				text-decoration: none;
+				&:hover{
+					background: $lightgrey;
+				}
+				img {
+					min-height: 5vh;
+					height: 10vh;
+					max-height: 10vh;
+					width: auto !important;
+					max-width: 24vw;
+				}
+			}
 		}
 	}
 

@@ -16,22 +16,22 @@ export class AppNavComponent implements OnInit, OnDestroy {
 	private showHelp: boolean = false;
 	public switchNavButtons(event: any, path?: string) {
 		let index;
-		// console.log('switchNavButtons:', event);
+		console.log('switchNavButtons:', event);
 		const route = (event.route) ? event.route : (typeof event.urlAfterRedirects === 'string') ? event.urlAfterRedirects : event.url;
 		path = (!path) ? route.substring(route.lastIndexOf('/') + 1, route.length) : path;
-		// console.log(' >> PATH', path);
+		console.log(' >> PATH', path);
 		if (!event.route && path === 'help') {
 			// console.log('help click');
 			this.emitter.emitEvent({ help: 'toggle' });
 			this.showHelp = (this.showHelp) ? false : true;
 		}
-		if (path === 'intro') {
+		if (path.indexOf('intro') !== -1) {
 			index = '1';
-		} else if (path === 'data') {
+		} else if (path.indexOf('data') !== -1) {
 			index = '2';
-		} else if (path === 'controls') {
+		} else if (path.indexOf('controls') !== -1) {
 			index = '3';
-		} else if (path === 'user') {
+		} else if (path.indexOf('user') !== -1) {
 			index = '4';
 		}
 		if (index) {

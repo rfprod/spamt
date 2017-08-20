@@ -258,7 +258,6 @@ export class DashboardDetailsComponent implements OnInit, OnDestroy {
 	public ngOnInit(): void {
 		console.log('ngOnInit: DashboardDetailsComponent initialized');
 		this.emitSpinnerStartEvent();
-		this.emitter.emitEvent({route: '/data'});
 		this.emitter.emitEvent({appInfo: 'hide'});
 		console.log('this.userService:', this.userService.model);
 		this.getQueries();
