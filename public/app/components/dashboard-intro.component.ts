@@ -98,11 +98,11 @@ export class DashboardIntroComponent implements OnInit, OnDestroy {
 
 // Spinner
 	private emitSpinnerStartEvent(): void {
-		console.log('root spinner start event emitted');
+		// console.log('root spinner start event emitted');
 		this.emitter.emitEvent({spinner: 'start'});
 	}
 	private emitSpinnerStopEvent(): void {
-		console.log('root spinner stop event emitted');
+		// console.log('root spinner stop event emitted');
 		this.emitter.emitEvent({spinner: 'stop'});
 	}
 
@@ -121,7 +121,6 @@ export class DashboardIntroComponent implements OnInit, OnDestroy {
 	public ngOnInit(): void {
 		console.log('ngOnInit: DashboardIntroComponent initialized');
 		this.emitSpinnerStartEvent();
-		this.emitter.emitEvent({route: '/intro'});
 		this.emitter.emitEvent({appInfo: 'show'});
 
 		this.ws.onopen = (evt) => {

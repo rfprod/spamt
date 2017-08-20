@@ -223,9 +223,10 @@ export class DashboardControlsComponent implements OnInit, OnDestroy {
 			});
 			if (reinitForm) {
 				/*
-				*	this is needed to reset form completely after submission
-				*	or it will be touched and not pristine
+				*	reset form completely
 				*/
+				this.userService.resetUser();
+				this.dismissMessages();
 				this.activate.form = false;
 				setTimeout(() => this.activate.form = true, 0);
 			}

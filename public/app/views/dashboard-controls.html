@@ -16,11 +16,11 @@
 		<p>{{description.authenticated}}</p>
 	</span>
 
-	<div *ngIf="errorMessage" class="md-warn">
+	<div *ngIf="errorMessage" class="feedback warning">
 		<button type="button" class="close" (click)="dismissMessages()" aria-label="Close"><span aria-hidden="true">&times;</span></button>
 		<i class="fa fa-warning"></i> {{errorMessage}}
 	</div>
-	<div *ngIf="successMessage" class="md-primary">
+	<div *ngIf="successMessage" class="feedback success">
 		<button type="button" class="close" (click)="dismissMessages()" aria-label="Close"><span aria-hidden="true">&times;</span></button>
 		<i class="fa fa-check-circle"></i> {{successMessage}}
 	</div>
@@ -34,7 +34,13 @@
 			</md-error>
 		</md-input-container>
 		<div fxLayout="row" fxLayoutAlign="start stretch" class="controls">
-			<button md-button fxFlex type="submit" [disabled]="authForm.pristine || authForm.invalid" [attr.aria-label]="submit">Submit</button>
+			<span fxFlex="1 1 auto"></span>
+			<span fxFlex="0 1 auto" *ngIf="authForm.controls.email.value">
+				<a md-button (click)="resetForm(true)">Reset Form</a>
+			</span>
+		</div>
+		<div fxLayout="row" fxLayoutAlign="start stretch" class="controls">
+			<button md-button fxFlex type="submit" [disabled]="authForm.invalid" [attr.aria-label]="submit">Submit</button>
 		</div>
 	</form>
 
