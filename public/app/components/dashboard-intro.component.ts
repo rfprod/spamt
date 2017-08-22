@@ -2,6 +2,7 @@ import { Component, OnInit, OnDestroy, ElementRef } from '@angular/core';
 import { EventEmitterService } from '../services/event-emitter.service';
 import { ServerStaticDataService } from '../services/server-static-data.service';
 import { PublicDataService } from '../services/public-data.service';
+import { WebsocketService } from '../services/websocket.service';
 
 // declare let d3: any;
 
@@ -13,6 +14,7 @@ export class DashboardIntroComponent implements OnInit, OnDestroy {
 	constructor(
 		public el: ElementRef,
 		private emitter: EventEmitterService,
+		private websocket: WebsocketService,
 		private serverStaticDataService: ServerStaticDataService,
 		private publicDataService: PublicDataService
 	) {
@@ -21,10 +23,6 @@ export class DashboardIntroComponent implements OnInit, OnDestroy {
 	private subscription: any;
 	public title: string = 'SPAMT';
 	public description: string = 'Social Profile Analysis and Management Tool';
-	public host: string = window.location.host;
-	public wsProtocol: string = (window.location.protocol === 'http:') ? 'ws://' : 'wss://';
-	public wsPort: string = (window.location.protocol === 'http:') ? '8000' : '8443';
-	public wsUrl: string = (this.host.indexOf('localhost') !== -1) ? this.wsProtocol + this.host + '/api/app-diag/dynamic' : this.wsProtocol + this.host + ':' + this.wsPort + '/api/app-diag/dynamic';
 	public chartOptions: object = {
 		chart: {
 			type: 'pieChart',
@@ -74,7 +72,7 @@ export class DashboardIntroComponent implements OnInit, OnDestroy {
 		static: [],
 		dynamic: [],
 	};
-	public ws = new WebSocket(this.wsUrl);
+	public ws = new WebSocket(this.websocket.generateUrl('/api/app-diag/dynamic'));
 	public errorMessage: string;
 
 	private getServerStaticData(callback): void {

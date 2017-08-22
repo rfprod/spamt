@@ -35,6 +35,7 @@ import { LoadingIndicatorDirective } from './directives/loading-indicator.direct
 import { ConvertDuration } from './pipes/convert-duration.pipe';
 
 import { EventEmitterService } from './services/event-emitter.service';
+import { WebsocketService } from './services/websocket.service';
 import { UserService } from './services/user.service';
 import { UserLogoutService } from './services/user-logout.service';
 import { SCgetQueriesService } from './services/sc-get-queries.service';
@@ -58,7 +59,7 @@ import { ControlsQueriesListService } from './services/controls-queries-list.ser
 	providers 	: [
 									{ provide: LocationStrategy, useClass: PathLocationStrategy },
 									{ provide: Window, useValue: window },
-									EventEmitterService, UserService, UserLogoutService, ServerStaticDataService, PublicDataService,
+									EventEmitterService, WebsocketService, UserService, UserLogoutService, ServerStaticDataService, PublicDataService,
 									SCgetQueriesService, SCgetUserService, SCgetUserDetailsService, SCgetUserTrackDownloadService, SCgetUserTrackStreamService,
 									ControlsLoginService, ControlsLogoutService, ControlsMeService, ControlsUsersListService, ControlsQueriesListService
 								],
