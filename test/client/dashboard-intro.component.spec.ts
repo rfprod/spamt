@@ -10,6 +10,7 @@ import { nvD3 } from 'ng2-nvd3';
 import { EventEmitterService } from '../../public/app/services/event-emitter.service';
 import { ServerStaticDataService } from '../../public/app/services/server-static-data.service';
 import { PublicDataService } from '../../public/app/services/public-data.service';
+import { WebsocketService } from '../../public/app/services/websocket.service';
 
 import { DashboardIntroComponent } from '../../public/app/components/dashboard-intro.component';
 
@@ -56,12 +57,19 @@ describe('DashboardIntroComponent', () => {
 					provide: PublicDataService,
 					useFactory: (http) => new PublicDataService(http),
 					deps: [Http]
+				},
+				{ provide: Window, useValue: { location: { host: 'localhost', protocol: 'http' } } },
+				{
+					provide: WebsocketService,
+					useFactory: (window) => new WebsocketService(window),
+					deps: [Window]
 				}
 			]);
 			this.elementRef = new ElementRef('<dashboard-intro>');
 			this.emitter = new EventEmitterService();
 			this.serverStaticDataService = this.injector.get(ServerStaticDataService);
 			this.publicDataService = this.injector.get(PublicDataService);
+			this.websocket = this.injector.get(WebsocketService);
 			/*
 			*	TODO - optionally switch to backend mock instead of spying and returning values
 			*
@@ -71,7 +79,7 @@ describe('DashboardIntroComponent', () => {
 			*		body: mockedResponse
 			*	})));
 			*/
-			this.component = new DashboardIntroComponent(this.elementRef, this.emitter, this.serverStaticDataService, this.publicDataService);
+			this.component = new DashboardIntroComponent(this.elementRef, this.emitter, this.websocket, this.serverStaticDataService, this.publicDataService);
 
 			spyOn(this.component.serverStaticDataService, 'getData').and.returnValue(Observable.of(mockedResponse));
 			spyOn(this.component.publicDataService, 'getData').and.returnValue(Observable.of(mockedResponse));
@@ -92,11 +100,6 @@ describe('DashboardIntroComponent', () => {
 			expect(c.description).toBeDefined();
 			expect(c.description).toEqual(jasmine.any(String));
 			expect(c.description === 'Social Profile Analysis and Management Tool').toBeTruthy();
-			expect(c.host).toBeDefined();
-			expect(c.host).toEqual(jasmine.any(String));
-			expect(c.host).toEqual(window.location.host);
-			expect(c.wsUrl).toEqual(jasmine.any(String));
-			expect(c.wsUrl).toEqual('ws://' + c.host + '/api/app-diag/dynamic');
 			expect(c.chartOptions).toBeDefined();
 			expect(c.chartOptions).toEqual(jasmine.any(Object));
 			expect(c.chartOptions.chart).toEqual(jasmine.any(Object));
@@ -148,7 +151,8 @@ describe('DashboardIntroComponent', () => {
 
 		it('should toggle modal state and control websocket connection on respective method call', (done) => {
 			const c = this.component;
-			c.ws = new MockWebsocket(c.wsUrl);
+			const wsMock = new MockWebsocket(c.websocket.generateUrl('/api/app-diag/dynamic'));
+			c.ws = wsMock.ws;
 			spyOn(c.ws, 'send');
 			expect(c.showModal).toBeFalsy();
 			c.toggleModal();
