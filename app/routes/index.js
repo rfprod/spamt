@@ -32,9 +32,16 @@ module.exports = function(app, passport, User, Query, SrvInfo, DataInit, thenReq
 				html: '<h3>SPAMT: Controls access was requested using your email address.</h3><p>If you did not request it, ignore this message.</p><p>If you requested access, follow the link: '+accessLink+'.</p>' // html body
 			};
 			mailTransporter.sendMail(mailOptions, (err, info) => {
-				if (err) throw err;
-				console.log('Message sent: ' + info.response);
-				if (callback) { callback(); }
+				if (err) {
+					if (!callback){
+						throw err;
+					} else {
+						callback(err);
+					}
+				} else {
+					console.log('Message sent: ' + info.response);
+					if (callback) { callback(); }
+				}
 			});
 		}
 	}
@@ -408,8 +415,12 @@ module.exports = function(app, passport, User, Query, SrvInfo, DataInit, thenReq
 					// console.log(payload, tokenObj);
 					JWT.setUserJWToken(user._id, tokenObj, () => {
 						let accessLink = process.env.APP_URL + 'controls?user_token=' + tokenObj.token;
-						sendAccessLink(userEmail, accessLink, () => {
-							res.status(200).json({message: 'access link was sent to provided email address'});
+						sendAccessLink(userEmail, accessLink, (error) => {
+							if (error) {
+								res.status(400).json({message: 'mail transporter error'});
+							} else {
+								res.status(200).json({message: 'access link was sent to provided email address'});
+							}
 						});
 					});
 					// update lastLogin
