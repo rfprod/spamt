@@ -177,10 +177,10 @@ gulp.task('move-vendor-fonts', () => {
 		'./node_modules/bootstrap/dist/fonts/*.*',
 		'./node_modules/components-font-awesome/fonts/*.*',
 		// material design icons
-		'node_modules/material-design-icons/iconfont/*.eot',
-		'node_modules/material-design-icons/iconfont/*.woff2',
-		'node_modules/material-design-icons/iconfont/*.woff',
-		'node_modules/material-design-icons/iconfont/*.ttf'
+		'node_modules/material-design-icon-fonts/iconfont/*.eot',
+		'node_modules/material-design-icon-fonts/iconfont/*.woff2',
+		'node_modules/material-design-icon-fonts/iconfont/*.woff',
+		'node_modules/material-design-icon-fonts/iconfont/*.ttf'
 	])
 		.pipe(gulp.dest('./public/fonts'));
 });
