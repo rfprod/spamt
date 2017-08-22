@@ -8,7 +8,7 @@ declare let $: JQueryStatic;
 	selector: 'spamt',
 	template: `
 		<app-nav></app-nav>
-		<loading-indicator></loading-indicator>
+		<loading-indicator *ngIf="showSpinner"></loading-indicator>
 		<router-outlet></router-outlet>
 		<app-info fxFlex="0 1 auto" *ngIf="showAppInfo"></app-info>
 	`,
@@ -22,6 +22,7 @@ export class AppComponent implements OnInit, OnDestroy {
 		console.log('this.el.nativeElement', this.el.nativeElement);
 	}
 	private showAppInfo: boolean = true;
+	private showSpinner: boolean = false;
 	public ngOnInit() {
 		console.log('ngOnInit: AppComponent initialized');
 		$('#init-spinner').remove();
@@ -32,6 +33,14 @@ export class AppComponent implements OnInit, OnDestroy {
 					this.showAppInfo = false;
 				} else if (message.appInfo === 'show') {
 					this.showAppInfo = true;
+				}
+			}
+			if (message.spinner) {
+				if (message.spinner === 'start') {
+					this.showSpinner = true;
+				}
+				if (message.spinner === 'stop') {
+					this.showSpinner = false;
 				}
 			}
 		});
