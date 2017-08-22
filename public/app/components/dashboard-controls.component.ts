@@ -218,15 +218,21 @@ export class DashboardControlsComponent implements OnInit, OnDestroy {
 		/*
 		*	resets user local storage and register form
 		*/
+		this.authForm = this.fb.group({
+			email: ['', Validators.compose([Validators.required, Validators.email, Validators.minLength(5)])],
+		});
+		if (reinitForm) {
+			/*
+			*	reset form completely - clear storage
+			*/
+			this.userService.resetUser();
+		}
 		this.userService.restoreUser(() => {
-			this.authForm = this.fb.group({
-				email: [this.userService.model.email, Validators.compose([Validators.required, Validators.email, Validators.minLength(5)])],
-			});
+			this.authForm.patchValue({email: this.userService.model.email});
 			if (reinitForm) {
 				/*
-				*	reset form completely
+				*	reset form completely - dismiss messages, reinit form
 				*/
-				this.userService.resetUser();
 				this.dismissMessages();
 				this.activate.form = false;
 				setTimeout(() => this.activate.form = true, 0);
