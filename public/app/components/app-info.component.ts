@@ -19,7 +19,7 @@ export class AppInfoComponent implements OnInit, OnDestroy {
 		console.log('this.el.nativeElement:', this.el.nativeElement);
 	}
 	private subscription: any;
-	private hideInfo: boolean = true;
+	private hideInfo: boolean = false;
 	private badges: any[] = [ // tslint:disable-line
 		{
 			title: 'Node.js - an open-source, cross-platform runtime environment for developing server-side Web applications.',
