@@ -22,7 +22,9 @@ export class DashboardIntroComponent implements OnInit, OnDestroy {
 	public title: string = 'SPAMT';
 	public description: string = 'Social Profile Analysis and Management Tool';
 	public host: string = window.location.host;
-	public wsUrl: string = (this.host.indexOf('localhost') !== -1) ? 'ws://' + this.host + '/api/app-diag/dynamic' : (window.location.origin.indexOf('https') === -1) ? 'ws://' + this.host + ':8000/api/app-diag/dynamic' : 'wss://' + this.host + ':8443/api/app-diag/dynamic';
+	public wsProtocol: string = (window.location.protocol === 'http:') ? 'ws://' : 'wss://';
+	public wsPort: string = (window.location.protocol === 'http:') ? '8000' : '8443';
+	public wsUrl: string = (this.host.indexOf('localhost') !== -1) ? this.wsProtocol + this.host + '/api/app-diag/dynamic' : this.wsProtocol + this.host + ':' + this.wsPort + '/api/app-diag/dynamic';
 	public chartOptions: object = {
 		chart: {
 			type: 'pieChart',
