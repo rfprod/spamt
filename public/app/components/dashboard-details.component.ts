@@ -35,7 +35,12 @@ export class DashboardDetailsComponent implements OnInit, OnDestroy {
 		followings: [],
 	};
 	private publicDataKeys = Object.keys(this.publicData);
-	private errorMessage: string;
+	public errorMessage: string;
+	public successMessage: string;
+	private dismissMessages(): void {
+		this.errorMessage = '';
+		this.successMessage = '';
+	}
 
 // 03 popular queries
 	private queries: any;
@@ -84,7 +89,7 @@ export class DashboardDetailsComponent implements OnInit, OnDestroy {
 			(data) => {
 				this.emitter.emitEvent({appInfo: 'hide'});
 				this.publicData.user = data;
-				this.errorMessage = undefined;
+				this.dismissMessages();
 				console.log('this.userService: ', this.userService);
 				this.userService.model.analyser_query = this.scUserName;
 				this.userService.model.analyser_user_id = this.publicData.user.id;
@@ -146,7 +151,7 @@ export class DashboardDetailsComponent implements OnInit, OnDestroy {
 						this.displayPlaylistTracks.push(false);
 					}
 				}
-				this.errorMessage = undefined;
+				this.dismissMessages();
 			},
 			(error) => {
 				this.errorMessage = error as any;
@@ -168,7 +173,7 @@ export class DashboardDetailsComponent implements OnInit, OnDestroy {
 		this.emitFilterSearchValueChangeEvent(val);
 	}
 	private emitFilterSearchValueChangeEvent(val): void {
-		console.log('labelSearchValue changed to:', val);
+		// console.log('labelSearchValue changed to:', val);
 		this.emitter.emitEvent({search: val});
 	}
 	private orderProp = 'timestamp';
@@ -179,17 +184,17 @@ export class DashboardDetailsComponent implements OnInit, OnDestroy {
 		this.emitOrderPropChangeEvent(val);
 	}
 	private emitOrderPropChangeEvent(val): void {
-		console.log('orderProp changed to:', val);
+		// console.log('orderProp changed to:', val);
 		this.emitter.emitEvent({sort: val});
 	}
 
 // Spinner
 	private emitSpinnerStartEvent(): void {
-		console.log('root spinner start event emitted');
+		// console.log('root spinner start event emitted');
 		this.emitter.emitEvent({spinner: 'start'});
 	}
 	private emitSpinnerStopEvent(): void {
-		console.log('root spinner stop event emitted');
+		// console.log('root spinner stop event emitted');
 		this.emitter.emitEvent({spinner: 'stop'});
 	}
 
@@ -205,7 +210,7 @@ export class DashboardDetailsComponent implements OnInit, OnDestroy {
 				console.log('scGetUserTrackPlayService, data: ', data);
 				this.selectedTrack = data.location;
 				this.selectedTrackURI = uri;
-				this.errorMessage = undefined;
+				this.dismissMessages();
 			},
 			(error) => {
 				this.errorMessage = error as any;
