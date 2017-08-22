@@ -80,7 +80,7 @@
 		"jquery": "^2.2.4",
 		"jwt-simple": "^0.5.1",
 		"karma": "^1.7.0",
-		"material-design-icons": "^3.0.1",
+		"material-design-icon-fonts": "^3.0.1",
 		"mongoose": "^4.11.3",
 		"ng2-nvd3": "^1.1.0",
 		"nodemailer": "2.7.2",
