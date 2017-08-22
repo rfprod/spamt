@@ -102,6 +102,7 @@ export class DashboardControlsComponent implements OnInit, OnDestroy {
 		this.successMessage = '';
 	}
 	private getServerStaticData(callback): void {
+		this.emitSpinnerStartEvent();
 		this.serverStaticDataService.getData().subscribe(
 			(data) => this.serverData.static = data,
 			(error) => {
@@ -110,11 +111,13 @@ export class DashboardControlsComponent implements OnInit, OnDestroy {
 			},
 			() => {
 				console.log('getServerStaticData done, data:', this.serverData.static);
+				this.emitSpinnerStopEvent();
 				if (callback) { callback(); }
 			}
 		);
 	}
 	private getPublicData(callback): void {
+		this.emitSpinnerStartEvent();
 		this.publicDataService.getData().subscribe(
 			(data) => this.appUsageData = data,
 			(error) => {
@@ -123,6 +126,7 @@ export class DashboardControlsComponent implements OnInit, OnDestroy {
 			},
 			() => {
 				console.log('getPublicData done, data:', this.appUsageData);
+				this.emitSpinnerStopEvent();
 				if (callback) { callback(); }
 			}
 		);
@@ -295,7 +299,6 @@ export class DashboardControlsComponent implements OnInit, OnDestroy {
 
 	public ngOnInit(): void {
 		console.log('ngOnInit: DashboardControlsComponent initialized');
-		this.emitSpinnerStartEvent();
 		this.emitter.emitEvent({appInfo: 'show'});
 
 		const route = this.router.url;
@@ -317,12 +320,11 @@ export class DashboardControlsComponent implements OnInit, OnDestroy {
 				this.getQueriesList();
 				this.getPublicData(() => {
 					this.getServerStaticData(() => {
-						this.emitSpinnerStopEvent();
+						console.log('get data done');
 					});
 				});
 			} else {
 				console.log('local storage is empty');
-				this.emitSpinnerStopEvent();
 			}
 		});
 

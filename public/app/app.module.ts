@@ -30,7 +30,6 @@ import { DashboardUserComponent } from './components/dashboard-user.component';
 import { nvD3 } from 'ng2-nvd3';
 
 import { AudioPlayerDirective } from './directives/audio-player.directive';
-import { LoadingIndicatorDirective } from './directives/loading-indicator.directive';
 
 import { ConvertDuration } from './pipes/convert-duration.pipe';
 
@@ -54,7 +53,7 @@ import { ControlsQueriesListService } from './services/controls-queries-list.ser
 // declare let $: JQueryStatic;
 
 @NgModule({
-	declarations: [ AppComponent, AppNavComponent, AppInfoComponent, DashboardIntroComponent, DashboardDetailsComponent, DashboardControlsComponent, DashboardUserComponent, nvD3, AudioPlayerDirective, LoadingIndicatorDirective, ConvertDuration],
+	declarations: [ AppComponent, AppNavComponent, AppInfoComponent, DashboardIntroComponent, DashboardDetailsComponent, DashboardControlsComponent, DashboardUserComponent, nvD3, AudioPlayerDirective, ConvertDuration],
 	imports 		: [ BrowserModule, BrowserAnimationsModule, FormsModule, FlexLayoutModule, MaterialModule, ReactiveFormsModule, HttpModule, RouterModule.forRoot(APP_ROUTES) ],
 	providers 	: [
 									{ provide: LocationStrategy, useClass: PathLocationStrategy },

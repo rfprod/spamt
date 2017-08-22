@@ -124,7 +124,13 @@ gulp.task('pack-vendor-js', () => {
 	*	components related to design, styling, data visualization etc.
 	*/
 	return gulp.src([
-		// sequence is essential
+		/*
+		*	add paths to required third party js files
+		*
+		*	note: sequence is essential
+		*/
+		'./node_modules/core-js/client/shim.js',
+
 		'./node_modules/jquery/dist/jquery.js',
 		'./node_modules/bootstrap/dist/js/bootstrap.js',
 		'./node_modules/d3/d3.js',
@@ -165,8 +171,16 @@ gulp.task('pack-vendor-css', () => {
 
 gulp.task('move-vendor-fonts', () => {
 	return gulp.src([
+		/*
+		*	add paths to required third party fonts
+		*/
 		'./node_modules/bootstrap/dist/fonts/*.*',
-		'./node_modules/components-font-awesome/fonts/*.*'
+		'./node_modules/components-font-awesome/fonts/*.*',
+		// material design icons
+		'node_modules/material-design-icons/iconfont/*.eot',
+		'node_modules/material-design-icons/iconfont/*.woff2',
+		'node_modules/material-design-icons/iconfont/*.woff',
+		'node_modules/material-design-icons/iconfont/*.ttf'
 	])
 		.pipe(gulp.dest('./public/fonts'));
 });
