@@ -16,6 +16,11 @@ $boxPadding: 0.5em;
 .warning { color: $warning; }
 .success { color: $success; }
 
+.warning-bg { background: $warning; }
+.danger-bg { background: $danger; }
+.success-bg { background: $success; }
+
+
 /* required in case of self hosting of material-design-icons */
 	@font-face {
 		font-family: 'Material Icons';
@@ -310,16 +315,17 @@ body {
 	}
 
 	dashboard-details {
-		.user-input {
-			width: 100%;
-			padding-left: 15px;
-			padding-right: 15px;
-		}
-		.input-label {
-			&:hover{
-				cursor: default;
+		#labels {
+			border: 1px solid $grey;
+			span {
+				text-align: center;
+				border: 1px solid $lightgrey;
+				&:hover {
+					cursor: default;
+				}
 			}
 		}
+
 		#filters {
 			z-index: 2;
 			width: 100%;
@@ -332,9 +338,11 @@ body {
 				flex: 1;
 				text-align: center;
 			}
-		}
-		#sc-user {
-			font-size: 0.9em;
+			.input-label {
+				&:hover{
+					cursor: default;
+				}
+			}
 		}
 		#queries-flex {
 			display: flex;

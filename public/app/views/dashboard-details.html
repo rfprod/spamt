@@ -15,94 +15,80 @@
 		</div>
 	</div>
 
-	<div fxFlex="35" fxFlex.xs>
+	<div fxFlex="25" fxFlex.xs>
 		<legend>User</legend>
-		<div class="user-input" *ngIf="!userSelected()">
-			<div class="input-group row" [ngClass]="{ 'has-error': (!scUserName || scUserName.length < 3) }">
-				<span class="input-group-addon">http://soundcloud.com/</span>
-				<input type="text" class="form-control" [(ngModel)]="scUserName" pattern="scUserNamePattern" (keyup)="scUserNameKey($event)">
-				<span class="input-group-btn">
-					<button class="btn" [ngClass]="{ 'btn-danger': (!scUserName || scUserName.length < 3), 'btn-success': (scUserName && scUserName.length >= 3) }" (click)="getUser()" [disabled]="!scUserName || scUserName.length < 3">get</button>
-				</span>
-			</div>
+		<div fxLayout="row" fxLayoutAlign="center center">
+			<md-input-container>
+				<span mdPrefix class="mat-caption">https://soundcloud.com/ &nbsp;</span>
+				<input mdInput type="scUserName" id="scUserName" name="scUserName" [(ngModel)]="scUserName" pattern="scUserNamePattern" title="username" placeholder="username" (keyup)="scUserNameKey($event)" [disabled]="userSelected()" required />
+			</md-input-container>
+			<button md-button [ngClass]="{ 'danger-bg': (!scUserName || scUserName.length < 3), 'success-bg': (scUserName && scUserName.length >= 3) }" (click)="getUser()" [disabled]="!scUserName || scUserName.length < 3" *ngIf="!userSelected()">GET</button>
+			<button md-button class="danger-bg" (click)="resetSelection()" *ngIf="userSelected()">RESET</button>
 		</div>
-		<div *ngIf="userSelected()">
-			<div class="user-input">
-				<div class="input-group row">
-					<span class="input-group-addon success">http://soundcloud.com/</span>
-					<input type="text" class="form-control" [(ngModel)]="scUserName" pattern="scUserNamePattern" (keyup)="scUserNameKey($event)" disabled>
-					<span class="input-group-btn">
-						<button class="btn btn-danger" (click)="resetSelection()">
-							<i class="glyphicon glyphicon-remove"></i>
-						</button>
-					</span>
+		<div *ngIf="userSelected()" fxLayout="column" fxLayoutAlign="start stretch" fxLayoutGap="5px">
+			<a md-button [href]="publicData.user.permalink_url" target=_blank mdTooltip="Open Soundcloud profile in a new tab">
+				<img [src]="publicData.user.avatar_url" alt="{{publicData.user.permalink}}">
+			</a>
+			<div fxLayout="column" fxLayoutAlign="start stretch" fxLayoutGap="5px">
+				<h3 class="mat-h3">{{publicData.user.username}}</h3>
+				<h4 class="mat-h4">{{publicData.user.full_name}}</h4>
+				<div fxLayout="row" fxLayoutAlign="center center" id="labels">
+					<span fxFlex>{{publicData.user.plan}}</span>
+					<span fxFlex>{{publicData.user.kind}}</span>
+					<span fxFlex [ngClass]="{ 'success-bg': publicData.user.online, 'danger-bg': !publicData.user.online }">{{ (publicData.user.online) ? 'online' : 'offline' }}</span>
 				</div>
-			</div>
-			<div class="thumbnail" id="sc-user">
-				<a [href]="publicData.user.permalink_url" target=_blank>
-					<img [src]="publicData.user.avatar_url" alt="{{publicData.user.permalink}}">
-				</a>
-				<div class="caption">
-					<h3>{{publicData.user.username}}</h3>
-					<h4>{{publicData.user.full_name}}</h4>
-					<h4>
-						<span class="label label-default">{{publicData.user.plan}}</span>
-						<span class="label label-default">{{publicData.user.kind}}</span>
-						<span class="label" [ngClass]="{ 'label-success': publicData.user.online, 'label-danger': !publicData.user.online }">{{ (publicData.user.online) ? 'online' : 'offline' }}</span>
-					</h4>
-					<table class="table table-condensed table-hover">
-						<tbody>
-							<tr>
-								<td class="hidden-xs hidden-sm">Id</td>
-								<td><i class="glyphicon glyphicon-info-sign hidden-md hidden-lg" title="Id"></i> {{publicData.user.id}}</td>
-							</tr>
-							<tr>
-								<td class="hidden-xs hidden-sm">Last&nbsp;modified</td>
-								<td><i class="glyphicon glyphicon-time hidden-md hidden-lg" title="Last modified"></i> {{publicData.user.last_modified | date: 'yyyy-MM-dd hh:mm'}}</td>
-							</tr>
-							<tr>
-								<td class="hidden-xs hidden-sm">Location</td>
-								<td><i class="glyphicon glyphicon-globe hidden-md hidden-lg" title="Location"></i> {{publicData.user.country}} / {{publicData.user.city}}</td>
-							</tr>
-							<tr *ngIf="publicData.user.discogs_name">
-								<td class="hidden-xs hidden-sm">Discogs&nbsp;name</td>
-								<td><i class="glyphicon glyphicon-link hidden-md hidden-lg" title="Discogs name"></i> {{publicData.user.discogs_name}}</td>
-							</tr>
-							<tr *ngIf="publicData.user.myspace_name">
-								<td class="hidden-xs hidden-sm">Myspace&nbsp;name</td>
-								<td><i class="glyphicon glyphicon-link hidden-md hidden-lg" title="Myspace name"></i> {{publicData.user.myspace_name}}</td>
-							</tr>
-							<tr>
-								<td class="hidden-xs hidden-sm">Website</td>
-								<td><a [href]="publicData.user.website" target=_blank><i class="glyphicon glyphicon-home" title="Website"></i> {{publicData.user.website_title}}</a></td>
-							</tr>
-							<tr [ngClass]="{ 'info': selectedTab === 'Tracks' }">
-								<td class="hidden-xs hidden-sm">Tracks</td>
-								<td><i class="glyphicon glyphicon-music hidden-md hidden-lg" title="Tracks"></i> {{publicData.user.track_count}}</td>
-							</tr>
-							<tr [ngClass]="{ 'info': selectedTab === 'Playlists' }">
-								<td class="hidden-xs hidden-sm">Playlists</td>
-								<td><i class="glyphicon glyphicon-list-alt hidden-md hidden-lg" title="Playlists"></i> {{publicData.user.playlist_count}}</td>
-							</tr>
-							<tr [ngClass]="{ 'info': selectedTab === 'Favorites' }">
-								<td class="hidden-xs hidden-sm">Favorites</td>
-								<td><i class="glyphicon glyphicon-heart hidden-md hidden-lg" title="Public favorites"></i> {{publicData.user.public_favorites_count}}</td>
-							</tr>
-							<tr [ngClass]="{ 'info': selectedTab === 'Followers' }">
-								<td class="hidden-xs hidden-sm">Followers</td>
-								<td><i class="glyphicon glyphicon-user hidden-md hidden-lg" title="Followers"></i> {{publicData.user.followers_count}}</td>
-							</tr>
-							<tr [ngClass]="{ 'info': selectedTab === 'Followings' }">
-								<td class="hidden-xs hidden-sm">Followings</td>
-								<td><i class="glyphicon glyphicon-user hidden-md hidden-lg" title="Followings"></i> {{publicData.user.followings_count}}</td>
-							</tr>
-						</tbody>
-					</table>
-				</div>
+				<table>
+					<tbody>
+						<tr>
+							<td fxHide.xs fxHide.sm>Id</td>
+							<td><i class="fa fa-info-circle" fxHide.md fxHide.lg fxHide.xl mdTooltip="Id"></i> {{publicData.user.id}}</td>
+						</tr>
+						<tr>
+							<td fxHide.xs fxHide.sm>Last&nbsp;modified</td>
+							<td><i class="fa fa-clock-o" fxHide.md fxHide.lg fxHide.xl mdTooltip="Last modified"></i> {{publicData.user.last_modified | date: 'yyyy-MM-dd hh:mm'}}</td>
+						</tr>
+						<tr>
+							<td fxHide.xs fxHide.sm>Location</td>
+							<td><i class="fa fa-globe" fxHide.md fxHide.lg fxHide.xl mdTooltip="Location"></i> {{publicData.user.country}} / {{publicData.user.city}}</td>
+						</tr>
+						<tr *ngIf="publicData.user.discogs_name">
+							<td fxHide.xs fxHide.sm>Discogs&nbsp;name</td>
+							<td><i class="fa fa-link" fxHide.md fxHide.lg fxHide.xl mdTooltip="Discogs name"></i> {{publicData.user.discogs_name}}</td>
+						</tr>
+						<tr *ngIf="publicData.user.myspace_name">
+							<td fxHide.xs fxHide.sm>Myspace&nbsp;name</td>
+							<td><i class="fa fa-link" fxHide.md fxHide.lg fxHide.xl mdTooltip="Myspace name"></i> {{publicData.user.myspace_name}}</td>
+						</tr>
+						<tr>
+							<td fxHide.xs fxHide.sm>Website</td>
+							<td><a [href]="publicData.user.website" target=_blank><i class="fa fa-home" fxHide.md fxHide.lg fxHide.xl mdTooltip="Website"></i> {{publicData.user.website_title}}</a></td>
+						</tr>
+						<tr [ngClass]="{ 'selected': selectedTab === 'Tracks' }">
+							<td fxHide.xs fxHide.sm>Tracks</td>
+							<td><i class="fa fa-music" fxHide.md fxHide.lg fxHide.xl mdTooltip="Tracks"></i> {{publicData.user.track_count}}</td>
+						</tr>
+						<tr [ngClass]="{ 'selected': selectedTab === 'Playlists' }">
+							<td fxHide.xs fxHide.sm>Playlists</td>
+							<td><i class="fa fa-list" fxHide.md fxHide.lg fxHide.xl mdTooltip="Playlists"></i> {{publicData.user.playlist_count}}</td>
+						</tr>
+						<tr [ngClass]="{ 'selected': selectedTab === 'Favorites' }">
+							<td fxHide.xs fxHide.sm>Favorites</td>
+							<td><i class="fa fa-heart" fxHide.md fxHide.lg fxHide.xl mdTooltip="Public favorites"></i> {{publicData.user.public_favorites_count}}</td>
+						</tr>
+						<tr [ngClass]="{ 'selected': selectedTab === 'Followers' }">
+							<td fxHide.xs fxHide.sm>Followers</td>
+							<td><i class="fa fa-users" fxHide.md fxHide.lg fxHide.xl mdTooltip="Followers"></i> {{publicData.user.followers_count}}</td>
+						</tr>
+						<tr [ngClass]="{ 'selected': selectedTab === 'Followings' }">
+							<td fxHide.xs fxHide.sm>Followings</td>
+							<td><i class="fa fa-users" fxHide.md fxHide.lg fxHide.xl mdTooltip="Followings"></i> {{publicData.user.followings_count}}</td>
+						</tr>
+					</tbody>
+				</table>
 			</div>
 		</div>
 	</div>
-	<div fxFlex="65" fxFlex.xs>
+	<div fxFlex="75" fxFlex.xs>
 		<legend>Data</legend>
 		<span *ngIf="userSelected()">
 			<span role="navigation">
