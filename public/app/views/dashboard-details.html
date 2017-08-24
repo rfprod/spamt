@@ -15,15 +15,19 @@
 		</div>
 	</div>
 
-	<div fxFlex="25" fxFlex.xs>
+	<div fxFlex="25" fxFlex.xs="0 1 auto" fxFlex.sm="0 1 auto">
 		<legend>User</legend>
 		<div fxLayout="row" fxLayoutAlign="center center">
 			<md-input-container>
-				<span mdPrefix class="mat-caption">https://soundcloud.com/ &nbsp;</span>
-				<input mdInput type="scUserName" id="scUserName" name="scUserName" [(ngModel)]="scUserName" pattern="scUserNamePattern" title="username" placeholder="username" (keyup)="scUserNameKey($event)" [disabled]="userSelected()" required />
+				<span mdPrefix class="mat-caption" fxHide.xs="false" fxHide.gt-xs="true" fxHide.md="false" title="https://soundcloud.com/... finish the link"><i class="fa fa-link"></i> &nbsp;</span>
+				<span mdPrefix class="mat-caption" fxHide.xs="true" fxHide.md="true">https://soundcloud.com/ &nbsp;</span>
+				<input mdInput type="text" id="scUserName" name="scUserName" [formControl]="scUserName" title="username" placeholder="username" (keyup)="scUserNameKey($event)" [readonly]="userSelected()" />
+				<md-error *ngIf="scUserName.hasError('pattern')">
+					must be at least 3 characters long
+				</md-error>
 			</md-input-container>
-			<button md-button [ngClass]="{ 'danger-bg': (!scUserName || scUserName.length < 3), 'success-bg': (scUserName && scUserName.length >= 3) }" (click)="getUser()" [disabled]="!scUserName || scUserName.length < 3" *ngIf="!userSelected()">GET</button>
-			<button md-button class="danger-bg" (click)="resetSelection()" *ngIf="userSelected()">RESET</button>
+			<button md-button [ngClass]="{ 'danger-bg': (!scUserName.value || scUserName.hasError('pattern')), 'success-bg': (scUserName.value && !scUserName.hasError('pattern')) }" (click)="getUser()" [disabled]="!scUserName.value || scUserName.hasError('pattern')" *ngIf="!userSelected()" mdTooltip="Get public data">GET</button>
+			<button md-button class="danger-bg" (click)="resetSelection()" *ngIf="userSelected()" mdTooltip="Reset username and data">RESET</button>
 		</div>
 		<div *ngIf="userSelected()" fxLayout="column" fxLayoutAlign="start stretch" fxLayoutGap="5px">
 			<a md-button [href]="publicData.user.permalink_url" target=_blank mdTooltip="Open Soundcloud profile in a new tab">
@@ -88,8 +92,20 @@
 			</div>
 		</div>
 	</div>
-	<div fxFlex="75" fxFlex.xs>
+	<div fxFlex="75" id="scroll-content">
 		<legend>Data</legend>
+
+		<md-tab-group *ngIf="userSelected()">
+			<md-tab *ngFor="let tab of dataTabs">
+				<ng-template md-tab-label>
+					{{tab}}
+				</ng-template>
+				<div class="tab-body">
+					tab body {{index}}
+				</div>
+			</md-tab>
+		</md-tab-group>
+
 		<span *ngIf="userSelected()">
 			<span role="navigation">
 				<ul class="nav nav-tabs nav-justified">
@@ -358,9 +374,11 @@
 			</div>
 		</span>
 		<span *ngIf="!userSelected()">
-			input <a href="https://soundcloud.com" target=_blank><i class="glyphicon glyphicon-new-window"></i> soundcloud</a> user name to be able to request data, or select one from the following list
+			<div id="instructions">
+				input <a href="https://soundcloud.com" target=_blank><i class="fa fa-external-link"></i> soundcloud</a> user name to be able to request data, or select one from the following list
+			</div>
 			<div id="queries-flex" *ngIf="queries">
-				<span class="btn btn-default" *ngFor="let q of queries.data" (click)="analyseThisUser(q.name)">{{q.name}}</span>
+				<a fxFlex md-button class="mat-primary" *ngFor="let q of queries.data" (click)="analyseThisUser(q.name)">{{q.name}}</a>
 			</div>
 		</span>
 	</div>

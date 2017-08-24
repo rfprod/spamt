@@ -325,6 +325,12 @@ body {
 				}
 			}
 		}
+		#scroll-content {
+			overflow-y: scroll;
+		}
+		#instructions {
+			text-align: center;
+		}
 
 		#filters {
 			z-index: 2;

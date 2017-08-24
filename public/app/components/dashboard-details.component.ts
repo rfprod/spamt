@@ -1,4 +1,5 @@
 import { Component, ElementRef, OnInit, OnDestroy } from '@angular/core';
+import { FormControl, Validators } from '@angular/forms';
 import { EventEmitterService } from '../services/event-emitter.service';
 import { SCgetQueriesService } from '../services/sc-get-queries.service';
 import { SCgetUserService } from '../services/sc-get-user.service';
@@ -61,23 +62,22 @@ export class DashboardDetailsComponent implements OnInit, OnDestroy {
 
 // User
 	private userSelected(): boolean { // tslint:disable-line
-		return this.publicData.user;
+		return (this.publicData.user) ? true : false;
 	}
 	private resetSelection(): void { // tslint:disable-line
 		for (const key of this.publicDataKeys) {
 			this.publicData[key] = '';
 		}
-		this.scUserName = '';
+		this.scUserName = new FormControl('', Validators.compose([Validators.pattern('.{3,}')]));
 		this.selectedTab = '';
 		this.selectedEndpoint = '';
-		this.userService.model.analyser_query = this.scUserName;
+		this.userService.model.analyser_query = this.scUserName.value;
 		this.userService.model.analyser_user_id = '';
 		this.userService.model.analyser_user_uri = '';
 		this.userService.saveUser();
 		this.emitter.emitEvent({appInfo: 'show'});
 	}
-	private scUserName: string = '';
-	private scUserNamePattern: any = /[*]{3,}/; // tslint:disable-line
+	private scUserName: FormControl = new FormControl('', Validators.compose([Validators.pattern('.{3,}')]));
 	private scUserNameKey(event): void { // tslint:disable-line
 		if (event.which === 13 || event.keyCode === 13 || event.key === 'Enter' || event.code === 'Enter') {
 			this.getUser();
@@ -85,13 +85,13 @@ export class DashboardDetailsComponent implements OnInit, OnDestroy {
 	}
 	private getUser(): void { // tslint:disable-line
 		this.emitSpinnerStartEvent();
-		this.scGetUserService.getData(this.scUserName).subscribe(
+		this.scGetUserService.getData(this.scUserName.value).subscribe(
 			(data) => {
 				this.emitter.emitEvent({appInfo: 'hide'});
 				this.publicData.user = data;
 				this.dismissMessages();
 				console.log('this.userService: ', this.userService);
-				this.userService.model.analyser_query = this.scUserName;
+				this.userService.model.analyser_query = this.scUserName.value;
 				this.userService.model.analyser_user_id = this.publicData.user.id;
 				this.userService.model.analyser_user_uri = this.publicData.user.uri;
 				console.log('this.userService.model update:', this.userService.model);
@@ -108,7 +108,7 @@ export class DashboardDetailsComponent implements OnInit, OnDestroy {
 		);
 	}
 	private analyseThisUser(permalink): void { // tslint:disable-line
-		this.scUserName = permalink;
+		this.scUserName.patchValue(permalink);
 		this.selectedTab = '';
 		for (const key in this.publicData) {
 			if (this.publicData[key] !== 'user') { this.publicData[key] = []; }
@@ -268,9 +268,9 @@ export class DashboardDetailsComponent implements OnInit, OnDestroy {
 		this.getQueries();
 		if (!this.userService.model.analyser_query) {
 			this.userService.restoreUser(() => {
-				this.scUserName = this.userService.model.analyser_query;
-				if (this.scUserName) {
-					console.log('restored user selection, this.scUserName:', this.scUserName);
+				this.scUserName.patchValue(this.userService.model.analyser_query);
+				if (this.scUserName.value) {
+					console.log('restored user selection, this.scUserName.value:', this.scUserName.value);
 					this.getUser();
 				} else {
 					console.log('restored user selection, user is not selected');
@@ -278,8 +278,8 @@ export class DashboardDetailsComponent implements OnInit, OnDestroy {
 				}
 			});
 		} else {
-			this.scUserName = this.userService.model.analyser_query;
-			console.log('user is selected, this.scUserName:', this.scUserName);
+			this.scUserName.patchValue(this.userService.model.analyser_query);
+			console.log('user is selected, this.scUserName.value:', this.scUserName.value);
 			this.getUser();
 		}
 		this.subscription = this.emitter.getEmitter().subscribe((message) => {
