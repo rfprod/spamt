@@ -35,7 +35,7 @@ export class DashboardDetailsComponent implements OnInit, OnDestroy {
 		followers: [],
 		followings: [],
 	};
-	private publicDataKeys = Object.keys(this.publicData);
+	private publicDataKeys: string[] = Object.keys(this.publicData);
 	public errorMessage: string;
 	public successMessage: string;
 	private dismissMessages(): void {
@@ -107,7 +107,7 @@ export class DashboardDetailsComponent implements OnInit, OnDestroy {
 			}
 		);
 	}
-	private analyseThisUser(permalink): void { // tslint:disable-line
+	private analyseThisUser(permalink: string): void { // tslint:disable-line
 		this.scUserName.patchValue(permalink);
 		this.selectedTab = '';
 		for (const key in this.publicData) {
@@ -121,7 +121,7 @@ export class DashboardDetailsComponent implements OnInit, OnDestroy {
 	private endpoints: string[] = ['tracks', 'playlists', 'favorites', 'followers', 'followings']; // tslint:disable-line
 	private selectedTab: string = '';
 	private selectedEndpoint: string = '';
-	private selectTab(tab): void { // tslint:disable-line
+	private selectTab(tab: string): void { // tslint:disable-line
 		console.log('selectTab, tab: ', tab);
 
 		if (this.audioPlayback || this.selectedTrack || this.selectedTrackURI) {
@@ -180,7 +180,7 @@ export class DashboardDetailsComponent implements OnInit, OnDestroy {
 			}
 		}
 	}
-	private orderProp = 'timestamp';
+	private orderProp: string = 'timestamp';
 	public get sortByCriterion(): string {
 		return this.orderProp;
 	}
