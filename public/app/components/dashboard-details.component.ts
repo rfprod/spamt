@@ -1,5 +1,6 @@
-import { Component, ElementRef, OnInit, OnDestroy } from '@angular/core';
+import { Component, ElementRef, ViewChild, OnInit, OnDestroy } from '@angular/core';
 import { FormControl, Validators } from '@angular/forms';
+import { MdTabGroup } from '@angular/material';
 import { EventEmitterService } from '../services/event-emitter.service';
 import { SCgetQueriesService } from '../services/sc-get-queries.service';
 import { SCgetUserService } from '../services/sc-get-user.service';
@@ -25,7 +26,10 @@ export class DashboardDetailsComponent implements OnInit, OnDestroy {
 	) {
 		console.log('this.el.nativeElement:', this.el.nativeElement);
 	}
-	private subscription: any;
+	private subscription: any = {
+		emitter: null as any,
+		tabChange: null as any
+	};
 
 	private publicData: any = {
 		user: null,
@@ -43,7 +47,7 @@ export class DashboardDetailsComponent implements OnInit, OnDestroy {
 		this.successMessage = '';
 	}
 
-// 03 popular queries
+// popular queries
 	private queries: any;
 	private getQueries(): void { // tslint:disable-line
 		this.emitSpinnerStartEvent();
@@ -66,7 +70,7 @@ export class DashboardDetailsComponent implements OnInit, OnDestroy {
 	}
 	private resetSelection(): void { // tslint:disable-line
 		for (const key of this.publicDataKeys) {
-			this.publicData[key] = '';
+			this.publicData[key] = (key === 'user') ? null : [];
 		}
 		this.scUserName = new FormControl('', Validators.compose([Validators.pattern('.{3,}')]));
 		this.selectedTab = '';
@@ -76,6 +80,9 @@ export class DashboardDetailsComponent implements OnInit, OnDestroy {
 		this.userService.model.analyser_user_uri = '';
 		this.userService.saveUser();
 		this.emitter.emitEvent({appInfo: 'show'});
+		if (this.subscription.tabGroup) {
+			this.subscription.tabGroup.unsubscribe();
+		}
 	}
 	private scUserName: FormControl = new FormControl('', Validators.compose([Validators.pattern('.{3,}')]));
 	private scUserNameKey(event): void { // tslint:disable-line
@@ -104,6 +111,7 @@ export class DashboardDetailsComponent implements OnInit, OnDestroy {
 			() => {
 				console.log('getUserService done');
 				this.emitSpinnerStopEvent();
+				this.setTabChangeListener();
 			}
 		);
 	}
@@ -117,6 +125,17 @@ export class DashboardDetailsComponent implements OnInit, OnDestroy {
 	}
 
 // Data tabs
+	@ViewChild('tabGroup') private tabGroup: MdTabGroup;
+	private setTabChangeListener(): void {
+		this.subscription.tabChange = this.tabGroup.selectChange.subscribe((message) => {
+			/*
+			*	tab change events
+			*/
+			console.log('tabs chage event:', message, '| active tab index', message.index, '| tab name', this.dataTabs[message.index]);
+			this.selectTab(this.dataTabs[message.index]);
+		});
+		this.selectTab(this.dataTabs[this.tabGroup.selectedIndex]);
+	}
 	private dataTabs: string[] = ['Tracks', 'Playlists', 'Favorites', 'Followers', 'Followings']; // tslint:disable-line
 	private endpoints: string[] = ['tracks', 'playlists', 'favorites', 'followers', 'followings']; // tslint:disable-line
 	private selectedTab: string = '';
@@ -303,7 +322,7 @@ export class DashboardDetailsComponent implements OnInit, OnDestroy {
 			console.log('user is selected, this.scUserName.value:', this.scUserName.value);
 			this.getUser();
 		}
-		this.subscription = this.emitter.getEmitter().subscribe((message) => {
+		this.subscription.emitter = this.emitter.getEmitter().subscribe((message) => {
 			/*
 			*	listen to help toggler messages
 			*/
@@ -323,6 +342,9 @@ export class DashboardDetailsComponent implements OnInit, OnDestroy {
 	}
 	public ngOnDestroy(): void {
 		console.log('ngOnDestroy: DashboardDetailsComponent destroyed');
-		this.subscription.unsubscribe();
+		this.subscription.emitter.unsubscribe();
+		if (this.subscription.tabGroup) {
+			this.subscription.tabGroup.unsubscribe();
+		}
 	}
 }
