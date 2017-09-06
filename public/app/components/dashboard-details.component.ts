@@ -127,6 +127,7 @@ export class DashboardDetailsComponent implements OnInit, OnDestroy {
 // Data tabs
 	@ViewChild('tabGroup') private tabGroup: MdTabGroup;
 	private setTabChangeListener(): void {
+		this.tabGroup.selectedIndex = 0;
 		this.subscription.tabChange = this.tabGroup.selectChange.subscribe((message) => {
 			/*
 			*	tab change events

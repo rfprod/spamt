@@ -95,56 +95,41 @@
 	<div fxFlex="75" id="scroll-content">
 		<legend>Data</legend>
 
+		<span *ngIf="!userSelected()">
+			<div id="instructions">
+				input <a href="https://soundcloud.com" target=_blank><i class="fa fa-external-link"></i> soundcloud</a> user name to be able to request data, or select one from the following list
+			</div>
+			<div id="queries-flex" *ngIf="queries">
+				<a fxFlex md-button class="mat-primary" *ngFor="let q of queries.data" (click)="analyseThisUser(q.name)">{{q.name}}</a>
+			</div>
+		</span>
+
+		<div id="filters" *ngIf="selectedTab !== ''">
+			<span class="flex-item">
+				<span class="input-label"><i class="fa fa-search" aria-hidden="true"></i> Search:</span>
+				<input [(ngModel)]="filterSearchQuery" class="form-control">
+			</span>
+			<span class="flex-item">
+				<span class="input-label"><i class="fa fa-sort" aria-hidden="true"></i> Sort by:</span>
+				<select [(ngModel)]="sortByCriterion" class="form-control">
+					<option value="name">Alphabetical</option>
+					<option value="timestamp">Timestamp</option>
+				</select>
+			</span>
+		</div>
+
+		<audio controls="controls" *ngIf="selectedTrack" audioPlayer>
+			<source src="{{selectedTrack}}" type="audio/mpeg">
+			Error: Your browser does not support <code>audio</code> element.
+		</audio>
+
 		<md-tab-group fxHide="{{!userSelected()}}" #tabGroup>
 			<md-tab *ngFor="let tab of dataTabs; let i = index">
 				<ng-template md-tab-label>
-					<span [ngClass]="{ 'active': tab === selectedTab }">{{tab}}</span>
+					<strong>{{tab}}</strong>
 				</ng-template>
-				<div class="tab-body">
-					tab body {{i}}
-				</div>
-			</md-tab>
-		</md-tab-group>
 
-		<span *ngIf="userSelected()">
-			<span role="navigation">
-				<ul class="nav nav-tabs nav-justified">
-					<li role="presentation" *ngFor="let tab of dataTabs" [ngClass]="{ 'active': tab === selectedTab }">
-						<a (click)="selectTab(tab)">{{tab}}</a>
-					</li>
-				</ul>
-			</span>
-			<div *ngIf="selectedTab === ''">
-				<ul class="nav nav-tabs nav-justified">
-					<li role="presentation" *ngFor="let tab of dataTabs" class="text-center">
-						<i class="glyphicon glyphicon-chevron-up"></i>
-					</li>
-				</ul>
-				<p class="text-center">select tab</p>
-			</div>
-			<div id="filters" *ngIf="selectedTab !== ''">
-				<span class="flex-item">
-					<span class="input-label"><i class="fa fa-search" aria-hidden="true"></i> Search:</span>
-					<input [(ngModel)]="filterSearchQuery" class="form-control">
-				</span>
-				<span class="flex-item">
-					<span class="input-label"><i class="fa fa-sort" aria-hidden="true"></i> Sort by:</span>
-					<select [(ngModel)]="sortByCriterion" class="form-control">
-						<option value="name">Alphabetical</option>
-						<option value="timestamp">Timestamp</option>
-					</select>
-				</span>
-			</div>
-
-			<audio controls="controls" *ngIf="selectedTrack" audioPlayer>
-				<source src="{{selectedTrack}}" type="audio/mpeg">
-				Error: Your browser does not support <code>audio</code> element.
-			</audio>
-
-			<div id="data" class="panel panel-default">
-
-				<div class="panel-body" *ngIf="selectedTab === dataTabs[0]">
-
+				<div class="tab-body data" *ngIf="tab === dataTabs[0]">
 					<div class="media" *ngFor="let track of publicData.tracks" [ngClass]="{ 'selected-track': selectedTrackURI ===  track.stream_url }">
 						<div class="media-left">
 							<a (click)="playTrack(track.stream_url)">
@@ -185,7 +170,7 @@
 					</div>
 				</div>
 
-				<div class="panel-body" *ngIf="selectedTab === dataTabs[1]">
+				<div class="tab-body data" *ngIf="tab === dataTabs[1]">
 					<div class="media" *ngFor="let playlist of publicData.playlists; let j = index;">
 						<div class="media-left">
 							<img class="media-object" [src]="playlist.artwork_url">
@@ -237,7 +222,7 @@
 					</div>
 				</div>
 
-				<div class="panel-body" *ngIf="selectedTab === dataTabs[2]">
+				<div class="tab-body data" *ngIf="tab === dataTabs[2]">
 
 					<div class="media" *ngFor="let track of publicData.favorites" [ngClass]="{ 'selected-track': selectedTrackURI ===  track.stream_url }">
 						<div class="media-left">
@@ -276,7 +261,7 @@
 					</div>
 				</div>
 
-				<div class="panel-body" *ngIf="selectedTab === dataTabs[3]">
+				<div class="tab-body data" *ngIf="tab === dataTabs[3]">
 					<div class="media" *ngFor="let user of publicData.followers">
 						<div class="media-left">
 							<a [href]="user.permalink_url" target=_blank>
@@ -324,7 +309,7 @@
 					</div>
 				</div>
 
-				<div class="panel-body" *ngIf="selectedTab === dataTabs[4]">
+				<div class="tab-body data" *ngIf="tab === dataTabs[4]">
 					<div class="media" *ngFor="let user of publicData.followings">
 						<div class="media-left">
 							<a [href]="user.permalink_url" target=_blank>
@@ -371,15 +356,7 @@
 						</div>
 					</div>
 				</div>
-			</div>
-		</span>
-		<span *ngIf="!userSelected()">
-			<div id="instructions">
-				input <a href="https://soundcloud.com" target=_blank><i class="fa fa-external-link"></i> soundcloud</a> user name to be able to request data, or select one from the following list
-			</div>
-			<div id="queries-flex" *ngIf="queries">
-				<a fxFlex md-button class="mat-primary" *ngFor="let q of queries.data" (click)="analyseThisUser(q.name)">{{q.name}}</a>
-			</div>
-		</span>
+			</md-tab>
+		</md-tab-group>
 	</div>
 </div>
