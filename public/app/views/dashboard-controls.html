@@ -32,13 +32,13 @@
 	</div>
 
 	<form id="auth-form" fxFlex fxLayout="column" fxLayoutAlign="start stretch" [formGroup]="authForm" (ngSubmit)="login()" *ngIf="!userService.model.user_token && activate.form" novalidate>
-		<md-input-container>
+		<md-form-field class="full-width">
 			<input mdInput type="email" id="email" name="email" [formControl]="authForm.controls.email" pattern="^[\w%+-]+@[\w.-]+" title="email" placeholder="email" required />
 			<md-icon mdSuffix class="material-icons">email</md-icon>
 			<md-error *ngIf="!authForm.controls.email.error">
 				Invalid value, should be email
 			</md-error>
-		</md-input-container>
+		</md-form-field>
 		<div fxLayout="row" fxLayoutAlign="start stretch" class="controls">
 			<span fxFlex="1 1 auto"></span>
 			<span fxFlex="0 1 auto" *ngIf="authForm.controls.email.value">

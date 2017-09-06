@@ -18,14 +18,14 @@
 	<div fxFlex="25" fxFlex.xs="0 1 auto" fxFlex.sm="0 1 auto">
 		<legend>User</legend>
 		<div fxLayout="row" fxLayoutAlign="center center">
-			<md-input-container>
+			<md-form-field>
 				<span mdPrefix class="mat-caption" fxHide.xs="false" fxHide.gt-xs="true" fxHide.md="false" title="https://soundcloud.com/... finish the link"><i class="fa fa-link"></i> &nbsp;</span>
 				<span mdPrefix class="mat-caption" fxHide.xs="true" fxHide.md="true">https://soundcloud.com/ &nbsp;</span>
 				<input mdInput type="text" id="scUserName" name="scUserName" [formControl]="scUserName" title="username" placeholder="username" (keyup)="scUserNameKey($event)" [readonly]="userSelected()" />
 				<md-error *ngIf="scUserName.hasError('pattern')">
 					must be at least 3 characters long
 				</md-error>
-			</md-input-container>
+			</md-form-field>
 			<button md-button [ngClass]="{ 'danger-bg': (!scUserName.value || scUserName.hasError('pattern')), 'success-bg': (scUserName.value && !scUserName.hasError('pattern')) }" (click)="getUser()" [disabled]="!scUserName.value || scUserName.hasError('pattern')" *ngIf="!userSelected()" mdTooltip="Get public data">GET</button>
 			<button md-button class="danger-bg" (click)="resetSelection()" *ngIf="userSelected()" mdTooltip="Reset username and data">RESET</button>
 		</div>

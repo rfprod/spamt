@@ -20,6 +20,8 @@ $boxPadding: 0.5em;
 .danger-bg { background: $danger; }
 .success-bg { background: $success; }
 
+.full-width { width: 100%; }
+
 
 /* required in case of self hosting of material-design-icons */
 	@font-face {
