@@ -222,7 +222,7 @@ gulp.task('watch', () => {
 	gulp.watch('./public/app/scss/*.scss', ['sass-autoprefix-minify-css']); // watch app css changes, pack css, minify and put in respective folder
 	gulp.watch(['./test/server/test.js'], ['server-test']); // watch server tests changes and run tests
 	gulp.watch(['./app/**', './public/js/*.js', './*.js', './.eslintignore', './.eslintrc.json'], ['eslint']); // watch js files to be linted or eslint config and lint on change
-	gulp.watch(['./public/app/*.ts', './public/app/**/*.ts', './tslint.json'], ['tslint']); // watch ts files to be linted or tslint config and lint on change
+	gulp.watch(['./public/app/*.ts', './public/app/**/*.ts', './test/client/**/*.ts', './tslint.json'], ['tslint']); // watch ts files to be linted or tslint config and lint on change
 });
 
 gulp.task('watch-and-lint', () => {
