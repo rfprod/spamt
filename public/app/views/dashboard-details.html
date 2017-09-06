@@ -95,13 +95,13 @@
 	<div fxFlex="75" id="scroll-content">
 		<legend>Data</legend>
 
-		<md-tab-group *ngIf="userSelected()">
-			<md-tab *ngFor="let tab of dataTabs">
+		<md-tab-group fxHide="{{!userSelected()}}" #tabGroup>
+			<md-tab *ngFor="let tab of dataTabs; let i = index">
 				<ng-template md-tab-label>
-					{{tab}}
+					<span [ngClass]="{ 'active': tab === selectedTab }">{{tab}}</span>
 				</ng-template>
 				<div class="tab-body">
-					tab body {{index}}
+					tab body {{i}}
 				</div>
 			</md-tab>
 		</md-tab-group>
