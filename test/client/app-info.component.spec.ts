@@ -29,7 +29,7 @@ describe('AppInfoComponent', () => {
 			expect(typeof c.subscription === 'undefined').toBeTruthy();
 			expect(c.hideInfo).toBeDefined();
 			expect(c.hideInfo).toEqual(jasmine.any(Boolean));
-			expect(c.hideInfo).toEqual(true);
+			expect(c.hideInfo).toEqual(false);
 			expect(c.badges).toBeDefined();
 			expect(c.badges).toEqual(jasmine.any(Array));
 			expect(c.badges.length).toEqual(4);
@@ -64,7 +64,7 @@ describe('AppInfoComponent', () => {
 			const c = this.component;
 			expect(typeof c.subscription === 'undefined').toBeTruthy();
 			c.ngOnInit();
-			expect(c.hideInfo).toEqual(true);
+			expect(c.hideInfo).toEqual(false);
 			expect(typeof c.subscription === 'undefined').toBeFalsy();
 			c.emitter.emitEvent({appInfo: 'show'});
 			expect(c.hideInfo).toEqual(false);
