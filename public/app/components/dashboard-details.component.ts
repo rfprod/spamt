@@ -166,26 +166,46 @@ export class DashboardDetailsComponent implements OnInit, OnDestroy {
 
 // Filters
 	private filterSearchValue: string;
-	get filterSearchQuery(): string {
+	public get filterSearchQuery(): string {
 		return this.filterSearchValue;
 	}
-	set filterSearchQuery(val) {
-		this.emitFilterSearchValueChangeEvent(val);
-	}
-	private emitFilterSearchValueChangeEvent(val): void {
-		// console.log('labelSearchValue changed to:', val);
-		this.emitter.emitEvent({search: val});
+	public set filterSearchQuery(val: string) {
+		this.filterSearchValue = val;
+		const domTitleObjects = this.el.nativeElement.querySelectorAll('#data')[this.dataTabs.indexOf(this.selectedTab)].querySelectorAll('.media-heading');
+		for (const domObj of domTitleObjects) {
+			if (domObj.innerHTML.toLowerCase().indexOf(val.toLowerCase()) !== -1) {
+				domObj.parentElement.parentElement.style.display = 'block';
+			} else {
+				domObj.parentElement.parentElement.style.display = 'none';
+			}
+		}
 	}
 	private orderProp = 'timestamp';
-	get sortByCriterion(): string {
+	public get sortByCriterion(): string {
 		return this.orderProp;
 	}
-	set sortByCriterion(val) {
-		this.emitOrderPropChangeEvent(val);
-	}
-	private emitOrderPropChangeEvent(val): void {
-		// console.log('orderProp changed to:', val);
-		this.emitter.emitEvent({sort: val});
+	public set sortByCriterion(val: string) {
+		this.orderProp = val;
+		if (val === 'timestamp') {
+			this.publicData[this.selectedEndpoint].sort((a, b) => {
+				if (this.selectedEndpoint === 'followers' || this.selectedEndpoint === 'followings') {
+					return new Date(b.last_modified).getTime() - new Date(a.last_modified).getTime();
+				}
+				return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+			});
+		}
+		if (val === 'name') {
+			this.publicData[this.selectedEndpoint].sort((a, b) => {
+				if (this.selectedEndpoint === 'followers' || this.selectedEndpoint === 'followings') {
+					if (a.username < b.username) { return -1; }
+					if (a.username > b.username) { return 1; }
+				} else {
+					if (a.title < b.title) { return -1; }
+					if (a.title > b.title) { return 1; }
+				}
+				return 0;
+			});
+		}
 	}
 
 // Spinner
@@ -260,6 +280,7 @@ export class DashboardDetailsComponent implements OnInit, OnDestroy {
 // Help
 	private showHelp: boolean = false; // controls help labells visibility, catches events from nav component
 
+// Lifecycle
 	public ngOnInit(): void {
 		console.log('ngOnInit: DashboardDetailsComponent initialized');
 		this.emitSpinnerStartEvent();
@@ -284,42 +305,8 @@ export class DashboardDetailsComponent implements OnInit, OnDestroy {
 		}
 		this.subscription = this.emitter.getEmitter().subscribe((message) => {
 			/*
-			*	listen to filtering messages
+			*	listen to help toggler messages
 			*/
-			if (message.search || message.search === '') {
-				console.log('/data consuming message:', message);
-				const domTitleObjects = this.el.nativeElement.querySelectorAll('#data')[this.dataTabs.indexOf(this.selectedTab)].querySelectorAll('.media-heading');
-				for (const domObj of domTitleObjects) {
-					if (domObj.innerHTML.toLowerCase().indexOf(message.search.toLowerCase()) !== -1) {
-						domObj.parentElement.parentElement.style.display = 'block';
-					} else {
-						domObj.parentElement.parentElement.style.display = 'none';
-					}
-				}
-			}
-			if (message.sort) {
-				console.log('/data consuming message:', message);
-				if (message.sort === 'timestamp') {
-					this.publicData[this.selectedEndpoint].sort((a, b) => {
-						if (this.selectedEndpoint === 'followers' || this.selectedEndpoint === 'followings') {
-							return new Date(b.last_modified).getTime() - new Date(a.last_modified).getTime();
-						}
-						return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
-					});
-				}
-				if (message.sort === 'name') {
-					this.publicData[this.selectedEndpoint].sort((a, b) => {
-						if (this.selectedEndpoint === 'followers' || this.selectedEndpoint === 'followings') {
-							if (a.username < b.username) { return -1; }
-							if (a.username > b.username) { return 1; }
-						} else {
-							if (a.title < b.title) { return -1; }
-							if (a.title > b.title) { return 1; }
-						}
-						return 0;
-					});
-				}
-			}
 			if (message.help === 'toggle') {
 				console.log('/data consuming event:', message, ' | toggling help labels visibility');
 				this.showHelp = (this.showHelp) ? false : true;
