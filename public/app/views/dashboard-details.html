@@ -130,231 +130,272 @@
 				</ng-template>
 
 				<div class="tab-body data" *ngIf="tab === dataTabs[0]">
-					<div class="media" *ngFor="let track of publicData.tracks" [ngClass]="{ 'selected-track': selectedTrackURI ===  track.stream_url }">
-						<div class="media-left">
-							<a (click)="playTrack(track.stream_url)">
-								<img class="media-object" [src]="track.artwork_url">
-							</a>
-							<div class="label label-default">{{track.genre}}</div>
-							<div class="label label-default">{{track.license}}</div>
-						</div>
-						<div class="media-body">
-							<div class="label label-default pull-right">{{track.created_at | date:'yyyy-MM-dd'}}</div>
-							<h4 class="media-heading">{{track.title}}</h4>
-							<span class="waveform-container">
-								<div class="underlay" *ngIf="selectedTrackURI === track.stream_url"></div>
-								<img class="waveform" [src]="track.waveform_url">
-							</span>
-							<span class="controls">
-								<a (click)="playTrack(track.stream_url)" class="flex-item">
-									<i class="glyphicon glyphicon-pause" *ngIf="audioPlayback && selectedTrackURI ===  track.stream_url"></i>
-									<i class="glyphicon glyphicon-play" *ngIf="!audioPlayback || (audioPlayback && selectedTrackURI !==  track.stream_url)"></i> {{track.playback_count}}
-								</a>
-								<span class="flex-item">
-									<i class="glyphicon glyphicon-time"></i> {{track.duration | duration}}
+					<md-card *ngFor="let track of publicData.tracks" [ngClass]="{ 'selected-track': selectedTrackURI ===  track.stream_url }">
+						<md-card-content fxLayout="row">
+							<div fxFlex="18" fxFlex.xs="25" fxLayout="column" fxLayoutAlign="start center">
+								<div class="cover-image-container" fxFlex="0 1 auto">
+									<img class="cover-image" [src]="track.artwork_url" (click)="playTrack(track.stream_url)" mdTooltip="Play / Pause">
+								</div>
+								<div fxFlex="0 1 auto" class="mat-caption center-text">{{track.genre}}</div>
+								<div fxFlex="0 1 auto" class="mat-caption center-text">{{track.license}}</div>
+							</div>
+							<div fxFlex fxLayout="column" fxLayoutAlign="start stretch">
+								<span fxFlex class="mat-caption">{{track.created_at | date:'yyyy-MM-dd'}}</span>
+								<h4 fxFlex class="mat-h4">{{track.title}}</h4>
+								<span fxFlex class="waveform-container">
+									<div class="underlay" *ngIf="selectedTrackURI === track.stream_url"></div>
+									<img class="waveform" [src]="track.waveform_url">
 								</span>
-								<a (click)="downloadTrack(track.download_url)" class="flex-item" *ngIf="track.downloadable">
-									<i class="glyphicon glyphicon-save"></i>
-								</a>
-								<a [href]="track.purchase_url" target=_blank class="flex-item" *ngIf="track.purchase_url">
-									<i class="glyphicon glyphicon-shopping-cart"></i>
-								</a>
-								<span class="flex-item">
-									<i class="glyphicon glyphicon-heart"></i> {{track.favoritings_count}}
+								<span class="controls" fxLayout="row" fxLayoutAlign="start stretch">
+									<a (click)="playTrack(track.stream_url)" mdTooltip="Play / Pause" fxFlex fxLayout="column" fxLayoutAlign="start center">
+										<i class="fa fa-pause" *ngIf="audioPlayback && selectedTrackURI ===  track.stream_url" fxFlex></i>
+										<i class="fa fa-play" *ngIf="!audioPlayback || (audioPlayback && selectedTrackURI !==  track.stream_url)" fxFlex></i>
+										<span fxFlex class="mat-caption">{{track.playback_count}}</span>
+									</a>
+									<span fxFlex fxLayout="column" fxLayoutAlign="start center">
+										<i class="fa fa-clock-o" fxFlex></i>
+										<span fxFlex class="mat-caption">{{track.duration | duration}}</span>
+									</span>
+									<a (click)="downloadTrack(track.download_url)" *ngIf="track.downloadable" mdTooltip="Download" fxFlex fxLayout="column" fxLayoutAlign="start center">
+										<i class="fa fa-download" fxFlex></i>
+									</a>
+									<a [href]="track.purchase_url" target=_blank *ngIf="track.purchase_url" mdTooltip="{{ track.purchase_title }}" fxFlex fxLayout="column" fxLayoutAlign="start center">
+										<i class="fa fa-download" fxFlex></i>
+									</a>
+									<span fxFlex fxHide.xs="true" fxLayout="column" fxLayoutAlign="start center">
+										<i class="fa fa-heart" fxFlex></i>
+										<span fxFlex class="mat-caption">{{track.favoritings_count}}</span>
+									</span>
+									<span fxFlex fxHide.xs="true" fxLayout="column" fxLayoutAlign="start center">
+										<i class="fa fa-comments-o" fxFlex></i>
+										<span fxFlex class="mat-caption">{{track.comment_count}}</span>
+									</span>
 								</span>
-								<span class="flex-item">
-									<i class="glyphicon glyphicon-comment"></i> {{track.comment_count}}
-								</span>
-							</span>
-						</div>
-					</div>
+							</div>
+						</md-card-content>
+					</md-card>
 				</div>
 
 				<div class="tab-body data" *ngIf="tab === dataTabs[1]">
-					<div class="media" *ngFor="let playlist of publicData.playlists; let j = index;">
-						<div class="media-left">
-							<img class="media-object" [src]="playlist.artwork_url">
-							<div class="label label-default">{{playlist.genre}}</div>
-							<div class="label label-default">{{playlist.license}}</div>
-						</div>
-						<div class="media-body">
-							<div class="label label-default pull-right">{{playlist.created_at | date:'yyyy-MM-dd'}}</div>
-							<h4 class="media-heading">{{playlist.title}}</h4>
-							<span class="description-container" contenteditable="false">
-								{{playlist.description}}
-							</span>
-							<span class="controls">
-								<a (click)="togglePlaylist(j)" class="flex-item">
-									<i class="glyphicon glyphicon-music"></i> {{playlist.track_count}}
-								</a>
-								<span class="flex-item">
-									<i class="glyphicon glyphicon-time"></i> {{playlist.duration | duration}}
+					<md-card *ngFor="let playlist of publicData.playlists; let j = index;">
+						<md-card-content fxLayout="row">
+							<div fxFlex="18" fxFlex.xs="25" fxLayout="column" fxLayoutAlign="start center">
+								<div class="cover-image-container" fxFlex="0 1 auto">
+									<img class="cover-image" [src]="playlist.artwork_url" (click)="togglePlaylist(j)" mdTooltip="Toggle playlist">
+								</div>
+								<div fxFlex="0 1 auto" class="mat-caption center-text">{{playlist.genre}}</div>
+								<div fxFlex="0 1 auto" class="mat-caption center-text">{{playlist.license}}</div>
+							</div>
+							<div fxFlex fxLayout="column" fxLayoutAlign="start stretch">
+								<span fxFlex class="mat-caption">{{playlist.created_at | date:'yyyy-MM-dd'}}</span>
+								<h4 fxFlex class="mat-h4">{{playlist.title}}</h4>
+								<span fxFlex class="description-container">{{playlist.description}}</span>
+								<span class="controls" fxLayout="row" fxLayoutAlign="start stretch">
+									<a (click)="togglePlaylist(j)" fxFlex fxLayout="column" fxLayoutAlign="start center" mdTooltip="Toggle playlist">
+										<i class="fa fa-music" fxFlex></i>
+										<span fxFlex>{{playlist.track_count}}</span>
+									</a>
+									<span fxFlex fxLayout="column" fxLayoutAlign="start center">
+										<i class="fa fa-clock-o" fxFlex></i>
+										<span fxFlex>{{playlist.duration | duration}}</span>
+									</span>
+									<a [href]="playlist.permalink_url" target=_blank fxFlex fxLayout="column" fxLayoutAlign="start center" mdTooltip="Open Soundcloud playlist in a new tab">
+										<i class="fa fa-external-link" fxFlex></i>
+									</a>
+									<span *ngIf="playlist.label_name" fxFlex fxLayout="column" fxLayoutAlign="start center">
+										<i class="fa fa-tag" fxFlex></i>
+										<span fxFlex>{{playlist.label_name}}</span>
+									</span>
+									<span *ngIf="playlist.release_year && playlist.release_month && playlist.release_day" fxFlex fxLayout="column" fxLayoutAlign="start center">
+										<i class="fa fa-calendar" fxFlex></i>
+										<span fxFlex>{{playlist.release_year}}-{{playlist.release_month}}-{{playlist.release_day}}</span>
+									</span>
 								</span>
-								<a [href]="playlist.permalink_url" target=_blank class="flex-item">
-									<i class="glyphicon glyphicon-new-window"></i>
-								</a>
-								<span class="flex-item" *ngIf="playlist.label_name">
-									<i class="glyphicon glyphicon-tag"></i> {{playlist.label_name}}
-								</span>
-								<span class="flex-item" *ngIf="playlist.release_year && playlist.release_month && playlist.release_day">
-									<i class="glyphicon glyphicon-calendar"></i> {{playlist.release_year}}-{{playlist.release_month}}-{{playlist.release_day}}
-								</span>
-							</span>
-							<table class="table table-condensed table-hover playlist-tracks" *ngIf="displayPlaylistTracks[j]">
-								<thead>
-									<tr>
-										<th>#</th>
-										<th>Title</th>
-										<th>Genre</th>
-										<th>Duration</th>
-									</tr>
-								</thead>
-								<tbody>
-									<tr *ngFor="let playlistTrack of playlist.tracks; let i = index;">
-										<td>{{i}}</td>
-										<td>{{playlistTrack.title}}</td>
-										<td>{{playlistTrack.genre}}</td>
-										<td>{{playlistTrack.duration | duration}}</td>
-									</tr>
-								</tbody>
-							</table>
-						</div>
-					</div>
+								<table *ngIf="displayPlaylistTracks[j]">
+									<thead>
+										<tr>
+											<th>#</th>
+											<th>Title</th>
+											<th>Genre</th>
+											<th>Duration</th>
+										</tr>
+									</thead>
+									<tbody>
+										<tr *ngFor="let playlistTrack of playlist.tracks; let i = index;">
+											<td>{{i}}</td>
+											<td>{{playlistTrack.title}}</td>
+											<td>{{playlistTrack.genre}}</td>
+											<td>{{playlistTrack.duration | duration}}</td>
+										</tr>
+									</tbody>
+								</table>
+							</div>
+						</md-card-content>
+					</md-card>
 				</div>
 
 				<div class="tab-body data" *ngIf="tab === dataTabs[2]">
 
-					<div class="media" *ngFor="let track of publicData.favorites" [ngClass]="{ 'selected-track': selectedTrackURI ===  track.stream_url }">
-						<div class="media-left">
-							<a (click)="playTrack(track.stream_url)">
-								<img class="media-object" [src]="track.artwork_url">
-							</a>
-							<div class="label label-default">{{track.genre}}</div>
-							<div class="label label-default">{{track.license}}</div>
-						</div>
-						<div class="media-body">
-							<div class="label label-default pull-right">{{track.created_at | date:'yyyy-MM-dd'}}</div>
-							<h4 class="media-heading">{{track.title}}</h4>
-							<span class="waveform-container">
-								<div class="underlay" *ngIf="selectedTrackURI === track.stream_url"></div>
-								<img class="waveform" [src]="track.waveform_url">
-							</span>
-							<span class="controls">
-								<a class="flex-item" (click)="playTrack(track.stream_url)">
-									<i class="glyphicon glyphicon-pause" *ngIf="audioPlayback && selectedTrackURI ===  track.stream_url"></i>
-									<i class="glyphicon glyphicon-play" *ngIf="!audioPlayback || (audioPlayback && selectedTrackURI !==  track.stream_url)"></i> {{track.playback_count}}
-								</a>
-								<a class="flex-item" (click)="downloadTrack(track.download_url)" *ngIf="track.downloadable">
-									<i class="glyphicon glyphicon-save"></i>
-								</a>
-								<a [href]="track.purchase_url" target=_blank class="flex-item" *ngIf="track.purchase_url">
-									<i class="glyphicon glyphicon-shopping-cart"></i>
-								</a>
-								<span class="flex-item">
-									<i class="glyphicon glyphicon-heart"></i> {{track.favoritings_count}}
+					<md-card *ngFor="let track of publicData.favorites" [ngClass]="{ 'selected-track': selectedTrackURI ===  track.stream_url }">
+						<md-card-content fxLayout="row">
+							<div fxFlex="18" fxFlex.xs="25" fxLayout="column" fxLayoutAlign="start center">
+								<div class="cover-image-container" fxFlex="0 1 auto">
+									<img class="cover-image" [src]="track.artwork_url" (click)="playTrack(track.stream_url)" mdTooltip="Play / Pause">
+								</div>
+								<div fxFlex="0 1 auto" class="mat-caption center-text">{{track.genre}}</div>
+								<div fxFlex="0 1 auto" class="mat-caption center-text">{{track.license}}</div>
+							</div>
+							<div fxFlex fxLayout="column" fxLayoutAlign="start stretch">
+								<span fxFlex class="mat-caption">{{track.created_at | date:'yyyy-MM-dd'}}</span>
+								<h4 fxFlex class="mat-h4">{{track.title}}</h4>
+								<span fxFlex class="waveform-container">
+									<div class="underlay" *ngIf="selectedTrackURI === track.stream_url"></div>
+									<img class="waveform" [src]="track.waveform_url">
 								</span>
-								<span class="flex-item">
-									<i class="glyphicon glyphicon-comment"></i> {{track.comment_count}}
+								<span class="controls" fxLayout="row" fxLayoutAlign="start stretch">
+									<a (click)="playTrack(track.stream_url)" mdTooltip="Play / Pause" fxFlex fxLayout="column" fxLayoutAlign="start center">
+										<i fxFlex class="fa fa-pause" *ngIf="audioPlayback && selectedTrackURI ===  track.stream_url"></i>
+										<i fxFlex class="fa fa-play" *ngIf="!audioPlayback || (audioPlayback && selectedTrackURI !==  track.stream_url)"></i>
+										<span fxFlex class="mat-caption">{{track.playback_count}}</span>
+									</a>
+									<a (click)="downloadTrack(track.download_url)" *ngIf="track.downloadable" mdTooltip="Download" fxFlex fxLayout="column" fxLayoutAlign="start center">
+										<i fxFlex class="fa fa-download"></i>
+									</a>
+									<a [href]="track.purchase_url" target=_blank *ngIf="track.purchase_url" mdTooltip="{{ track.purchase_title }}" fxFlex fxLayout="column" fxLayoutAlign="start center">
+										<i class="fa fa-download" fxFlex></i>
+									</a>
+									<span fxFlex fxLayout="column" fxLayoutAlign="start center">
+										<i class="fa fa-heart" fxFlex></i>
+										<span fxFlex class="mat-caption">{{track.favoritings_count}}</span>
+									</span>
+									<span fxFlex fxLayout="column" fxLayoutAlign="start center">
+										<i class="fa fa-comments-o" fxFlex></i>
+										<span fxFlex class="mat-caption">{{track.comment_count}}</span>
+									</span>
 								</span>
-							</span>
-						</div>
-					</div>
+							</div>
+						</md-card-content>
+					</md-card>
 				</div>
 
 				<div class="tab-body data" *ngIf="tab === dataTabs[3]">
-					<div class="media" *ngFor="let user of publicData.followers">
-						<div class="media-left">
-							<a [href]="user.permalink_url" target=_blank>
-								<img class="media-object" [src]="user.avatar_url">
-							</a>
-							<div class="label label-default">{{user.plan}}</div>
-							<div class="label" [ngClass]="{ 'label-success': user.online, 'label-danger': !user.online }">online</div>
-						</div>
-						<div class="media-body">
-							<div class="label label-default pull-right">{{user.last_modified | date:'yyyy-MM-dd'}}</div>
-							<h4 class="media-heading">{{user.username}}</h4>
-							<span class="description-container" contenteditable="false">
-								{{user.description}}
-							</span>
-							<span class="controls">
-								<span class="flex-item">
-									<i class="glyphicon glyphicon-music"></i> {{user.track_count}}
-								</span>
-								<span class="flex-item">
-									<i class="glyphicon glyphicon-th-list"></i> {{user.playlist_count}}
-								</span>
-								<span class="flex-item">
-									<i class="glyphicon glyphicon-heart"></i> {{user.public_favorites_count}}
-								</span>
-								<span class="flex-item">
-									<i class="glyphicon glyphicon-retweet"></i> {{user.reposts_count}}
-								</span>
-								<span class="flex-item">
-									<i class="glyphicon glyphicon-comment"></i> {{user.comments_count}}
-								</span>
-								<span class="flex-item">
-									<i class="glyphicon glyphicon-user"></i><i class="glyphicon glyphicon-arrow-up"></i> {{user.followers_count}}
-								</span>
-								<span class="flex-item">
-									<i class="glyphicon glyphicon-user"></i><i class="glyphicon glyphicon-arrow-down"></i> {{user.followings_count}}
-								</span>
-								<a class="flex-item" [href]="user.website" *ngIf="user.website && user.website_title">
-									<i class="glyphicon glyphicon-link"></i> {{user.website_title}}
+					<md-card *ngFor="let user of publicData.followers">
+						<md-card-content fxLayout="row">
+							<div fxFlex="18" fxFlex.xs="25" fxLayout="column" fxLayoutAlign="start center">
+								<a class="cover-image-container" [href]="user.permalink_url" target=_blank fxFlex="0 1 auto" mdTooltip="Open Soundcloud profile in a new tab">
+									<img class="cover-image" [src]="user.avatar_url">
 								</a>
-								<a class="flex-item" (click)="analyseThisUser(user.permalink)">
-									<i class="glyphicon glyphicon-search"></i>
-								</a>
-							</span>
-						</div>
-					</div>
+								<div fxFlex="0 1 auto" class="mat-caption center-text">{{user.plan}}</div>
+								<div fxFlex="0 1 auto" class="mat-caption center-text" [ngClass]="{ 'label-success': user.online, 'label-danger': !user.online }">&nbsp;online&nbsp;</div>
+							</div>
+							<div fxFlex fxLayout="column" fxLayoutAlign="start stretch">
+								<span fxFlex class="mat-caption">{{user.last_modified | date:'yyyy-MM-dd'}}</span>
+								<h4 fxFlex class="mat-h4">{{user.username}}</h4>
+								<span fxFlex class="description-container">{{user.description}}</span>
+								<span class="controls" fxLayout="row" fxLayoutAlign="start stretch">
+									<span fxFlex fxLayout="column" fxLayoutAlign="start center">
+										<i class="fa fa-music" fxFlex></i>
+										<span fxFlex class="mat-caption">{{user.track_count}}</span>
+									</span>
+									<span fxFlex fxLayout="column" fxLayoutAlign="start center">
+										<i class="fa fa-th-list" fxFlex></i>
+										<span fxFlex class="mat-caption">{{user.playlist_count}}</span>
+									</span>
+									<span fxFlex fxLayout="column" fxLayoutAlign="start center">
+										<i class="fa fa-heart" fxFlex></i>
+										<span fxFlex class="mat-caption">{{user.public_favorites_count}}</span>
+									</span>
+									<span fxFlex fxLayout="column" fxLayoutAlign="start center">
+										<i class="fa fa-retweet" fxFlex></i>
+										<span fxFlex class="mat-caption">{{user.reposts_count}}</span>
+									</span>
+									<span fxFlex fxLayout="column" fxLayoutAlign="start center">
+										<i class="fa fa-comments-o" fxFlex></i>
+										<span fxFlex class="mat-caption">{{user.comments_count}}</span>
+									</span>
+									<span fxFlex fxLayout="column" fxLayoutAlign="start center">
+										<span fxFlex>
+											<i class="fa fa-user"></i><i class="fa fa-arrow-up"></i>
+										</span>
+										<span fxFlex class="mat-caption">{{user.followers_count}}</span>
+									</span>
+									<span fxFlex fxLayout="column" fxLayoutAlign="start center">
+										<span fxFlex>
+											<i class="fa fa-user"></i><i class="fa fa-arrow-down"></i>
+										</span>
+										<span fxFlex class="mat-caption">{{user.followings_count}}</span>
+									</span>
+									<a [href]="user.website" *ngIf="user.website && user.website_title" mdTooltip="Open website in a new tab" fxFlex fxLayout="column" fxLayoutAlign="start center">
+										<i class="fa fa-link" fxFlex></i>
+										<span fxFlex class="mat-caption center-text">{{user.website_title}}</span>
+									</a>
+									<a (click)="analyseThisUser(user.permalink)" mdTooltip="Analyse this user" fxFlex fxLayout="column" fxLayoutAlign="start center">
+										<i class="fa fa-search" fxFlex></i>
+									</a>
+								</span>
+							</div>
+						</md-card-content>
+					</md-card>
 				</div>
 
 				<div class="tab-body data" *ngIf="tab === dataTabs[4]">
-					<div class="media" *ngFor="let user of publicData.followings">
-						<div class="media-left">
-							<a [href]="user.permalink_url" target=_blank>
-								<img class="media-object" [src]="user.avatar_url">
-							</a>
-							<div class="label label-default">{{user.plan}}</div>
-							<div class="label" [ngClass]="{ 'label-success': user.online, 'label-danger': !user.online }">online</div>
-						</div>
-						<div class="media-body">
-							<div class="label label-default pull-right">{{user.last_modified | date:'yyyy-MM-dd'}}</div>
-							<h4 class="media-heading">{{user.username}}</h4>
-							<span class="description-container" contenteditable="false">
-								{{user.description}}
-							</span>
-							<span class="controls">
-								<span class="flex-item">
-									<i class="glyphicon glyphicon-music"></i> {{user.track_count}}
-								</span>
-								<span class="flex-item">
-									<i class="glyphicon glyphicon-th-list"></i> {{user.playlist_count}}
-								</span>
-								<span class="flex-item">
-									<i class="glyphicon glyphicon-heart"></i> {{user.public_favorites_count}}
-								</span>
-								<span class="flex-item">
-									<i class="glyphicon glyphicon-retweet"></i> {{user.reposts_count}}
-								</span>
-								<span class="flex-item">
-									<i class="glyphicon glyphicon-comment"></i> {{user.comments_count}}
-								</span>
-								<span class="flex-item">
-									<i class="glyphicon glyphicon-user"></i><i class="glyphicon glyphicon-arrow-up"></i> {{user.followers_count}}
-								</span>
-								<span class="flex-item">
-									<i class="glyphicon glyphicon-user"></i><i class="glyphicon glyphicon-arrow-down"></i> {{user.followings_count}}
-								</span>
-								<a class="flex-item" [href]="user.website" *ngIf="user.website && user.website_title">
-									<i class="glyphicon glyphicon-link"></i> {{user.website_title}}
+					<md-card *ngFor="let user of publicData.followings">
+						<md-card-content fxLayout="row">
+							<div fxFlex="18" fxFlex.xs="25" fxLayout="column" fxLayoutAlign="start center">
+								<a class="cover-image-container" [href]="user.permalink_url" target=_blank fxFlex="0 1 auto" mdTooltip="Open Soundcloud profile in a new tab">
+									<img class="cover-image" [src]="user.avatar_url">
 								</a>
-								<a class="flex-item" (click)="analyseThisUser(user.permalink)">
-									<i class="glyphicon glyphicon-search"></i>
-								</a>
-							</span>
-						</div>
-					</div>
+								<div fxFlex="0 1 auto" class="mat-caption center-text">{{user.plan}}</div>
+								<div fxFlex="0 1 auto" class="mat-caption center-text" [ngClass]="{ 'label-success': user.online, 'label-danger': !user.online }">&nbsp;online&nbsp;</div>
+							</div>
+							<div fxFlex fxLayout="column" fxLayoutAlign="start stretch">
+								<span fxFlex class="mat-caption">{{user.last_modified | date:'yyyy-MM-dd'}}</span>
+								<h4 fxFlex class="mat-h4">{{user.username}}</h4>
+								<span fxFlex class="description-container">{{user.description}}</span>
+								<span class="controls" fxLayout="row" fxLayoutAlign="start stretch">
+									<span fxFlex fxLayout="column" fxLayoutAlign="start center">
+										<i class="fa fa-music" fxFlex></i>
+										<span fxFlex class="mat-caption">{{user.track_count}}</span>
+									</span>
+									<span fxFlex fxLayout="column" fxLayoutAlign="start center">
+										<i class="fa fa-th-list" fxFlex></i>
+										<span fxFlex class="mat-caption">{{user.playlist_count}}</span>
+									</span>
+									<span fxFlex fxLayout="column" fxLayoutAlign="start center">
+										<i class="fa fa-heart" fxFlex></i>
+										<span fxFlex class="mat-caption">{{user.public_favorites_count}}</span>
+									</span>
+									<span fxFlex fxLayout="column" fxLayoutAlign="start center">
+										<i class="fa fa-retweet" fxFlex></i>
+										<span fxFlex class="mat-caption">{{user.reposts_count}}</span>
+									</span>
+									<span fxFlex fxLayout="column" fxLayoutAlign="start center">
+										<i class="fa fa-comments-o" fxFlex></i>
+										<span fxFlex class="mat-caption">{{user.comments_count}}</span>
+									</span>
+									<span fxFlex fxLayout="column" fxLayoutAlign="start center">
+										<span fxFlex>
+											<i class="fa fa-user"></i><i class="fa fa-arrow-up"></i>
+										</span>
+										<span fxFlex class="mat-caption">{{user.followers_count}}</span>
+									</span>
+									<span fxFlex fxLayout="column" fxLayoutAlign="start center">
+										<span fxFlex>
+											<i class="fa fa-user"></i><i class="fa fa-arrow-down"></i>
+										</span>
+										<span fxFlex class="mat-caption">{{user.followings_count}}</span>
+									</span>
+									<a [href]="user.website" *ngIf="user.website && user.website_title" mdTooltip="Open website in a new tab" fxFlex fxLayout="column" fxLayoutAlign="start center">
+										<i class="fa fa-link" fxFlex></i>
+										<span fxFlex class="mat-caption center-text">{{user.website_title}}</span>
+									</a>
+									<a (click)="analyseThisUser(user.permalink)" mdTooltip="Analyse this user" fxFlex fxLayout="column" fxLayoutAlign="start center">
+										<i class="fa fa-search" fxFlex></i>
+									</a>
+								</span>
+							</div>
+						</md-card-content>
+					</md-card>
 				</div>
 			</md-tab>
 		</md-tab-group>
