@@ -18,6 +18,9 @@ import { ControlsQueriesListService } from '../services/controls-queries-list.se
 @Component({
 	selector: 'dashboard-controls',
 	templateUrl: '/public/app/views/dashboard-controls.html',
+	host: {
+		class: 'mat-body-1'
+	}
 })
 export class DashboardControlsComponent implements OnInit, OnDestroy {
 	constructor(

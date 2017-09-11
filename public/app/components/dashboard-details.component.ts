@@ -12,6 +12,9 @@ import { UserService } from '../services/user.service';
 @Component({
 	selector: 'dashboard-details',
 	templateUrl: '/public/app/views/dashboard-details.html',
+	host: {
+		class: 'mat-body-1'
+	}
 })
 export class DashboardDetailsComponent implements OnInit, OnDestroy {
 	constructor(

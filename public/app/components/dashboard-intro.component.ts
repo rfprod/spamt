@@ -9,6 +9,9 @@ import { WebsocketService } from '../services/websocket.service';
 @Component({
 	selector: 'dashboard-intro',
 	templateUrl: '/public/app/views/dashboard-intro.html',
+	host: {
+		class: 'mat-body-1'
+	}
 })
 export class DashboardIntroComponent implements OnInit, OnDestroy {
 	constructor(

@@ -132,7 +132,6 @@ gulp.task('pack-vendor-js', () => {
 		'./node_modules/core-js/client/shim.js',
 
 		'./node_modules/jquery/dist/jquery.js',
-		'./node_modules/bootstrap/dist/js/bootstrap.js',
 		'./node_modules/d3/d3.js',
 		'./node_modules/nvd3/build/nv.d3.js',
 		// angular dependencies start here
@@ -150,7 +149,6 @@ gulp.task('pack-vendor-js', () => {
 
 gulp.task('pack-vendor-css', () => {
 	return gulp.src([
-		'./node_modules/bootstrap/dist/css/bootstrap.css',
 		'./node_modules/nvd3/build/nv.d3.css',
 		'./node_modules/components-font-awesome/css/font-awesome.css',
 		/*
@@ -174,7 +172,6 @@ gulp.task('move-vendor-fonts', () => {
 		/*
 		*	add paths to required third party fonts
 		*/
-		'./node_modules/bootstrap/dist/fonts/*.*',
 		'./node_modules/components-font-awesome/fonts/*.*',
 		// material design icons
 		'node_modules/material-design-icon-fonts/iconfont/*.eot',
