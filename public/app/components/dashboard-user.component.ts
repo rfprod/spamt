@@ -7,6 +7,9 @@ import { UserLogoutService } from '../services/user-logout.service';
 @Component({
 	selector: 'dashboard-user',
 	templateUrl: '/public/app/views/dashboard-user.html',
+	host: {
+		class: 'mat-body-1'
+	}
 })
 export class DashboardUserComponent implements OnInit, OnDestroy {
 	constructor(

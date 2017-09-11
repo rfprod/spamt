@@ -10,7 +10,7 @@ declare let $: JQueryStatic;
 		<app-nav></app-nav>
 		<loading-indicator *ngIf="showSpinner"></loading-indicator>
 		<router-outlet></router-outlet>
-		<app-info fxFlex="0 1 auto" *ngIf="showAppInfo"></app-info>
+		<app-info *ngIf="showAppInfo"></app-info>
 	`,
 	animations: [
 		trigger('empty', [])

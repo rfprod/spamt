@@ -23,7 +23,6 @@ $boxPadding: 0.5em;
 .full-width { width: 100%; }
 .center-text { text-align: center; }
 
-
 /* required in case of self hosting of material-design-icons */
 	@font-face {
 		font-family: 'Material Icons';
@@ -85,6 +84,8 @@ spamt {
 }
 
 body {
+	padding: 0;
+	margin: 0;
 	height: 100%;
 	width: 100%;
 	overflow-x: hidden;
@@ -95,7 +96,10 @@ body {
 	overflow-x: hidden;
 
 	a {
+		color: $info;
+		text-decoration: none;
 		&:hover {
+			color: $success;
 			text-decoration: none;
 		}
 	}
@@ -293,9 +297,12 @@ body {
 *	specific styling for view containers
 */
 	app-info {
-		height: 10vh;
+		flex: 0 1 auto;
+		max-height: 10vh;
 		width: 100%;
 		.app-info {
+			height: 100%;
+			width: 100%;
 			display: flex;
 			justify-content: space-around;
 			align-items: center;
@@ -309,7 +316,7 @@ body {
 				img {
 					min-height: 5vh;
 					height: 10vh;
-					max-height: 10vh;
+					max-height: 8vh;
 					width: auto !important;
 					max-width: 24vw;
 				}

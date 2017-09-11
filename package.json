@@ -51,7 +51,6 @@
 		"@types/jquery": "^3.2.12",
 		"@types/node": "^8.0.26",
 		"body-parser": "^1.17.2",
-		"bootstrap": "^3.3.7",
 		"components-font-awesome": "^4.6.3",
 		"concurrently": "^3.5.0",
 		"connect-flash": "^0.1.1",
