@@ -16,7 +16,7 @@
 	</div>
 
 	<div fxFlex="25" fxFlex.xs="0 1 auto" fxFlex.sm="0 1 auto">
-		<legend>User</legend>
+		<legend class="mat-h3">User</legend>
 		<div fxLayout="row" fxLayoutAlign="center center">
 			<md-form-field>
 				<span mdPrefix class="mat-caption" fxHide.xs="false" fxHide.gt-xs="true" fxHide.md="false" title="https://soundcloud.com/... finish the link"><i class="fa fa-link"></i> &nbsp;</span>
@@ -93,7 +93,7 @@
 		</div>
 	</div>
 	<div fxFlex="75" id="scroll-content">
-		<legend>Data</legend>
+		<legend class="mat-h3">Data</legend>
 
 		<span *ngIf="!userSelected()">
 			<div id="instructions">
@@ -106,15 +106,17 @@
 
 		<div id="filters" *ngIf="selectedTab !== ''">
 			<span class="flex-item">
-				<span class="input-label"><i class="fa fa-search" aria-hidden="true"></i> Search:</span>
-				<input [(ngModel)]="filterSearchQuery" class="form-control">
+				<md-form-field>
+					<input mdInput [(ngModel)]="filterSearchQuery">
+					<md-icon mdSuffix class="material-icons">search</md-icon>
+				</md-form-field>
 			</span>
 			<span class="flex-item">
-				<span class="input-label"><i class="fa fa-sort" aria-hidden="true"></i> Sort by:</span>
-				<select [(ngModel)]="sortByCriterion" class="form-control">
-					<option value="name">Alphabetical</option>
-					<option value="timestamp">Timestamp</option>
-				</select>
+				<span class="input-label"><i class="fa fa-sort" aria-hidden="true"></i></span>
+				<md-select [(ngModel)]="sortByCriterion" floatPlaceholder="auto" placeholder="Sorting">
+					<md-option value="name">Alphabetical</md-option>
+					<md-option value="timestamp">Timestamp</md-option>
+				</md-select>
 			</span>
 		</div>
 

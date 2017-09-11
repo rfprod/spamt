@@ -155,8 +155,12 @@ export class DashboardDetailsComponent implements OnInit, OnDestroy {
 		}
 
 		this.selectedTab = tab;
+		findTab:
 		for (const i in this.dataTabs) {
-			if (this.dataTabs[i] === tab) { this.selectedEndpoint = this.endpoints[i]; }
+			if (this.dataTabs[i] === tab) {
+				this.selectedEndpoint = this.endpoints[i];
+				break findTab;
+			}
 		}
 		console.log('this.selectedEndpoint: ', this.selectedEndpoint);
 		this.emitSpinnerStartEvent();
