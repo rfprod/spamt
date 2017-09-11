@@ -340,16 +340,26 @@ body {
 			overflow-y: auto;
 		}
 
-		#instructions {
-			text-align: center;
-		}
-		#queries-flex {
-			display: flex;
+		#instructions-container {
+			z-index: 2;
+			border: 1px $lightgrey dotted;
+			box-sizing: border-box;
+			padding: $boxPadding;
+			flex: 1 1 auto;
 			align-items: center;
-			align-content: flex-start;
-			flex-wrap: wrap;
-			.btn {
-				flex: 1;
+			#instructions {
+				flex: 100;
+				text-align: center;
+			}
+			#queries-flex {
+				flex: 100;
+				display: flex;
+				align-items: center;
+				align-content: flex-start;
+				flex-wrap: wrap;
+				.btn {
+					flex: 1;
+				}
 			}
 		}
 
