@@ -198,14 +198,10 @@ export class DashboardDetailsComponent implements OnInit, OnDestroy {
 	}
 	public set filterSearchQuery(val: string) {
 		this.filterSearchValue = val;
-		const domTitleObjects = this.el.nativeElement.querySelectorAll('#data')[this.dataTabs.indexOf(this.selectedTab)].querySelectorAll('.media-heading');
-		for (const domObj of domTitleObjects) {
-			if (domObj.innerHTML.toLowerCase().indexOf(val.toLowerCase()) !== -1) {
-				domObj.parentElement.parentElement.style.display = 'block';
-			} else {
-				domObj.parentElement.parentElement.style.display = 'none';
-			}
-		}
+	}
+	public hideCard(trackTitle: string): boolean {
+		if (!this.filterSearchQuery) { return false; }
+		return trackTitle.toLowerCase().indexOf(this.filterSearchQuery.toLowerCase()) === -1;
 	}
 	private orderProp: string = 'timestamp';
 	public get sortByCriterion(): string {

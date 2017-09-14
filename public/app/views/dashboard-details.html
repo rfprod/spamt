@@ -125,17 +125,17 @@
 			Error: Your browser does not support <code>audio</code> element.
 		</audio>
 
-		<md-tab-group fxHide="{{!userSelected()}}" #tabGroup>
+		<md-tab-group fxHide="{{!userSelected()}}" #tabGroup [dynamicHeight]="true">
 			<md-tab *ngFor="let tab of dataTabs; let i = index">
 				<ng-template md-tab-label>
 					<strong>{{tab}}</strong>
 				</ng-template>
 
 				<div class="tab-body data" *ngIf="tab === dataTabs[0]">
-					<md-card *ngFor="let track of publicData.tracks" [ngClass]="{ 'selected-track': selectedTrackURI ===  track.stream_url }">
+					<md-card *ngFor="let track of publicData.tracks" [ngClass]="{ 'selected-track': selectedTrackURI ===  track.stream_url }" fxHide="{{hideCard(track.title)}}">
 						<md-card-content fxLayout="row">
 							<div fxFlex="18" fxFlex.xs="25" fxLayout="column" fxLayoutAlign="start center">
-								<div class="cover-image-container" fxFlex="0 1 auto">
+								<div fxFlex="0 1 auto" class="cover-image-container">
 									<img class="cover-image" [src]="track.artwork_url" (click)="playTrack(track.stream_url)" mdTooltip="Play / Pause">
 								</div>
 								<div fxFlex="0 1 auto" class="mat-caption center-text">{{track.genre}}</div>
@@ -179,7 +179,7 @@
 				</div>
 
 				<div class="tab-body data" *ngIf="tab === dataTabs[1]">
-					<md-card *ngFor="let playlist of publicData.playlists; let j = index;">
+					<md-card *ngFor="let playlist of publicData.playlists; let j = index;" fxHide="{{hideCard(playlist.title)}}">
 						<md-card-content fxLayout="row">
 							<div fxFlex="18" fxFlex.xs="25" fxLayout="column" fxLayoutAlign="start center">
 								<div class="cover-image-container" fxFlex="0 1 auto">
@@ -238,7 +238,7 @@
 
 				<div class="tab-body data" *ngIf="tab === dataTabs[2]">
 
-					<md-card *ngFor="let track of publicData.favorites" [ngClass]="{ 'selected-track': selectedTrackURI ===  track.stream_url }">
+					<md-card *ngFor="let track of publicData.favorites" [ngClass]="{ 'selected-track': selectedTrackURI ===  track.stream_url }" fxHide="{{hideCard(track.title)}}">
 						<md-card-content fxLayout="row">
 							<div fxFlex="18" fxFlex.xs="25" fxLayout="column" fxLayoutAlign="start center">
 								<div class="cover-image-container" fxFlex="0 1 auto">
@@ -281,7 +281,7 @@
 				</div>
 
 				<div class="tab-body data" *ngIf="tab === dataTabs[3]">
-					<md-card *ngFor="let user of publicData.followers">
+					<md-card *ngFor="let user of publicData.followers" fxHide="{{hideCard(user.username)}}">
 						<md-card-content fxLayout="row">
 							<div fxFlex="18" fxFlex.xs="25" fxLayout="column" fxLayoutAlign="start center">
 								<a class="cover-image-container" [href]="user.permalink_url" target=_blank fxFlex="0 1 auto" mdTooltip="Open Soundcloud profile in a new tab">
@@ -341,7 +341,7 @@
 				</div>
 
 				<div class="tab-body data" *ngIf="tab === dataTabs[4]">
-					<md-card *ngFor="let user of publicData.followings">
+					<md-card *ngFor="let user of publicData.followings" fxHide="{{hideCard(user.username)}}">
 						<md-card-content fxLayout="row">
 							<div fxFlex="18" fxFlex.xs="25" fxLayout="column" fxLayoutAlign="start center">
 								<a class="cover-image-container" [href]="user.permalink_url" target=_blank fxFlex="0 1 auto" mdTooltip="Open Soundcloud profile in a new tab">
