@@ -1,11 +1,12 @@
-import { EventEmitter } from '@angular/core';
+import { EventEmitter, Injectable } from '@angular/core';
 
+@Injectable()
 export class EventEmitterService {
 	public emitter: EventEmitter<object> = new EventEmitter();
-	public emitEvent(object) {
+	public emitEvent(object): void {
 		this.emitter.emit(object);
 	}
-	public getEmitter() {
+	public getEmitter(): EventEmitter<object> {
 		return this.emitter;
 	}
 }

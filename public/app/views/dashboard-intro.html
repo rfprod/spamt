@@ -6,7 +6,7 @@
 	</h3>
 	<p>{{description}}</p>
 
-	<nvd3 [options]="chartOptions" [data]="appUsageData"></nvd3>
+	<nvd3 #chart [options]="chartOptions" [data]="appUsageData"></nvd3>
 
 	<span id="modal" *ngIf="showModal">
 		<button type="button" class="close" (click)="toggleModal()"><span>&times;</span></button>
