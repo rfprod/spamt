@@ -1,5 +1,4 @@
-// #docregion
-// /*global jasmine, __karma__, window*/
+/*global jasmine, __karma__, window*/
 Error.stackTraceLimit = 0; // "No stacktrace"" is usually best for app testing.
 
 // Uncomment to get full stacktrace output. Sometimes helpful, usually not.
@@ -28,23 +27,17 @@ var allSpecFiles = Object.keys(window.__karma__.files)
 	.filter(isBuiltFile);
 
 System.config({
-	// Extend usual application package list with test folder
-	packages: { 'testing': { main: 'index.js', defaultExtension: 'js' } },
-
-	// Assume npm: is set in `paths` in systemjs.config
-	// Map the angular testing umd bundles
+	// Map angular testing umd bundles
 	map: {
-		'@angular/animations/testing': '/base/node_modules/@angular/animations/bundles/animations-browser-testing.umd.js',
 		'@angular/core/testing': '/base/node_modules/@angular/core/bundles/core-testing.umd.js',
 		'@angular/common/testing': '/base/node_modules/@angular/common/bundles/common-testing.umd.js',
 		'@angular/compiler/testing': '/base/node_modules/@angular/compiler/bundles/compiler-testing.umd.js',
 		'@angular/forms/testing': '/base/node_modules/@angular/forms/bundles/forms-testing.umd.js',
-		'@angular/http/testing': 'npm:@angular/http/bundles/http-testing.umd.js',
+		'@angular/http/testing': '/base/node_modules/@angular/http/bundles/http-testing.umd.js',
+		'@angular/animations/testing': '/base/node_modules/@angular/animations/bundles/animations-browser-testing.umd.js',
 		'@angular/platform-browser/testing': '/base/node_modules/@angular/platform-browser/bundles/platform-browser-testing.umd.js',
 		'@angular/platform-browser-dynamic/testing': '/base/node_modules/@angular/platform-browser-dynamic/bundles/platform-browser-dynamic-testing.umd.js',
-		'@angular/http/testing': '/base/node_modules/@angular/http/bundles/http-testing.umd.js',
 		'@angular/router/testing': '/base/node_modules/@angular/router/bundles/router-testing.umd.js',
-
 
 		'systemConfig': '/base/systemjs.karma.config.js',
 		'systemConfigExtras': '/base/systemjs.config.extras.js',
