@@ -19,7 +19,6 @@
 		".git",
 		"app",
 		"node_modules",
-		"public/bower_components",
 		"public/css",
 		"public/img",
 		"public/js",
