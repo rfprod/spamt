@@ -9,7 +9,7 @@
 	// packages locations
 	var map = {
 		'app': 																	'./base/public/app',
-		'ng2-nvd3': 														'npm:ng2-nvd3/build/lib',
+		'ng2-nvd3': 														'npm:ng2-nvd3/build',
 		'rxjs': 																'npm:rxjs',
 		'traceur': 															'npm:traceur/bin',
 		'@angular/animations': 									'npm:@angular/animations/bundles/animations.umd.js',
@@ -41,7 +41,7 @@
 	// how to load packages
 	var packages = {
 		'app':                        { main: 'app', defaultExtension: 'js' },
-		'ng2-nvd3':                   { main: 'ng2-nvd3', defaultExtension: 'js' },
+		'ng2-nvd3':                   { main: 'index', defaultExtension: 'js' },
 		'rxjs':                       { main: 'Rx', defaultExtension: 'js' },
 		'traceur':                    { main: 'traceur', defaultExtension: 'js' }
 	};
