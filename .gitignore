@@ -6,6 +6,11 @@ node_modules/
 .*.env
 *.log
 
+# logs
+*.log
+logs/*
+!logs/*.gitkeep
+
 # compiled client app
 public/app/*.js
 public/app/*.js.map
