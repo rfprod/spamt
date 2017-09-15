@@ -117,30 +117,73 @@ SPAMT is up and running.
 
 ### Testing
 
+`HeadlessChrome` note: for client unit and e2e tests to work you should have an environment variable for headless Chrome exported (appended to `~/.bashrc`), its value should be set to one of the following options, depending on what you have installed: `chromium-browser, chromium, google-chrome`
+
+```
+export CHROME_BIN=chromium-browser
+```
+
+#### Server
+
 To test the server execute the following command in the terminal window while in your project's folder when the server is running:
 
 ```
-$ npm run server-test
+npm run server-test
 ```
+
+#### Client Unit
 
 To test the client execute the following command in the terminal window while in your project's folder:
 
 for continuous testing
 
 ```
-$ npm run client-test
+npm run client-test
 ```
 
 for single test
 
 ```
-$ npm run client-test-single-run
+npm run client-test-single-run
 ```
+
+single run execution generates a coverage html-report from generated json data, reports location
+
+  * `./logs`
+    * `./logs/coverage` - json data
+      * `./logs/coverage/html-report` - html-report generated from json data
+
+#### Coverage report
+
+to generate a coverage report for client code execute (should be preceeded by unit tests execution so that json data exists)
+
+```
+npm run client-coverage-report
+```
+
+previously generated coverage reports are cleared automatically before single run tests execution
+
+to remove previously generated coverage reports manually use
+
+```
+npm run clear-reports
+```
+
+##### How to read a coverage report
+
+* `Statements` - how much statements of the program module have beed executed
+* `Branches` - how much branches of the control flow of the program module have been executed (if else statements)
+* `Functions` - how much functions of the program module have beed executed
+* `Lines` - how much executable lines in the source code have been executed
+
+for more details see [`istanbul code coverage tool`](https://gotwarlost.github.io/istanbul)
 
 To lint the code execute the following command in the terminal window while in your project's folder:
 
+#### Code Linting
+
 ```
-$ npm run lint
+npm run lint
 ```
 
 ### The OpenShift cartridges documentation

@@ -102,6 +102,31 @@ gulp.task('client-unit-test', (done) => {
 	server.start();
 });
 
+gulp.task('client-unit-test-single-run', (done) => {
+	const server = new karmaServer({
+		configFile: require('path').resolve('test/karma.conf.js'),
+		singleRun: true
+	});
+
+	server.on('browser_error', (browser, err) => {
+		console.log('=====\nKarma > Run Failed\n=====\n', err);
+		throw err;
+	});
+
+	server.on('run_complete', (browsers, results) => {
+		if (results.failed) {
+			// throw new Error('=====\nKarma > Tests Failed\n=====\n', results);
+			console.log('=====\nKarma > Tests Failed\n=====\n', results);
+		} else {
+			console.log('=====\nKarma > Complete With No Failures\n=====\n', results);
+		}
+
+		done();
+	});
+
+	server.start();
+});
+
 gulp.task('build-system-js', () => {
 	/*
 	*	this task builds angular application
@@ -132,6 +157,7 @@ gulp.task('pack-vendor-js', () => {
 		'./node_modules/core-js/client/shim.js',
 
 		'./node_modules/jquery/dist/jquery.js',
+
 		'./node_modules/d3/d3.js',
 		'./node_modules/nvd3/build/nv.d3.js',
 		// angular dependencies start here
