@@ -122,7 +122,10 @@ export class DashboardControlsComponent implements OnInit, OnDestroy {
 	private getPublicData(callback): void {
 		this.emitSpinnerStartEvent();
 		this.publicDataService.getData().subscribe(
-			(data) => this.appUsageData = data,
+			(data) => {
+				this.nvd3usage.clearElement();
+				this.appUsageData = data;
+			},
 			(error) => {
 				this.errorMessage = error as any;
 				this.emitSpinnerStopEvent();
@@ -152,6 +155,7 @@ export class DashboardControlsComponent implements OnInit, OnDestroy {
 		this.emitSpinnerStartEvent();
 		this.controlsQueriesListService.getData(this.userService.model.user_token, this.queries.page).subscribe(
 			(data) => {
+				this.nvd3queries.clearElement();
 				this.queries.queriesList = data;
 				this.queriesData = [];
 				for (const query of this.queries.queriesList) {
@@ -299,6 +303,10 @@ export class DashboardControlsComponent implements OnInit, OnDestroy {
 
 // Help
 	private showHelp: boolean = false; // controls help labells visibility, catches events from nav component
+
+// Charts
+	@ViewChild('appUsageChart') private nvd3usage: any;
+	@ViewChild('queriesDataChart') private nvd3queries: any;
 
 	public ngOnInit(): void {
 		console.log('ngOnInit: DashboardControlsComponent initialized');
