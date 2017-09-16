@@ -343,10 +343,12 @@ body {
 		#instructions-container {
 			z-index: 2;
 			border: 1px $lightgrey dotted;
-			box-sizing: border-box;
 			padding: $boxPadding;
-			flex: 1 1 auto;
+			flex: 100;
+			display: flex;
+			flex-direction: column;
 			align-items: center;
+			height: auto!important;
 			#instructions {
 				flex: 100;
 				text-align: center;
@@ -357,8 +359,8 @@ body {
 				align-items: center;
 				align-content: flex-start;
 				flex-wrap: wrap;
-				.btn {
-					flex: 1;
+				a {
+					min-width: auto!important;
 				}
 			}
 		}

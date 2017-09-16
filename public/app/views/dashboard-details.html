@@ -100,7 +100,7 @@
 				input <a href="https://soundcloud.com" target=_blank><i class="fa fa-external-link"></i> soundcloud</a> user name to be able to request data, or select one from the following list
 			</div>
 			<div id="queries-flex" *ngIf="queries">
-				<a fxFlex md-button class="mat-primary" *ngFor="let q of queries.data" (click)="analyseThisUser(q.name)">{{q.name}}</a>
+				<a fxFlex md-button class="mat-primary" *ngFor="let q of queries.data" (click)="analyseThisUser(q.name)" mdTooltip="Analyze this user">{{q.name}}</a>
 			</div>
 		</span>
 
