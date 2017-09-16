@@ -13,7 +13,6 @@ const express = require('express'),
 	flash = require('connect-flash'),
 	thenReq = require('then-request'),
 	nodemailer = require('nodemailer'),
-	xoauth2 = require('xoauth2'),
 	crypto = require('crypto'),
 	cluster = require('cluster'),
 	os = require('os');
@@ -119,29 +118,40 @@ let smtpConfig = {
 	port: process.env.MAILER_PORT,
 	secure: true, // use SSL
 	auth: {
-		xoauth2: xoauth2.createXOAuth2Generator({
-			user: process.env.MAILER_EMAIL,
-			clientId: process.env.MAILER_CLIENT_ID,
-			clientSecret: process.env.MAILER_CLIENT_SECRET,
-			refreshToken: process.env.MAILER_REFRESH_TOKEN,
-			accessToken: 'empty'
-		})
+		type: 'OAuth2',
+		user: process.env.MAILER_EMAIL,
+		clientId: process.env.MAILER_CLIENT_ID,
+		clientSecret: process.env.MAILER_CLIENT_SECRET,
+		refreshToken: process.env.MAILER_REFRESH_TOKEN,
+		accessToken: 'empty'
 	}
 };
 // set proxy for smtp for development environment
-if (process.env.HOME.indexOf('ruser') != -1) {
-	console.log('development environment launch detected, setting proxy for smtpConfig');
+if (process.env.DEV_ENV) {
+	console.log('mail transporter >> development environment launch detected, setting proxy for smtpConfig');
 	smtpConfig.proxy = 'socks5://127.0.0.1:9150/';
 }
 
 const mailTransporter = nodemailer.createTransport(smtpConfig); // reusable transporter object using the default SMTP transport
+mailTransporter.verify((err, success) => {
+	if (err) {
+		console.log('Mail transporter diag error >>', err);
+	} else {
+		console.log('Mail transporter diag success >> Mail transporter is ready');
+	}
+});
+// enable support for socks URLs for development environment
+if (process.env.DEV_ENV) {
+	console.log('mail transporter >> development environment launch detected, enabling support for socks proxy urls');
+	mailTransporter.set('proxy_socks_module', require('socks'));
+}
 
 routes(app, passport, User, Query, SrvInfo, DataInit, thenReq, JWT, mailTransporter, crypto, SC, TWTR);
 
 const port = process.env.PORT || process.env.OPENSHIFT_NODEJS_PORT || 8080,
 	ip = process.env.OPENSHIFT_NODEJS_IP; // "127.0.0.1" is not specified here on purpose, this env var should be included in .openshift.env
 
-function terminator (sig) {
+function terminator(sig) {
 	if (typeof sig === 'string') {
 		console.log('%s: Received %s - terminating app '+sig+'...', Date(Date.now()));
 		if (cluster.isMaster && !clusterStop) {

@@ -417,7 +417,7 @@ module.exports = function(app, passport, User, Query, SrvInfo, DataInit, thenReq
 						let accessLink = process.env.APP_URL + 'controls?user_token=' + tokenObj.token;
 						sendAccessLink(userEmail, accessLink, (error) => {
 							if (error) {
-								res.status(400).json({message: 'mail transporter error'});
+								res.status(500).json({message: 'mail transporter error'});
 							} else {
 								res.status(200).json({message: 'access link was sent to provided email address'});
 							}

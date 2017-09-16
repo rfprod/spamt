@@ -83,7 +83,7 @@
 		"material-design-icon-fonts": "^3.0.1",
 		"mongoose": "^4.11.11",
 		"ng2-nvd3": "^2.0.0",
-		"nodemailer": "2.7.2",
+		"nodemailer": "4.1.0",
 		"nvd3": "^1.8.6",
 		"passport": "^0.4.0",
 		"passport-http-api-token-bearer": "^1.0.1",
@@ -98,7 +98,6 @@
 		"tslint": "^5.7.0",
 		"typescript": "^2.5.2",
 		"web-animations-js": "^2.3.1",
-		"xoauth2": "^1.2.0",
 		"zone.js": "0.8.17"
 	},
 	"devDependencies": {
@@ -114,6 +113,7 @@
 		"protractor": "^5.1.2",
 		"remap-istanbul": "^0.9.5",
 		"request": "^2.81.0",
+		"socks": "^1.1.10",
 		"string": "^3.3.3",
 		"ws": "^3.2.0"
 	},
