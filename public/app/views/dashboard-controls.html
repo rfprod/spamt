@@ -60,7 +60,7 @@
 
 		<md-tab-group #tabGroup>
 			<md-tab label="{{dataTabs[0]}}">
-				<nvd3 *ngIf="tabGroup.selectedIndex === 0" [options]="chartOptions" [data]="appUsageData"></nvd3>
+				<nvd3 #appUsageChart *ngIf="tabGroup.selectedIndex === 0" [options]="chartOptions" [data]="appUsageData"></nvd3>
 				<table>
 					<thead>
 						<tr>
@@ -85,7 +85,7 @@
 				</table>
 			</md-tab>
 			<md-tab label="{{dataTabs[1]}}">
-				<nvd3 *ngIf="tabGroup.selectedIndex === 1" [options]="chartOptions" [data]="queriesData"></nvd3>
+				<nvd3 #queriesDataChart *ngIf="tabGroup.selectedIndex === 1" [options]="chartOptions" [data]="queriesData"></nvd3>
 				<table>
 					<thead>
 						<tr>
