@@ -1,3 +1,5 @@
+'use strict';
+
 const os = require('os'),
 	exec = require('child_process').execSync;
 

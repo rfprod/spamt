@@ -1,5 +1,4 @@
-//const User = require('../models/users');
-//const jwt = require('jwt-simple');
+'use strict';
 
 module.exports = function(crypto, jwt, User) {
 	return {
