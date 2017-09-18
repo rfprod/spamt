@@ -266,7 +266,7 @@ class TWTR {
 			oauth_token = this.accessToken;
 			oauth_secret = this.tokenSecret;
 		}
-// eslint-disable-next-line
+		// eslint-disable-next-line
 	/*
 	*	collect parameters for request authorization
 	*/
@@ -304,7 +304,7 @@ class TWTR {
 			authParam[p[0]] = (!authParam[p[0]]) ? p[1] : authParam[p[0]];
 		}
 		console.log('authParam:', authParam);
-// eslint-disable-next-line
+		// eslint-disable-next-line
 	/*
 	*	Twitter oauth signature generation
 	*	https://dev.twitter.com/oauth/overview/creating-signatures
@@ -337,7 +337,7 @@ class TWTR {
 		}
 		parameterString = parameterString.substring(0, parameterString.length - 1);
 		console.log('parameterString:', parameterString, '\n');
-// eslint-disable-next-line
+		// eslint-disable-next-line
 	/*
 	*	create signature base string
 	*	1. add method name in uppercase to output string
@@ -350,7 +350,7 @@ class TWTR {
 	*/
 		const signatureBaseString = method.toUpperCase() + '&' + encodeURIComponent(url) + '&' + encodeURIComponent(parameterString);
 		console.log('signatureBaseString:', signatureBaseString, '\n');
-// eslint-disable-next-line
+		// eslint-disable-next-line
 	/*
 	*	create signing key
 	*	1. add percent encoded Twitter App Client Secret to output string
@@ -362,13 +362,13 @@ class TWTR {
 	*/
 		const signingKey = encodeURIComponent(this.clientSecret) + '&' + encodeURIComponent(oauth_secret);
 		console.log('signingKey:', signingKey, '\n');
-// eslint-disable-next-line
+		// eslint-disable-next-line
 	/*
 	*	generate HMAC-SHA1 oauth signature string
 	*/
 		const oauthSignature = this.crypto.createHmac('sha1', signingKey).update(signatureBaseString).digest('base64');
 		console.log('oauthSignature:', oauthSignature, '\n');
-// eslint-disable-next-line
+		// eslint-disable-next-line
 	/*
 	*	Building the request string
 	*	1. Append 'OAuth' to output

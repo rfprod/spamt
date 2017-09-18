@@ -137,7 +137,7 @@ mailTransporter.verify((err, success) => {
 	if (err) {
 		console.log('Mail transporter diag error >>', err);
 	} else {
-		console.log('Mail transporter diag success >> Mail transporter is ready');
+		console.log('Mail transporter diag success >>', success);
 	}
 });
 // enable support for socks URLs for development environment

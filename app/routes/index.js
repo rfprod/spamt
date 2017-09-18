@@ -8,17 +8,17 @@ module.exports = function(app, passport, User, Query, SrvInfo, DataInit, thenReq
 *	data is initialized with dummy data if the DB is empty on server start
 */
 	DataInit.initData();
-// eslint-disable-next-line
+	// eslint-disable-next-line
 /**
 *	Soundcloud API wrapper
 */
 	const SCapi = new SC(thenReq);
-// eslint-disable-next-line
+	// eslint-disable-next-line
 /**
 *	Twitter API wrapper
 */
 	const TwitterAPI = new TWTR(thenReq, crypto);
-// eslint-disable-next-line
+	// eslint-disable-next-line
 /**
 *	Mailer config
 */
@@ -45,7 +45,7 @@ module.exports = function(app, passport, User, Query, SrvInfo, DataInit, thenReq
 			});
 		}
 	}
-// eslint-disable-next-line
+	// eslint-disable-next-line
 /**
 *	routes
 */
@@ -384,7 +384,7 @@ module.exports = function(app, passport, User, Query, SrvInfo, DataInit, thenReq
 		});
 		ws.on('error', () => {console.log('Persistent websocket: ERROR');});
 	});
-// eslint-disable-next-line
+	// eslint-disable-next-line
 /**
 *	Administration endpoints
 */
@@ -570,7 +570,7 @@ module.exports = function(app, passport, User, Query, SrvInfo, DataInit, thenReq
 			else { res.status(200).json({message: 'logged out, token reset'}); }
 		});
 	});
-// eslint-disable-next-line
+	// eslint-disable-next-line
 /**
 *	social networks authentication
 */
@@ -651,7 +651,7 @@ module.exports = function(app, passport, User, Query, SrvInfo, DataInit, thenReq
 			res.status(200).json({message: 'logged out successfully'});
 		}
 	});
-// eslint-disable-next-line
+	// eslint-disable-next-line
 /*
 *	Twitter endpoints
 */
