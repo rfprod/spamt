@@ -9,7 +9,15 @@
 		<!-- external libraries not from npm, not bundled yet -->
 		<script src="/public/js/soundcloud.player.api.js"></script>
 		<!-- external libraries not from npm, not bundled yet -->
-		
+
+		<link href="/public/css/bundle.min.css" rel="stylesheet">
+
+		<base href="/">
+	</head>
+	<body>
+		<spamt></spamt>
+		<span id="init-spinner">Loading Angular...</span>
+
 		<!-- load app in dev mode -->
 		<!--
 		<script src="/node_modules/systemjs/dist/system.src.js"></script>
@@ -21,12 +29,5 @@
 		<!-- load app in production mode -->
 		<script src="/public/js/bundle.min.js"></script>
 		<!-- load app in production mode -->
-
-		<link href="/public/css/bundle.min.css" rel="stylesheet">
-	</head>
-	<body>
-		<base href="/">
-		<spamt></spamt>
-		<span id="init-spinner">Loading Angular...</span>
 	</body>
 </html>
