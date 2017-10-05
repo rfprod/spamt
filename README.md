@@ -1,6 +1,6 @@
 # SPAMT
 
-[SPAMT deployed on Openshift](http://spamt-ecapseman.rhcloud.com/)
+Openshift v2 -> v3 migration in progress
 
 ## Overview
 
@@ -30,6 +30,10 @@ In order to run your own copy of SPAMT, you must have the following installed:
 - [`NPM`](https://nodejs.org/)
 - [`MongoDB`](http://www.mongodb.org/)
 - [`Git`](https://git-scm.com/)
+
+To deploy on Openshift you may need a CLI
+
+- [`oc`](https://docs.openshift.com/online/cli_reference/get_started_cli.html#installing-the-cli)
 
 ### Installation & Startup
 
@@ -72,13 +76,7 @@ MAILER_RECIPIENT_EMAIL=dummy-recipient-email@gmail.com
 4. `Step1` Select & authorize APIs: type your own `https://mail.google.com`
 5. `Step2` Exchange authorization code for tokens: get a refresh token - use this token as a value for the MAILER_REFRESH_TOKEN `.env` var
 
-#### Openshift deployment requires env variables setup via rhc
-
-for example
-
-`rhc env set -a smapt -e APP_URL=https://spamt-ecapseman.rhcloud.com/`
-
-required vars
+#### Openshift deployment requires env variables
 
 ```
 TWITTER_KEY=twitter-key
@@ -186,11 +184,10 @@ To lint the code execute the following command in the terminal window while in y
 npm run lint
 ```
 
-### The OpenShift cartridges documentation
+### The OpenShift docs
 
-* [`cartridge guide`](https://github.com/openshift/origin-server/blob/master/documentation/oo_cartridge_guide.adoc#openshift-origin-cartridge-guide)
-* [`cartridge guide: mongodb`](https://github.com/openshift/origin-server/blob/master/documentation/oo_cartridge_guide.adoc#9-mongodb)
-* [`cartridge guide: nodejs`](https://github.com/openshift/origin-server/blob/master/documentation/oo_cartridge_guide.adoc#11-nodejs)
+* [`CLI reference`](https://docs.openshift.com/online/cli_reference/get_started_cli.html)
+* [`Migrating applications`](https://docs.openshift.com/online/dev_guide/migrating_applications/index.html)
 
 ## Licenses
 
