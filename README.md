@@ -191,4 +191,4 @@ npm run lint
 
 ## Licenses
 
-* [`SPAMT`](LICENSE.md)
+* [`SPAMT`](LICENSE)
