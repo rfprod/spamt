@@ -60,13 +60,10 @@ module.exports = function(config){
 			}
 		},
 		browsers: ['ChromeHeadless'],
-		// browsers: ['Chrome'],
-		// browsers : ['Firefox'],
 		
 		plugins : [
 			'karma-redirect-preprocessor',
 			'karma-chrome-launcher',
-		// 'karma-firefox-launcher',
 			'karma-sourcemap-loader',
 			'karma-coverage',
 			'karma-jasmine'
@@ -92,7 +89,7 @@ module.exports = function(config){
 			]
 		},
 
-		failOnEmptyTestSuite: false, // overrides the error, warn instead - by default returns error if there're no tests defined
+		failOnEmptyTestSuite: false,
 
 		hostname: process.env.IP,
 		port: process.env.PORT,

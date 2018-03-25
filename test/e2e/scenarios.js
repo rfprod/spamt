@@ -2,18 +2,20 @@
 
 /*global browser, expect, element, by */
 
+/*
+*	API DOC: http://www.protractor.org/#/api
+*/
+
 describe('SPAMT: ', function() {
 
 	it('should load index view', function() {
-		//browser.ignoreSynchronization = false;
 
-		//browser.waitForAngularEnabled(true);
 		browser.getCurrentUrl().then(function(url) {
 			expect(url).toMatch('\/intro$');
 		});
 
-		var navButtons = element.all(by.css('#flex-nav'));
-		expect(navButtons.count()).toBe(1);
+		var navBar = element.all(by.css('.mat-toolbar'));
+		expect(navBar.count()).toBe(1);
 	});
 
 /*
