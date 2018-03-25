@@ -1,6 +1,6 @@
 # SPAMT
 
-Openshift v2 -> v3 migration in progress
+![build](https://travis-ci.org/rfprod/spamt.svg?branch=master)
 
 ## Overview
 
@@ -22,7 +22,7 @@ SPAMT stands for Social Profile Analysis and Management Tool.
 
 # Start
 
-### Requirements
+## Requirements
 
 In order to run your own copy of SPAMT, you must have the following installed:
 
@@ -30,12 +30,9 @@ In order to run your own copy of SPAMT, you must have the following installed:
 - [`NPM`](https://nodejs.org/)
 - [`MongoDB`](http://www.mongodb.org/)
 - [`Git`](https://git-scm.com/)
+- [`Heroku CLI`](https://devcenter.heroku.com/articles/heroku-cli)
 
-To deploy on Openshift you may need a CLI
-
-- [`oc`](https://docs.openshift.com/online/cli_reference/get_started_cli.html#installing-the-cli)
-
-### Installation & Startup
+## Installation & Startup
 
 To install SPAMT execute the below command in the terminal window while in your projects folder:
 
@@ -68,34 +65,13 @@ MAILER_REFRESH_TOKEN=dummy-refresh-token
 MAILER_RECIPIENT_EMAIL=dummy-recipient-email@gmail.com
 ```
 
-##### Google Mail API instructions
+#### Google Mail API instructions
 
 1. go to [https://console.developers.google.com/](https://console.developers.google.com/) and create a project
 2. create clientId, provide `https://developers.google.com/oauthplayground` as a Redirect URL form value, download data as json or copy paste it, you'll need `Client ID` and `Client secret`
 3. go to [https://developers.google.com/oauthplayground](https://developers.google.com/oauthplayground), open config (click cog icon, right top screen part), select `Access token location`: `Authorization header w/ Bearer prefix`, set use you own OAuth credentials flag and input your credentials from previous step, close config
 4. `Step1` Select & authorize APIs: type your own `https://mail.google.com`
 5. `Step2` Exchange authorization code for tokens: get a refresh token - use this token as a value for the MAILER_REFRESH_TOKEN `.env` var
-
-#### Openshift deployment requires env variables
-
-```
-TWITTER_KEY=twitter-key
-TWITTER_SECRET=twitter-secret
-TWITTER_ACCESS_TOKEN=twitter-access-token-for-single-user-app-mode
-TWITTER_TOKEN_SECRET=twitter-token-secret-for-single-user-app-mode
-SOUNDCLOUD_SECRET=soundcloud-secret
-SOUNDCLOUD_CLIENT_ID=soundcloud-client-id
-APP_URL=application-url
-MONGO_USR=database-user-name
-MONGO_PASS=database-user-password
-MAILER_HOST=smtp.gmail.com
-MAILER_PORT=465
-MAILER_EMAIL=dummy-sender-email@gmail.com
-MAILER_CLIENT_ID=dummy-client-id.apps.googleusercontent.com
-MAILER_CLIENT_SECRET=dummy-client-secret
-MAILER_REFRESH_TOKEN=dummy-refresh-token
-MAILER_RECIPIENT_EMAIL=dummy-recipient-email@gmail.com
-```
 
 ### Starting the App
 
@@ -112,6 +88,80 @@ http://localhost:8080/
 ```
 
 SPAMT is up and running.
+
+### Heroku Deployment
+
+create a project
+
+```
+heroku create
+```
+
+check `./Procfile` which should have the following contents
+
+```
+web: npm run heroku-start
+```
+
+add mongolab addon
+
+```
+heroku addons:add mongolab
+```
+
+get mongodb url and copy result
+
+```
+heroku config:get MONGODB_URI
+```
+
+set environment variables (all listed in under **Local Environment Variables** subheading above)
+
+```
+...
+heroku config:set PORT=8080
+...
+```
+
+edit local `.env` file manually, set Heroku mongo uri instead of local one
+
+```
+MONGODB_URI=value-got-previously-from-heroku
+```
+
+build application and push to heroku
+
+```
+gulp build
+git push heroku master
+```
+
+or use a single command
+
+```
+npm run heroku-deploy
+```
+
+open on heroku
+
+```
+heroku open
+```
+
+#### Heroku deployment: START
+
+to start the app (MongoDB, Node and establish MongoDB connection, Gulp watchers), execute in the terminal while in the project folder (dependencies installation check will be performed before)
+
+```
+heroku local
+```
+
+now open your browser and type in the address bar
+
+```
+http://localhost:8080/
+```
+
 
 ### Testing
 
@@ -184,10 +234,10 @@ To lint the code execute the following command in the terminal window while in y
 npm run lint
 ```
 
-### The OpenShift docs
+## Heroku Documentation
 
-* [`CLI reference`](https://docs.openshift.com/online/cli_reference/get_started_cli.html)
-* [`Migrating applications`](https://docs.openshift.com/online/dev_guide/migrating_applications/index.html)
+* [`Heroku Devcenter: Getting started with nodejs`](https://devcenter.heroku.com/articles/getting-started-with-nodejs)
+* [`Heroku Elements: Addons: Mongolab`](https://elements.heroku.com/addons/mongolab)
 
 ## Licenses
 
