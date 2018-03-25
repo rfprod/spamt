@@ -29,6 +29,22 @@ exports.config = {
 
 	framework: 'jasmine',
 
+	plugins: [
+		{
+			package: 'jasmine2-protractor-utils',
+			disableHTMLReport: false,
+			disableScreenshot: false,
+			screenshotOnExpectFailure: true, // default: false
+			screenshotOnSpecFailure: true, // default: false
+			screenshotPath: 'logs/e2e/screenshots', // default: 'reports/screenshots'
+			clearFoldersBeforeTest: true, // default: false
+			htmlReportDir: 'logs/e2e/report', // default: 'reports/htmlReports'
+			failTestOnErrorLog: {
+				failTestOnErrorLogLevel: 5000 // default: 900
+			}
+		}
+	],
+
 	allScriptsTimeout: 5000000,
 
 	getPageTimeout: 5000000,

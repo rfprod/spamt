@@ -1,24 +1,28 @@
 import { Component, ElementRef, ViewChild, OnInit, OnDestroy } from '@angular/core';
 import { FormControl, Validators } from '@angular/forms';
-import { MdTabGroup } from '@angular/material';
+import { MatTabGroup } from '@angular/material';
+
 import { EventEmitterService } from '../services/event-emitter.service';
+
 import { SCgetQueriesService } from '../services/sc-get-queries.service';
 import { SCgetUserService } from '../services/sc-get-user.service';
 import { SCgetUserDetailsService } from '../services/sc-get-user-details.service';
 import { SCgetUserTrackDownloadService } from '../services/sc-get-user-track-download.service';
 import { SCgetUserTrackStreamService } from '../services/sc-get-user-track-stream.service';
+
 import { UserService } from '../services/user.service';
 
 @Component({
-	selector: 'dashboard-details',
-	templateUrl: '/public/app/views/dashboard-details.html',
+	selector: 'app-analyser-soundcloud',
+	templateUrl: '/public/app/views/app-analyser-soundcloud.html',
 	host: {
 		class: 'mat-body-1'
 	}
 })
-export class DashboardDetailsComponent implements OnInit, OnDestroy {
+export class AppAnalyserSoundcloudComponent implements OnInit, OnDestroy {
+
 	constructor(
-		public el: ElementRef,
+		private el: ElementRef,
 		private emitter: EventEmitterService,
 		private scGetQueriesService: SCgetQueriesService,
 		private scGetUserService: SCgetUserService,
@@ -27,14 +31,15 @@ export class DashboardDetailsComponent implements OnInit, OnDestroy {
 		private scGetUserTrackStreamService: SCgetUserTrackStreamService,
 		private userService: UserService
 	) {
-		console.log('this.el.nativeElement:', this.el.nativeElement);
+		console.log('AppAnalyserSoundcloudComponent element:', this.el.nativeElement);
 	}
-	private subscription: any = {
-		emitter: null as any,
-		tabChange: null as any
-	};
 
-	private publicData: any = {
+	/**
+	 * Component subscriptions.
+	 */
+	private subscriptions: any[] = [];
+
+	public publicData: any = {
 		user: null,
 		tracks: [],
 		playlists: [],
@@ -42,83 +47,80 @@ export class DashboardDetailsComponent implements OnInit, OnDestroy {
 		followers: [],
 		followings: [],
 	};
-	private publicDataKeys: string[] = Object.keys(this.publicData);
+	public publicDataKeys: string[] = Object.keys(this.publicData);
 	public errorMessage: string;
 	public successMessage: string;
-	private dismissMessages(): void {
+	public dismissMessages(): void {
 		this.errorMessage = '';
 		this.successMessage = '';
 	}
 
 // popular queries
-	private queries: any;
-	private getQueries(): void { // tslint:disable-line
-		this.emitSpinnerStartEvent();
+	public queries: any;
+	private getQueries(): void {
+		this.emitter.emitSpinnerStartEvent();
 		this.scGetQueriesService.getData().subscribe(
-			(data) => {
+			(data: any) => {
 				this.queries = data;
 				console.log('this.queries: ', this.queries);
 			},
-			(error) => this.errorMessage = error as any,
+			(error: any) => this.errorMessage = error,
 			() => {
 				console.log('getQueriesService done');
-				this.emitSpinnerStopEvent();
+				this.emitter.emitSpinnerStopEvent();
 			}
 		);
 	}
 
 // User
-	private userSelected(): boolean { // tslint:disable-line
+	public userSelected(): boolean {
 		return (this.publicData.user) ? true : false;
 	}
-	private resetSelection(): void { // tslint:disable-line
+	public resetSelection(): void {
 		for (const key of this.publicDataKeys) {
 			this.publicData[key] = (key === 'user') ? null : [];
 		}
 		this.scUserName = new FormControl('', Validators.compose([Validators.pattern('.{3,}')]));
 		this.selectedTab = '';
 		this.selectedEndpoint = '';
-		this.userService.model.analyser_query = this.scUserName.value;
-		this.userService.model.analyser_user_id = '';
-		this.userService.model.analyser_user_uri = '';
-		this.userService.saveUser();
-		this.emitter.emitEvent({appInfo: 'show'});
-		if (this.subscription.tabGroup) {
-			this.subscription.tabGroup.unsubscribe();
-		}
+		const newValues: any = {
+			analyser_query: this.scUserName.value,
+			analyser_user_id: '',
+			analyser_user_uri: ''
+		};
+		this.userService.saveUser(newValues);
 	}
-	private scUserName: FormControl = new FormControl('', Validators.compose([Validators.pattern('.{3,}')]));
-	private scUserNameKey(event): void { // tslint:disable-line
+	public scUserName: FormControl = new FormControl('', Validators.compose([Validators.pattern('.{3,}')]));
+	public scUserNameKey(event): void {
 		if (event.which === 13 || event.keyCode === 13 || event.key === 'Enter' || event.code === 'Enter') {
 			this.getUser();
 		}
 	}
-	private getUser(): void { // tslint:disable-line
-		this.emitSpinnerStartEvent();
+	public getUser(): void {
+		this.emitter.emitSpinnerStartEvent();
 		this.scGetUserService.getData(this.scUserName.value).subscribe(
-			(data) => {
-				this.emitter.emitEvent({appInfo: 'hide'});
+			(data: any) => {
 				this.publicData.user = data;
 				this.dismissMessages();
-				console.log('this.userService: ', this.userService);
-				this.userService.model.analyser_query = this.scUserName.value;
-				this.userService.model.analyser_user_id = this.publicData.user.id;
-				this.userService.model.analyser_user_uri = this.publicData.user.uri;
-				console.log('this.userService.model update:', this.userService.model);
-				this.userService.saveUser();
+				const newValues: any = {
+					analyser_query: this.scUserName.value,
+					analyser_user_id: this.publicData.user.id,
+					analyser_user_uri: this.publicData.user.uri
+				};
+				this.userService.saveUser(newValues);
 			},
-			(error) => {
-				this.errorMessage = error as any;
-				this.emitSpinnerStopEvent();
+			(error: any) => {
+				this.errorMessage = error;
+				this.emitter.emitSpinnerStopEvent();
 			},
 			() => {
 				console.log('getUserService done');
-				this.emitSpinnerStopEvent();
+				this.emitter.emitSpinnerStopEvent();
 				this.setTabChangeListener();
 			}
 		);
 	}
-	private analyseThisUser(permalink: string): void { // tslint:disable-line
+	public analyseThisUser(permalink: string): void {
 		this.scUserName.patchValue(permalink);
 		this.selectedTab = '';
 		for (const key in this.publicData) {
@@ -128,23 +130,24 @@ export class DashboardDetailsComponent implements OnInit, OnDestroy {
 	}
 
 // Data tabs
-	@ViewChild('tabGroup') private tabGroup: MdTabGroup;
+	@ViewChild('tabGroup') private tabGroup: MatTabGroup;
 	private setTabChangeListener(): void {
 		this.tabGroup.selectedIndex = 0;
-		this.subscription.tabChange = this.tabGroup.selectChange.subscribe((message) => {
+		const sub = this.tabGroup.selectedTabChange.subscribe((event: any) => {
 			/*
 			*	tab change events
 			*/
-			console.log('tabs chage event:', message, '| active tab index', message.index, '| tab name', this.dataTabs[message.index]);
-			this.selectTab(this.dataTabs[message.index]);
+			console.log('tabs chage event:', event, '| active tab index', event.index, '| tab name', this.dataTabs[event.index]);
+			this.selectTab(this.dataTabs[event.index]);
 		});
+		this.subscriptions.push(sub);
 		this.selectTab(this.dataTabs[this.tabGroup.selectedIndex]);
 	}
-	private dataTabs: string[] = ['Tracks', 'Playlists', 'Favorites', 'Followers', 'Followings']; // tslint:disable-line
-	private endpoints: string[] = ['tracks', 'playlists', 'favorites', 'followers', 'followings']; // tslint:disable-line
-	private selectedTab: string = '';
+	public dataTabs: string[] = ['Tracks', 'Playlists', 'Favorites', 'Followers', 'Followings'];
+	private endpoints: string[] = ['tracks', 'playlists', 'favorites', 'followers', 'followings'];
+	public selectedTab: string = '';
 	private selectedEndpoint: string = '';
-	private selectTab(tab: string): void { // tslint:disable-line
+	private selectTab(tab: string): void {
 		console.log('selectTab, tab: ', tab);
 
 		if (this.audioPlayback || this.selectedTrack || this.selectedTrackURI) {
@@ -163,7 +166,7 @@ export class DashboardDetailsComponent implements OnInit, OnDestroy {
 			}
 		}
 		console.log('this.selectedEndpoint: ', this.selectedEndpoint);
-		this.emitSpinnerStartEvent();
+		this.emitter.emitSpinnerStartEvent();
 		this.scGetUserDetailsService.getData(this.userService.model.analyser_user_uri + '/' + this.selectedEndpoint).subscribe(
 			(data: any) => {
 				if (data.hasOwnProperty('collection')) {
@@ -180,13 +183,13 @@ export class DashboardDetailsComponent implements OnInit, OnDestroy {
 				}
 				this.dismissMessages();
 			},
-			(error) => {
-				this.errorMessage = error as any;
-				this.emitSpinnerStopEvent();
+			(error: any) => {
+				this.errorMessage = error;
+				this.emitter.emitSpinnerStopEvent();
 			},
 			() => {
 				console.log('getUserDetailsService done');
-				this.emitSpinnerStopEvent();
+				this.emitter.emitSpinnerStopEvent();
 			}
 		);
 	}
@@ -231,45 +234,35 @@ export class DashboardDetailsComponent implements OnInit, OnDestroy {
 		}
 	}
 
-// Spinner
-	private emitSpinnerStartEvent(): void {
-		// console.log('root spinner start event emitted');
-		this.emitter.emitEvent({spinner: 'start'});
-	}
-	private emitSpinnerStopEvent(): void {
-		// console.log('root spinner stop event emitted');
-		this.emitter.emitEvent({spinner: 'stop'});
-	}
-
 // Data tabs controls: Tracks
-	private selectedTrackURI: string;
-	private audioPlayback: boolean = false;
-	private selectedTrack: string = undefined;
+	public selectedTrackURI: string;
+	public audioPlayback: boolean = false;
+	public selectedTrack: string = undefined;
 	private resolvePreviewSource(uri): void {
 		this.selectedTrack = undefined;
-		this.emitSpinnerStartEvent();
+		this.emitter.emitSpinnerStartEvent();
 		this.scGetUserTrackStreamService.getData(uri).subscribe(
-			(data) => {
+			(data: any) => {
 				console.log('scGetUserTrackPlayService, data: ', data);
 				this.selectedTrack = data.location;
 				this.selectedTrackURI = uri;
 				this.dismissMessages();
 			},
-			(error) => {
-				this.errorMessage = error as any;
-				this.emitSpinnerStopEvent();
+			(error: any) => {
+				this.errorMessage = error;
+				this.emitter.emitSpinnerStopEvent();
 			},
 			() => {
 				console.log('scGetUserTrackPlayService done');
 				setTimeout(() => {
 					this.emitter.emitEvent({audio: 'play'});
 					this.audioPlayback = true;
-					this.emitSpinnerStopEvent();
+					this.emitter.emitSpinnerStopEvent();
 				}, 1000);
 			}
 		);
 	}
-	private playTrack(uri): void { // tslint:disable-line
+	public playTrack(uri: string): void {
 		console.log('playTrack, sc api uri: ', uri);
 		if (this.selectedTrackURI !== uri) {
 			if (this.selectedTrackURI && this.audioPlayback) {
@@ -288,26 +281,25 @@ export class DashboardDetailsComponent implements OnInit, OnDestroy {
 			}
 		}
 	}
-	private downloadTrack(uri): void { // tslint:disable-line
+	public downloadTrack(uri: string): void {
 		console.log('downloadTrack, sc api uri: ', uri);
 		this.scGetUserTrackDownloadService.openInNewWindow(uri);
 	}
 
 // Data tabs controls: Playlists
-	private displayPlaylistTracks: boolean[] = [];
-	private togglePlaylist(index) { // tslint:disable-line
+	public displayPlaylistTracks: boolean[] = [];
+	public togglePlaylist(index: number) {
 		console.log('togglePlaylist, dispalyPlaylistTracks index: ', index);
 		this.displayPlaylistTracks[index] = (this.displayPlaylistTracks[index]) ? false : true;
 	}
 
 // Help
-	private showHelp: boolean = false; // controls help labells visibility, catches events from nav component
+	public showHelp: boolean = false; // controls help labells visibility, catches events from nav component
 
 // Lifecycle
 	public ngOnInit(): void {
-		console.log('ngOnInit: DashboardDetailsComponent initialized');
-		this.emitSpinnerStartEvent();
-		this.emitter.emitEvent({appInfo: 'hide'});
+		console.log('ngOnInit: AppAnalyserSoundcloudComponent initialized');
+		this.emitter.emitSpinnerStartEvent();
 		console.log('this.userService:', this.userService.model);
 		this.getQueries();
 		if (!this.userService.model.analyser_query) {
@@ -318,7 +310,6 @@ export class DashboardDetailsComponent implements OnInit, OnDestroy {
 					this.getUser();
 				} else {
 					console.log('restored user selection, user is not selected');
-					this.emitter.emitEvent({appInfo: 'show'});
 				}
 			});
 		} else {
@@ -326,29 +317,32 @@ export class DashboardDetailsComponent implements OnInit, OnDestroy {
 			console.log('user is selected, this.scUserName.value:', this.scUserName.value);
 			this.getUser();
 		}
-		this.subscription.emitter = this.emitter.getEmitter().subscribe((message) => {
+
+		const sub = this.emitter.getEmitter().subscribe((event: any) => {
 			/*
-			*	listen to help toggler messages
+			*	help toggler events
 			*/
-			if (message.help === 'toggle') {
-				console.log('/data consuming event:', message, ' | toggling help labels visibility');
+			if (event.help === 'toggle') {
+				console.log('AppAnalyserSoundcloudComponent emitter event:', event, ' | toggling help labels visibility');
 				this.showHelp = (this.showHelp) ? false : true;
 			}
 			/*
-			*	listen to <audio> element playback controls messages
+			*	<audio> element playback event
 			*/
-			if (message.AudioPlayerDirective) {
-				console.log('/data consuming event from AudioPlayerDirective: ', message);
-				if (message.AudioPlayerDirective === 'play') { this.audioPlayback = true; }
-				if (message.AudioPlayerDirective === 'pause') { this.audioPlayback = false; }
+			if (event.AudioPlayerDirective) {
+				console.log('AppAnalyserSoundcloudComponent emitter event from AudioPlayerDirective: ', event);
+				if (event.AudioPlayerDirective === 'play') { this.audioPlayback = true; }
+				if (event.AudioPlayerDirective === 'pause') { this.audioPlayback = false; }
 			}
 		});
+		this.subscriptions.push(sub);
 	}
 	public ngOnDestroy(): void {
-		console.log('ngOnDestroy: DashboardDetailsComponent destroyed');
-		this.subscription.emitter.unsubscribe();
-		if (this.subscription.tabGroup) {
-			this.subscription.tabGroup.unsubscribe();
+		console.log('ngOnDestroy: AppAnalyserSoundcloudComponent destroyed');
+		if (this.subscriptions.length) {
+			for (const sub of this.subscriptions) {
+				sub.unsubscribe();
+			}
 		}
 	}
 }

@@ -15,6 +15,9 @@ const gulp = require('gulp'),
 	cssnano = require('gulp-cssnano'),
 	autoprefixer = require('gulp-autoprefixer'),
 	systemjsBuilder = require('gulp-systemjs-builder'),
+	hashsum = require('gulp-hashsum'),
+	crypto = require('crypto'),
+	fs = require('fs'),
 	spawn = require('child_process').spawn,
 	exec = require('child_process').exec;
 let node,
@@ -22,14 +25,17 @@ let node,
 	tsc;
 
 function killProcessByName(name){
-	exec('ps -e | grep '+name, (error, stdout, stderr) => {
-		if (error) throw error;
+	exec('pgrep ' + name, (error, stdout, stderr) => {
+		if (error) {
+			// throw error;
+			console.log('killProcessByName, error', error);
+		}
 		if (stderr) console.log('stderr: ',stderr);
 		if (stdout) {
 			//console.log('killing running processes:', stdout);
 			const runningProcessesIDs = stdout.match(/\d{3,6}/);
 			runningProcessesIDs.forEach((id) => {
-				exec('kill -9 '+id, (error, stdout, stderr) => {
+				exec('kill -9 ' + id, (error, stdout, stderr) => {
 					if (error) throw error;
 					if (stderr) console.log('stdout: ', stdout);
 					if (stdout) console.log('stderr: ', stderr);
@@ -39,17 +45,120 @@ function killProcessByName(name){
 	});
 }
 
-gulp.task('database', () => {
+function setDevEnv(value, done) {
+	if (typeof value === 'boolean') {
+		fs.readFile('./.env', (err, data) => {
+			let env;
+			if (err) {
+				env = '';
+			} else {
+				env = data.toString();
+			}
+			if (env.indexOf('DEV_ENV=true') !== -1) {
+				env = env.replace(/DEV_ENV=true.*\n/, 'DEV_ENV=false\n');
+			}
+			fs.writeFile('./.env', env, (err) => {
+				if (err) throw err;
+				console.log('# > ENV > .env file was created');
+				if (done) done();
+			});
+		});
+	} else {
+		throw new TypeError('first argument must be boolean');
+	}
+}
+
+gulp.task('dont-use-cluster', (done) => {
+	setDevEnv(false, done);
+});
+
+gulp.task('use-cluster', (done) => {
+	setDevEnv(true, done);
+});
+
+function dontGitignoreBuild(gitignore, done) {
+	fs.writeFile('./.gitignore', gitignore, (err) => {
+		if (err) throw err;
+		console.log('# > ENV > .gitignore file was updated');
+		done();
+	});
+}
+
+gulp.task('dont-gitignore-build', (done) => {
+	fs.readFile('./.gitignore', (err, data) => {
+		let gitignore = '';
+		if (err) {
+			console.log('./.gitignore does not exist');
+			dontGitignoreBuild(gitignore, done);
+		} else {
+			gitignore = data.toString()
+				.replace(/public\/js\/\*\.min\.js\n/, '')
+				.replace(/public\/css\/\*\.min\.css\n/, '')
+				.replace(/public\/webfonts\/\*\.\*\n/, '')
+				.replace(/public\/SHA1SUMS\.json\n/, '');
+			console.log('./.gitignore exists, updated gitignore', gitignore);
+			dontGitignoreBuild(gitignore, done);
+		}
+	});
+});
+
+/*
+*	hashsum identifies build
+*
+*	after build SHA1SUMS.json is generated with sha1 sums for different files
+*	then sha256 is calculated using stringified file contents
+*/
+gulp.task('hashsum', () => {
+	return gulp.src(['./public/*', '!./public/SHA1SUMS.json', './public/app/views/**', './public/css/**', './public/webfonts/**', './public/img/**', './public/js/**'])
+		.pipe(hashsum({ filename: 'public/SHA1SUMS.json', hash: 'sha1', json: true }));
+});
+
+function setBuildHashENV(done) {
+	fs.readFile('./public/SHA1SUMS.json', (err, data) => {
+		if (err) throw err;
+		const hash = crypto.createHmac('sha256', data.toString()).digest('hex');
+		console.log('BUILD_HASH', hash);
+		fs.readFile('./.env', (err, data) => {
+			let env;
+			if (err) {
+				env = '';
+			} else {
+				env = data.toString();
+			}
+			// console.log('ENV', env);
+			if (env.indexOf('BUILD_HASH') !== -1) {
+				// console.log('contains hash, replace');
+				env = env.replace(/BUILD_HASH=.*\n/, 'BUILD_HASH=' + hash + '\n');
+			} else {
+				// console.log('does not contain hash, add');
+				env += 'BUILD_HASH=' + hash + '\n';
+			}
+			// console.log('env.split(\'\n\')', env);
+			fs.writeFile('./.env', env, (err) => {
+				if (err) throw err;
+				console.log('# > ENV > .env file was created');
+				if (done) done();
+			});
+		});
+	});
+}
+
+gulp.task('set-build-hash', (done) => {
+	setBuildHashENV(done);
+});
+
+gulp.task('database', (done) => {
 	if (mongo) mongo.kill();
-	mongo = spawn('mongod', ['--smallfiles', '--nojournal'], {stdio: 'inherit'});
+	mongo = spawn('npm', ['run', 'mongo-start'], {stdio: 'inherit'});
 	mongo.on('close', (code) => {
 		if (code === 8) {
 			console.log('Error detected, waiting for changes...');
 		}
 	});
+	done();
 });
 
-gulp.task('server', () => {
+gulp.task('server', (done) => {
 	if (node) node.kill();
 	node = spawn('node', ['server.js'], {stdio: 'inherit'});
 	node.on('close', (code) => {
@@ -57,6 +166,7 @@ gulp.task('server', () => {
 			console.log('Error detected, waiting for changes...');
 		}
 	});
+	done();
 });
 
 gulp.task('tsc', (done) => {
@@ -74,10 +184,147 @@ gulp.task('tsc', (done) => {
 	});
 });
 
+const logsIndexHTML = `
+<!DOCTYPE html>
+<html>
+	<head>
+		<style>
+			body {
+				height: 100%;
+				margin: 0;
+				padding: 0 1em;
+				display: flex;
+				flex-direction: row;
+				flex-wrap: wrap;
+				align-items: flex-start;
+				align-content: flex-start;
+				justify-content: stretch;
+			}
+			.flex-100 {
+				flex: 100%;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+			}
+			.flex-item {
+				flex: 1 1 auto;
+				display: flex;
+				flex-direction: row;
+				flex-wrap: wrap;
+				align-items: center;
+				justify-content: center;
+				border: 1px rgba(0, 0, 0, 0.3) dotted;
+			}
+		</style>
+	</head>
+	<body>
+			<h1 class="flex-100">SPAMT Reports and Documentation Index</h1>
+
+			<h2 class="flex-100">Reports</h2>
+
+			<span class="flex-item">
+				<h3 class="flex-100">Server Unit</h3>
+				<a class="flex-item" href="unit/server/index.html" target=_blank>Spec</a>
+			</span>
+
+			<span class="flex-item">
+				<h3 class="flex-100">Client Unit</h3>
+				<a class="flex-item" href="unit/client/index.html" target=_blank>Spec</a>
+				<a class="flex-item" href="coverage/html-report/index.html" target=_blank>Coverage</a>
+			</span>
+
+			<span class="flex-item">
+				<h3 class="flex-100">Client E2E</h3>
+				<a class="flex-item" href="e2e/report/index.html" target=_blank>Spec</a>
+			</span>
+
+			<h2 class="flex-100">Documentation</h2>
+
+			<span class="flex-item">
+				<h3 class="flex-100">Server</h3>
+				<a class="flex-item" href="jsdoc/index.html" target=_blank>JSDoc</a>
+			</span>
+
+			<span class="flex-item">
+				<h3 class="flex-100">Client</h3>
+				<a class="flex-item" href="typedoc/index.html" target=_blank>TypeDoc</a>
+			</span>
+	</body>
+</html>
+`;
+gulp.task('generate-logs-index', (done) => {
+	fs.writeFile('./logs/index.html', logsIndexHTML, (err) => {
+		if (err) throw err;
+		console.log('# > LOGS index.html > was created');
+		done();
+	});
+});
+
+gulp.task('jsdoc-server', () => {
+	const jsdoc = require('gulp-jsdoc3');
+	const config = require('./jsdoc.json');
+	const source = ['./server.js', './app/**/*.js'];
+	return gulp.src(['README.md'].concat(source), {read: false})
+		.pipe(jsdoc(config));
+});
+
+gulp.task('typedoc-client', () => {
+	const typedoc = require('gulp-typedoc');
+	const config = {
+		// typescript options (see typescript docs)
+		allowSyntheticDefaultImports: true,
+		alwaysStrict: true,
+		importHelpers: true,
+		baseUrl: '.',
+		paths: {
+			'tslib': ['node_modules/tslib/tslib.d.ts'],
+			'*': ['*']
+		},
+		emitDecoratorMetadata: true,
+		esModuleInterop: true,
+		experimentalDecorators: true,
+		forceConsistentCasingInFileNames: true,
+		module: 'commonjs',
+		moduleResolution: 'node',
+		noImplicitAny: false,
+		removeComments: true,
+		sourceMap: true,
+		suppressImplicitAnyIndexErrors: true,
+		target: 'es2017',
+		typeRoots: ['./node_modules/@types'],
+		types: ['node', 'jasmine', 'hammerjs', 'core-js', 'jquery'],
+		// output options (see typedoc docs: http://typedoc.org/api/index.html)
+		readme: './README.md',
+		out: './logs/typedoc',
+		json: './logs/typedoc/typedoc-output.json',
+		// typedoc options (see typedoc docs: http://typedoc.org/api/index.html)
+		name: 'SPAMT Client',
+		theme: 'default',
+		//plugins: [], // set to none to use no plugins, omit to use all
+		includeDeclarations: false,
+		ignoreCompilerErrors: true,
+		version: true
+	};
+	return gulp.src(['public/app/**/*.ts'], {read: false})
+		.pipe(typedoc(config));
+});
+
 gulp.task('server-test', () => {
 	return gulp.src(['./test/server/*.js'], { read: false })
-		.pipe(mocha({ reporter: 'spec' }))
-		.on('error', util.log);
+		.pipe(mocha({ reporter: 'good-mocha-html-reporter' })) // also spec reporter in terminal
+		.on('error', util.log)
+		.once('end', () => {
+			if (fs.existsSync('./report.html')) {
+				if (!fs.existsSync('./logs/unit/server')) {
+					if (!fs.existsSync('./logs/unit')) {
+						fs.mkdirSync('./logs/unit');
+					}
+					fs.mkdirSync('./logs/unit/server');
+				}
+				fs.copyFileSync('./report.html', './logs/unit/server/index.html');
+				fs.unlinkSync('./report.html');
+			}
+		});
 });
 
 gulp.task('client-unit-test', (done) => {
@@ -115,12 +362,9 @@ gulp.task('client-unit-test-single-run', (done) => {
 
 	server.on('run_complete', (browsers, results) => {
 		if (results.failed) {
-			// throw new Error('=====\nKarma > Tests Failed\n=====\n', results);
-			console.log('=====\nKarma > Tests Failed\n=====\n', results);
-		} else {
-			console.log('=====\nKarma > Complete With No Failures\n=====\n', results);
+			throw new Error('=====\nKarma > Tests Failed\n=====\n', results);
 		}
-
+		console.log('=====\nKarma > Complete With No Failures\n=====\n', results);
 		done();
 	});
 
@@ -135,35 +379,32 @@ gulp.task('build-system-js', () => {
 	*	nonangular components related to design, styling, data visualization etc.
 	*	are built by another task
 	*/
-	const builder = systemjsBuilder('/','./systemjs.config.js');
-	return builder.buildStatic('app', 'bundle.min.js', {
-		minify: true,
-		mangle: true
-	})
+	return systemjsBuilder('/','./systemjs.config.js')
+		.buildStatic('app', 'bundle.min.js', {
+			minify: true,
+			mangle: true
+		})
 		.pipe(gulp.dest('./public/js'));
 });
 
 gulp.task('pack-vendor-js', () => {
 	/*
-	*	nonangular js bundle
-	*	components related to design, styling, data visualization etc.
+	*	third party js files
 	*/
 	return gulp.src([
-		/*
-		*	add paths to required third party js files
-		*
-		*	note: sequence is essential
-		*/
+		// angular requirements
 		'./node_modules/core-js/client/shim.js',
+		'./node_modules/zone.js/dist/zone.min.js',
+		'./node_modules/reflect-metadata/Reflect.js',
+		'./node_modules/web-animations-js/web-animations.min.js',
 
 		'./node_modules/jquery/dist/jquery.js',
 
+		// ng2nvd3 dependency
 		'./node_modules/d3/d3.js',
 		'./node_modules/nvd3/build/nv.d3.js',
-		// angular dependencies start here
-		'./node_modules/zone.js/dist/zone.min.js',
-		'./node_modules/reflect-metadata/Reflect.js',
-		'./node-modules/web-animations-js/web-animations.min.js'
+
+		'https://raw.githubusercontent.com/soundcloud/soundcloud-custom-player/master/js/soundcloud.player.api.js'
 	])
 		.pipe(plumber())
 		.pipe(concat('vendor-bundle.js'))
@@ -174,9 +415,12 @@ gulp.task('pack-vendor-js', () => {
 });
 
 gulp.task('pack-vendor-css', () => {
+	/*
+	*	third party css files
+	*/
 	return gulp.src([
 		'./node_modules/nvd3/build/nv.d3.css',
-		'./node_modules/components-font-awesome/css/font-awesome.css',
+		'./node_modules/components-font-awesome/css/fontawesome-all.css',
 		/*
 		*	Angular material theme should be chosen and loaded here
 		*/
@@ -195,17 +439,14 @@ gulp.task('pack-vendor-css', () => {
 
 gulp.task('move-vendor-fonts', () => {
 	return gulp.src([
-		/*
-		*	add paths to required third party fonts
-		*/
-		'./node_modules/components-font-awesome/fonts/*.*',
+		'./node_modules/components-font-awesome/webfonts/*.*',
 		// material design icons
-		'node_modules/material-design-icon-fonts/iconfont/*.eot',
-		'node_modules/material-design-icon-fonts/iconfont/*.woff2',
-		'node_modules/material-design-icon-fonts/iconfont/*.woff',
-		'node_modules/material-design-icon-fonts/iconfont/*.ttf'
+		'./node_modules/material-design-icon-fonts/iconfont/*.eot',
+		'./node_modules/material-design-icon-fonts/iconfont/*.woff2',
+		'./node_modules/material-design-icon-fonts/iconfont/*.woff',
+		'./node_modules/material-design-icon-fonts/iconfont/*.ttf'
 	])
-		.pipe(gulp.dest('./public/fonts'));
+		.pipe(gulp.dest('./public/webfonts'));
 });
 
 gulp.task('sass-autoprefix-minify-css', () => {
@@ -239,27 +480,47 @@ gulp.task('tslint', () => {
 });
 
 gulp.task('watch', () => {
-	gulp.watch(['./server.js', './app/config/*.js', './app/routes/*.js', './app/utils/*.js'], ['server']); // watch server and database changes and restart server
-	gulp.watch(['./server.js', './app/models/*.js'], ['database']); // watch database changes and restart database
-	gulp.watch(['./public/app/*.js', './public/app/**/*.js'], ['build-system-js']); // watch app js changes and build system
-	gulp.watch('./public/app/scss/*.scss', ['sass-autoprefix-minify-css']); // watch app css changes, pack css, minify and put in respective folder
-	gulp.watch(['./test/server/test.js'], ['server-test']); // watch server tests changes and run tests
-	gulp.watch(['./app/**', './public/js/*.js', './*.js', './.eslintignore', './.eslintrc.json'], ['eslint']); // watch js files to be linted or eslint config and lint on change
-	gulp.watch(['./public/app/*.ts', './public/app/**/*.ts', './test/client/**/*.ts', './tslint.json'], ['tslint']); // watch ts files to be linted or tslint config and lint on change
+	gulp.watch(['./server.js', './app/**/*.js'], ['database', 'server']);
+	gulp.watch(['./test/server/*.js'], ['server-test']);
+	gulp.watch(['./gulpfile.js'], ['pack-vendor-js', 'pack-vendor-css', 'move-vendor-fonts']);
+	gulp.watch('./public/app/scss/*.scss', ['sass-autoprefix-minify-css']);
+	gulp.watch(['./public/app/*.ts', './public/app/**/*.ts', './test/client/**/*.ts', './tslint.json'], ['spawn-rebuild-app']);
+	gulp.watch(['./app/**', './public/js/*.js', './*.js', './.eslintignore', './.eslintrc.json'], ['eslint']);
 });
 
 gulp.task('watch-and-lint', () => {
 	gulp.watch(['./app/**', './public/js/*.js', './*.js', './.eslintignore', './.eslintrc.json'], ['eslint']); // watch js files to be linted or eslint config and lint on change
-	gulp.watch(['./public/app/*.ts', './public/app/**/*.ts', './tslint.json'], ['tslint']); // watch ts files to be linted or tslint config and lint on change
+	gulp.watch(['./public/app/*.ts', './public/app/**/*.ts', './test/client/**/*.ts', './tslint.json'], ['tslint']); // watch ts files to be linted or tslint config and lint on change
 });
 
 gulp.task('watch-client-and-test', () => {
-	gulp.watch(['./public/app/*.ts','./test/client/*.ts'], ['tsc']);
-	gulp.watch(['./public/app/*.js','./test/client/*.js','./test/karma.conf.js','./test/karma.test-shim.js'], ['client-unit-test']); //watch unit test changes and run tests
+	gulp.watch(['./public/app/*.ts', './public/app/**/*.ts', './test/client/**/*.ts', './test/karma.conf.js','./test/karma.test-shim.js'], ['compile-and-test']);
 });
 
 gulp.task('build', (done) => {
-	runSequence('build-system-js', 'pack-vendor-js', 'pack-vendor-css', 'move-vendor-fonts', 'sass-autoprefix-minify-css', done);
+	runSequence('build-system-js', 'pack-vendor-js', 'pack-vendor-css', 'move-vendor-fonts', 'sass-autoprefix-minify-css', 'hashsum', 'set-build-hash', done);
+});
+
+gulp.task('compile-and-build', (done) => {
+	runSequence('tsc', 'build', done);
+});
+
+gulp.task('compile-and-test', (done) => {
+	runSequence('tsc', 'client-unit-test', done);
+});
+
+gulp.task('rebuild-app', (done) => {
+	runSequence('tslint', 'tsc', 'build-system-js', 'hashsum', 'set-build-hash', done);
+});
+
+let rebuildApp;
+gulp.task('spawn-rebuild-app', (done) => {
+	if (rebuildApp) rebuildApp.kill();
+	rebuildApp = spawn('gulp', ['rebuild-app'], {stdio: 'inherit'});
+	rebuildApp.on('close', (code) => {
+		console.log(`rebuildApp closed with code ${code}`);
+	});
+	done();
 });
 
 gulp.task('lint', (done) => {
@@ -267,27 +528,18 @@ gulp.task('lint', (done) => {
 });
 
 gulp.task('default', (done) => {
-	runSequence('database', 'server', 'build', 'lint', 'watch', done);
+	runSequence('lint', 'compile-and-build', 'database', 'server', 'watch', done);
 });
 
-gulp.task('production-start', (done) => {
-	runSequence('database', 'server', 'build', done);
+gulp.task('start-prebuilt', (done) => {
+	runSequence('database', 'server', 'watch', done);
 });
 
-process.on('exit', () => {
-	if (node) node.kill();
-	if (mongo) mongo.kill();
-	if (tsc) tsc.kill();
+gulp.task('kill', (done) => {
 	killProcessByName('gulp');
+	done();
 });
 
-['SIGHUP', 'SIGINT', 'SIGQUIT', 'SIGILL', 'SIGTRAP', 'SIGABRT',
-	'SIGBUS', 'SIGFPE', 'SIGUSR1', 'SIGSEGV', 'SIGUSR2', 'SIGTERM'
-].forEach((element) => {
-	process.on(element, () => {
-		if (node) node.kill();
-		if (mongo) mongo.kill();
-		if (tsc) tsc.kill();
-		killProcessByName('gulp');
-	});
+process.on('exit', (code) => {
+	console.log(`PROCESS EXIT CODE ${code}`);
 });

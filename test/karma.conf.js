@@ -20,29 +20,46 @@ module.exports = function(config){
 			'node_modules/zone.js/dist/async-test.js',
 			'node_modules/zone.js/dist/fake-async-test.js',
 
+			'node_modules/moment/min/moment-with-locales.min.js',
+
 			'node_modules/systemjs/dist/system.src.js',
+			{ pattern: 'node_modules/@angular/material/prebuilt-themes/deeppurple-amber.css' },
 
 			{ pattern: 'systemjs.config.js', included: false, watched: false },
 			{ pattern: 'systemjs.karma.config.js', included: false, watched: false },
 			{ pattern: 'systemjs.config.extras.js', included: false, watched: false },
 			{ pattern: 'node_modules/traceur/bin/traceur.js', included: false, watched: false },
-			
+
 			'node_modules/hammerjs/hammer.js',
 			{ pattern: 'node_modules/@angular/**', included: false, watched: false },
-			
 			{ pattern: 'node_modules/rxjs/**', included: false, watched: false },
+			{ pattern: 'node_modules/tslib/**', included: false, watched: false },
+			{ pattern: 'node_modules/traceur/**', included: false, watched: false },
 
 			'test/karma.test-shim.js',
 			{ pattern: 'test/client/**', included: false, watched: false },
 
-			{ pattern: 'public/app/**', included: false, watched: false }
+			{ pattern: 'public/app/**', included: false, watched: false },
+
+			{ pattern: 'public/service-worker.js', included: false, watched: false },
+
+			{ pattern: 'public/webfonts/**', included: false, watched: false },
+
+			{ pattern: 'public/img/**', included: false, watched: false }
 		],
+
+		proxies: {
+			'/service-worker.js': '/base/public/service-worker.js',
+			'/public/webfonts/': '/base/public/webfonts/',
+			'/public/img/': '/base/public/img/'
+		},
 
 		// exclude: [],
 
 		frameworks: ['jasmine'],
 
 		browserNoActivityTimeout: 20000,
+		browserDisconnectTimeout: 20000,
 		customLaunchers: {
 			/*
 			*	this custom launcher requires setting env var CHROME_BIN=chromium-browser
@@ -64,6 +81,7 @@ module.exports = function(config){
 		plugins : [
 			'karma-redirect-preprocessor',
 			'karma-chrome-launcher',
+			'karma-html-reporter',
 			'karma-sourcemap-loader',
 			'karma-coverage',
 			'karma-jasmine'
@@ -81,12 +99,23 @@ module.exports = function(config){
 			// prependPrefix: ''
 		},
 
-		reporters: ['progress', 'coverage'],
+		reporters: ['progress', 'coverage', 'html'],
+
 		coverageReporter: {
 			dir: 'logs/',
 			reporters: [
 				{ type: 'json', subdir: 'coverage'}
 			]
+		},
+
+		htmlReporter: {
+			outputDir: 'logs/unit',
+			templatePath: null,
+			focusOnFailures: true,
+			namedFiles: false,
+			pageTitle: 'Ng2NWTN Client Unit Tests',
+			urlFriendlyName: true,
+			reportName: 'client'
 		},
 
 		failOnEmptyTestSuite: false,

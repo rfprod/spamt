@@ -7,23 +7,29 @@ import { WebsocketService } from '../services/websocket.service';
 // declare let d3: any;
 
 @Component({
-	selector: 'dashboard-intro',
-	templateUrl: '/public/app/views/dashboard-intro.html',
+	selector: 'app-intro',
+	templateUrl: '/public/app/views/app-intro.html',
 	host: {
 		class: 'mat-body-1'
 	}
 })
-export class DashboardIntroComponent implements OnInit, OnDestroy {
+export class AppIntroComponent implements OnInit, OnDestroy {
+
 	constructor(
-		public el: ElementRef,
+		private el: ElementRef,
 		private emitter: EventEmitterService,
 		private websocket: WebsocketService,
 		private serverStaticDataService: ServerStaticDataService,
 		private publicDataService: PublicDataService
 	) {
-		console.log('this.el.nativeElement:', this.el.nativeElement);
+		console.log('AppIntroComponent element:', this.el.nativeElement);
 	}
-	private subscription: any;
+
+	/**
+	 * Component subscriptions.
+	 */
+	private subscriptions: any[] = [];
+
 	public title: string = 'SPAMT';
 	public description: string = 'Social Profile Analysis and Management Tool';
 	public chartOptions: object = {
@@ -80,8 +86,8 @@ export class DashboardIntroComponent implements OnInit, OnDestroy {
 
 	private getServerStaticData(callback): void {
 		this.serverStaticDataService.getData().subscribe(
-			(data) => this.serverData.static = data,
-			(error) => this.errorMessage = error as any,
+			(data: any) => this.serverData.static = data,
+			(error: any) => this.errorMessage = error,
 			() => {
 				console.log('getServerStaticData done, data:', this.serverData.static);
 				if (callback) { callback(); }
@@ -90,11 +96,11 @@ export class DashboardIntroComponent implements OnInit, OnDestroy {
 	}
 	private getPublicData(callback): void {
 		this.publicDataService.getData().subscribe(
-			(data) => {
+			(data: any) => {
 				this.nvd3.clearElement();
 				this.appUsageData = data;
 			},
-			(error) => this.errorMessage = error as any,
+			(error: any) => this.errorMessage = error,
 			() => {
 				console.log('getPublicData done, data:', this.appUsageData);
 				if (callback) { callback(); }
@@ -102,19 +108,9 @@ export class DashboardIntroComponent implements OnInit, OnDestroy {
 		);
 	}
 
-// Spinner
-	private emitSpinnerStartEvent(): void {
-		// console.log('root spinner start event emitted');
-		this.emitter.emitEvent({spinner: 'start'});
-	}
-	private emitSpinnerStopEvent(): void {
-		// console.log('root spinner stop event emitted');
-		this.emitter.emitEvent({spinner: 'stop'});
-	}
-
 // Modal
-	private showModal: boolean = false;
-	private toggleModal(): void { /* tslint:disable-line */
+	public showModal: boolean = false;
+	public toggleModal(): void {
 		if (this.showModal) {
 			this.ws.send(JSON.stringify({action: 'pause'}));
 		} else { this.ws.send(JSON.stringify({action: 'get'})); }
@@ -126,12 +122,34 @@ export class DashboardIntroComponent implements OnInit, OnDestroy {
 
 	@ViewChild('chart') private nvd3: any;
 
-	public ngOnInit(): void {
-		console.log('ngOnInit: DashboardIntroComponent initialized');
-		this.emitSpinnerStartEvent();
-		this.emitter.emitEvent({appInfo: 'show'});
+	public badges: any[] = [
+		{
+			title: 'Node.js - an open-source, cross-platform runtime environment for developing server-side Web applications.',
+			link: 'https://en.wikipedia.org/wiki/Node.js',
+			img: '/public/img/Node.js_logo.svg',
+		},
+		{
+			title: 'MongoDB - a free and open-source cross-platform document-oriented database.',
+			link: 'https://en.wikipedia.org/wiki/MongoDB',
+			img: '/public/img/MongoDB_logo.svg',
+		},
+		{
+			title: 'Angular - (commonly referred to as "Angular 2+" or "Angular 2") is a TypeScript-based open-source front-end web application platform led by the Angular Team at Google and by a community of individuals and corporations to address all of the parts of the developer\'s workflow while building complex web applications. Angular is a complete rewrite from the same team that built AngularJS.',
+			link: 'https://en.wikipedia.org/wiki/Angular_(application_platform)',
+			img: '/public/img/Angular_logo.svg',
+		},
+		{
+			title: 'Soundcloud - a global online audio distribution platform based in Berlin, Germany, that enables its users to upload, record, promote, and share their originally-created sounds.',
+			link: 'https://en.wikipedia.org/wiki/SoundCloud',
+			img: '/public/img/SoundCloud_logo.svg',
+		}
+	];
 
-		this.ws.onopen = (evt) => {
+	public ngOnInit(): void {
+		console.log('ngOnInit: AppIntroComponent initialized');
+		this.emitter.emitSpinnerStartEvent();
+
+		this.ws.onopen = (evt: any) => {
 			console.log('websocket opened:', evt);
 			/*
 			*	ws connection is established, but data is requested
@@ -140,46 +158,50 @@ export class DashboardIntroComponent implements OnInit, OnDestroy {
 			*/
 			// this.ws.send(JSON.stringify({action: 'get'}));
 		};
-		this.ws.onmessage = (message) => {
-			console.log('websocket incoming message:', message);
+		this.ws.onmessage = (event: any) => {
+			console.log('websocket incoming message event:', event);
 			this.serverData.dynamic = [];
-			const data = JSON.parse(message.data);
+			const data = JSON.parse(event.data);
 			for (const d in data) {
 				if (data[d]) { this.serverData.dynamic.push(data[d]); }
 			}
 			console.log('this.serverData.dynamic:', this.serverData.dynamic);
 		};
-		this.ws.onerror = (evt) => {
+		this.ws.onerror = (evt: any) => {
 			console.log('websocket error:', evt);
 			this.ws.close();
 		};
-		this.ws.onclose = (evt) => {
+		this.ws.onclose = (evt: any) => {
 			console.log('websocket closed:', evt);
 		};
 
-		this.subscription = this.emitter.getEmitter().subscribe((message) => {
-			if (message.sys === 'close websocket') {
-				console.log('/intro consuming event:', message);
+		const sub = this.emitter.getEmitter().subscribe((event: any) => {
+			if (event.sys === 'close websocket') {
+				console.log('AppIntroComponent emitter event:', event);
 				console.log('closing webcosket');
-				this.subscription.unsubscribe();
 				this.ws.close();
 			}
-			if (message.help === 'toggle') {
-				console.log('/intro consuming event:', message);
+			if (event.help === 'toggle') {
+				console.log('AppIntroComponent emitter event:', event);
 				console.log('toggling help labels visibility', this.showHelp);
 				this.showHelp = (this.showHelp) ? false : true;
 			}
 		});
+		this.subscriptions.push(sub);
 
 		this.getPublicData(() => {
 			this.getServerStaticData(() => {
-				this.emitSpinnerStopEvent();
+				this.emitter.emitSpinnerStopEvent();
 			});
 		});
 	}
 	public ngOnDestroy(): void {
-		console.log('ngOnDestroy: DashboardIntroComponent destroyed');
-		this.subscription.unsubscribe();
+		console.log('ngOnDestroy: AppIntroComponent destroyed');
 		this.ws.close();
+		if (this.subscriptions.length) {
+			for (const sub of this.subscriptions) {
+				sub.unsubscribe();
+			}
+		}
 	}
 }

@@ -1,29 +1,28 @@
 import { Injectable } from '@angular/core';
-import { Http, Response } from '@angular/http';
+import { HttpClient } from '@angular/common/http';
 
-import { Observable } from 'rxjs/Observable';
-import 'rxjs/Rx';
+import { CustomHttpHandlersService } from '../services/custom-http-handlers.service';
+import { CustomHttpUtilsService } from '../services/custom-http-utils.service';
+
+import { Observable } from 'rxjs';
+import { timeout, take, map, catchError } from 'rxjs/operators';
 
 @Injectable()
 export class SCgetUserService {
-	public appDataUrl: string = window.location.origin + '/api/sc/get/user?name=';
-	constructor(private http: Http) {}
 
-	public extractData(res: Response) {
-		const body = res.json();
-		return body || {};
-	}
+	constructor(
+		private http: HttpClient,
+		private handlers: CustomHttpHandlersService,
+		private utils: CustomHttpUtilsService
+	) {}
 
-	public handleError(error: any) {
-		const errMsg = (error.message) ? error.message :
-			error.status ? `${error.status} - ${error.statusText}` : 'Server error';
-		console.log(errMsg);
-		return Observable.throw(errMsg);
-	}
+	public appDataUrl: string = this.utils.apiUrl('/api/sc/get/user?name=');
 
-	public getData(userName: string): Observable<any[]> { // tslint:disable-line
-		return this.http.get(this.appDataUrl + userName)
-			.map(this.extractData)
-			.catch(this.handleError);
+	public getData(userName: string): Observable<any> {
+		return this.http.get(this.appDataUrl + userName).pipe(
+			timeout(this.utils.timeoutValue),
+			map(this.handlers.extractObject),
+			catchError(this.handlers.handleError)
+		);
 	}
 }

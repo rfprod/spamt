@@ -1,0 +1,420 @@
+<div fxFlex fxLayoutFill fxLayout="row wrap" fxLayoutAlign="start stretch" fxLayoutGap="5px">
+
+	<div *ngIf="errorMessage || successMessage">
+		<div *ngIf="errorMessage" class="feedback warning" fxLayout="row" fxLayoutAlign="start stretch">
+			<span fxFlex="90" fxLayout="row" fxLayoutAlign="start center">
+				<mat-icon class="material-icons-fas" fontSet="fas" fontIcon="fa-exclamation-triangle"></mat-icon> {{errorMessage}}
+			</span>
+			<button type="button" class="close" (click)="dismissMessages()" aria-label="Close">&times;</button>
+		</div>
+		<div *ngIf="successMessage" class="feedback success" fxLayout="row" fxLayoutAlign="start stretch">
+			<span fxFlex="90" fxLayout="row" fxLayoutAlign="start center">
+				<mat-icon class="material-icons-fas" fontSet="fas" fontIcon="fa-check-circle"></mat-icon> {{successMessage}}
+			</span>
+			<button fxFlex="10" type="button" class="close" (click)="dismissMessages()" aria-label="Close">&times;</button>
+		</div>
+	</div>
+
+	<div fxFlex="25" fxFlex.xs="100" fxFlex.sm="100" fxLayout="row wrap" fxLayoutAlign="start start">
+		<legend fxFlex="100" class="mat-h3">User</legend>
+		<div fxFlex="100" fxLayout="row wrap" fxLayoutAlign="start center">
+			<mat-form-field fxFlex="100">
+				<span matPrefix class="mat-caption" fxHide.xs="false" fxHide.gt-xs="true" fxHide.md="false" title="https://soundcloud.com/... finish the link"><mat-icon class="material-icons">link</mat-icon> &nbsp;</span>
+				<span matPrefix class="mat-caption" fxHide.xs="true" fxHide.md="true">https://soundcloud.com/ &nbsp;</span>
+				<input matInput type="text" id="scUserName" name="scUserName" [formControl]="scUserName" title="username" placeholder="username" (keyup)="scUserNameKey($event)" [readonly]="userSelected()" />
+				<mat-error *ngIf="scUserName.hasError('pattern')">
+					must be at least 3 characters long
+				</mat-error>
+			</mat-form-field>
+			<mat-toolbar fxFlex="100">
+				<button mat-button [ngClass]="{ 'danger-bg': (!scUserName.value || scUserName.hasError('pattern')), 'success-bg': (scUserName.value && !scUserName.hasError('pattern')) }" (click)="getUser()" [disabled]="!scUserName.value || scUserName.hasError('pattern')" *ngIf="!userSelected()" matTooltip="Get public data">GET</button>
+				<button mat-button class="danger-bg" (click)="resetSelection()" *ngIf="userSelected()" matTooltip="Reset username and data">RESET</button>
+			</mat-toolbar>
+		</div>
+		<div fxFlex="100" fxLayout="column" fxLayoutAlign="start stretch" fxLayoutGap="5px" *ngIf="userSelected()">
+			<a mat-button [href]="publicData.user.permalink_url" target=_blank matTooltip="Open Soundcloud profile in a new tab">
+				<img [src]="publicData.user.avatar_url" alt="{{publicData.user.permalink}}">
+			</a>
+			<div fxLayout="column" fxLayoutAlign="start stretch" fxLayoutGap="5px">
+				<h3 class="mat-h3">{{publicData.user.username}}</h3>
+				<h4 class="mat-h4">{{publicData.user.full_name}}</h4>
+				<div fxLayout="row" fxLayoutAlign="center center" id="labels">
+					<span fxFlex>{{publicData.user.plan}}</span>
+					<span fxFlex>{{publicData.user.kind}}</span>
+					<span fxFlex [ngClass]="{ 'success-bg': publicData.user.online, 'danger-bg': !publicData.user.online }">{{ (publicData.user.online) ? 'online' : 'offline' }}</span>
+				</div>
+				<table>
+					<tbody>
+						<tr>
+							<td fxHide.xs fxHide.sm>Id</td>
+							<td>
+								<mat-icon class="material-icons" fxHide.md fxHide.lg fxHide.xl matTooltip="Id">info_outline</mat-icon> {{publicData.user.id}}
+							</td>
+						</tr>
+						<tr>
+							<td fxHide.xs fxHide.sm>Last&nbsp;modified</td>
+							<td>
+								<mat-icon class="material-icons" fxHide.md fxHide.lg fxHide.xl matTooltip="Last modified">alarm</mat-icon> {{publicData.user.last_modified | date: 'yyyy-MM-dd hh:mm'}}
+							</td>
+						</tr>
+						<tr>
+							<td fxHide.xs fxHide.sm>Location</td>
+							<td>
+								<mat-icon class="material-icons" fxHide.md fxHide.lg fxHide.xl matTooltip="Location">location_on</mat-icon> {{publicData.user.country}} / {{publicData.user.city}}
+							</td>
+						</tr>
+						<tr *ngIf="publicData.user.discogs_name">
+							<td fxHide.xs fxHide.sm>Discogs&nbsp;name</td>
+							<td>
+								<mat-icon class="material-icons" fxHide.md fxHide.lg fxHide.xl matTooltip="Discogs name">link</mat-icon> {{publicData.user.discogs_name}}
+							</td>
+						</tr>
+						<tr *ngIf="publicData.user.myspace_name">
+							<td fxHide.xs fxHide.sm>Myspace&nbsp;name</td>
+							<td>
+								<mat-icon class="material-icons" fxHide.md fxHide.lg fxHide.xl matTooltip="Myspace name">link</mat-icon> {{publicData.user.myspace_name}}
+							</td>
+						</tr>
+						<tr>
+							<td fxHide.xs fxHide.sm>Website</td>
+							<td>
+								<a [href]="publicData.user.website" target=_blank>
+									<mat-icon class="material-icons" fxHide.md fxHide.lg fxHide.xl matTooltip="Website">home</mat-icon> {{publicData.user.website_title}}
+								</a>
+							</td>
+						</tr>
+						<tr [ngClass]="{ 'selected': selectedTab === 'Tracks' }">
+							<td fxHide.xs fxHide.sm>Tracks</td>
+							<td>
+								<mat-icon class="material-icons" fxHide.md fxHide.lg fxHide.xl matTooltip="Tracks">music_note</mat-icon> {{publicData.user.track_count}}
+							</td>
+						</tr>
+						<tr [ngClass]="{ 'selected': selectedTab === 'Playlists' }">
+							<td fxHide.xs fxHide.sm>Playlists</td>
+							<td>
+								<mat-icon class="material-icons" fxHide.md fxHide.lg fxHide.xl matTooltip="Playlists">library_music</mat-icon> {{publicData.user.playlist_count}}
+							</td>
+						</tr>
+						<tr [ngClass]="{ 'selected': selectedTab === 'Favorites' }">
+							<td fxHide.xs fxHide.sm>Favorites</td>
+							<td>
+								<mat-icon class="material-icons" fxHide.md fxHide.lg fxHide.xl matTooltip="Public favorites">favorite</mat-icon> {{publicData.user.public_favorites_count}}
+							</td>
+						</tr>
+						<tr [ngClass]="{ 'selected': selectedTab === 'Followers' }">
+							<td fxHide.xs fxHide.sm>Followers</td>
+							<td>
+								<mat-icon class="material-icons" fxHide.md fxHide.lg fxHide.xl matTooltip="Followers">people</mat-icon> {{publicData.user.followers_count}}
+							</td>
+						</tr>
+						<tr [ngClass]="{ 'selected': selectedTab === 'Followings' }">
+							<td fxHide.xs fxHide.sm>Followings</td>
+							<td>
+								<mat-icon class="material-icons" fxHide.md fxHide.lg fxHide.xl matTooltip="Followings">people_outline</mat-icon> {{publicData.user.followings_count}}
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+	<div fxFlex fxFlex.xs="100" fxFlex.sm="100" id="scroll-content">
+		<legend class="mat-h3">Data</legend>
+
+		<span id="instructions-container" *ngIf="!userSelected()">
+			<div id="instructions">
+				input <a href="https://soundcloud.com" target=_blank>soundcloud</a> user name to be able to request data, or select one from the following list
+			</div>
+			<div id="queries-flex" *ngIf="queries">
+				<a fxFlex mat-button class="mat-primary" *ngFor="let q of queries.data" (click)="analyseThisUser(q.name)" matTooltip="Analyze this user">{{q.name}}</a>
+			</div>
+		</span>
+
+		<div fxLayout="row wrap" fxLayoutGap="10px" *ngIf="selectedTab !== ''">
+			<mat-form-field fxFlex>
+				<input matInput [(ngModel)]="filterSearchQuery">
+				<mat-icon matSuffix class="material-icons">search</mat-icon>
+			</mat-form-field>
+
+			<mat-form-field fxFlex>
+				<mat-select [(ngModel)]="sortByCriterion" floatPlaceholder="auto" placeholder="Sorting">
+					<mat-option value="name">Alphabetical</mat-option>
+					<mat-option value="timestamp">Timestamp</mat-option>
+				</mat-select>
+			</mat-form-field>
+		</div>
+
+		<audio controls="controls" *ngIf="selectedTrack" audioPlayer>
+			<source src="{{selectedTrack}}" type="audio/mpeg">
+			Error: Your browser does not support <code>audio</code> element.
+		</audio>
+
+		<mat-tab-group fxHide="{{!userSelected()}}" #tabGroup [dynamicHeight]="true">
+			<mat-tab *ngFor="let tab of dataTabs; let i = index">
+				<ng-template mat-tab-label>
+					<strong>{{tab}}</strong>
+				</ng-template>
+
+				<div class="tab-body data" *ngIf="tab === dataTabs[0]">
+					<mat-card *ngFor="let track of publicData.tracks" [ngClass]="{ 'selected-track': selectedTrackURI ===  track.stream_url }" fxHide="{{hideCard(track.title)}}">
+						<mat-card-content fxLayout="row">
+							<div fxFlex="18" fxFlex.xs="25" fxLayout="column" fxLayoutAlign="start center">
+								<div fxFlex="0 1 auto" class="cover-image-container">
+									<img class="cover-image" [src]="track.artwork_url" (click)="playTrack(track.stream_url)" matTooltip="Play / Pause">
+								</div>
+								<div fxFlex="0 1 auto" class="mat-caption center-text">{{track.genre}}</div>
+								<div fxFlex="0 1 auto" class="mat-caption center-text">{{track.license}}</div>
+							</div>
+							<div fxFlex fxLayout="column" fxLayoutAlign="start stretch">
+								<span fxFlex class="mat-caption">{{track.created_at | date:'yyyy-MM-dd'}}</span>
+								<h4 fxFlex class="mat-h4">{{track.title}}</h4>
+								<span fxFlex class="waveform-container">
+									<div class="underlay" *ngIf="selectedTrackURI === track.stream_url"></div>
+									<img class="waveform" [src]="track.waveform_url">
+								</span>
+								<span class="controls" fxLayout="row" fxLayoutAlign="start stretch">
+									<a (click)="playTrack(track.stream_url)" matTooltip="Play / Pause" fxFlex fxLayout="column" fxLayoutAlign="start center">
+										<mat-icon class="material-icons-fas" fontSet="fas" fontIcon="fa-pause" *ngIf="audioPlayback && selectedTrackURI ===  track.stream_url"></mat-icon>
+										<mat-icon class="material-icons-fas" fontSet="fas" fontIcon="fa-play" *ngIf="!audioPlayback || (audioPlayback && selectedTrackURI !==  track.stream_url)"></mat-icon>
+									</a>
+									<span fxFlex fxLayout="column" fxLayoutAlign="start center">
+										<mat-icon class="material-icons-fas" fontSet="fas" fontIcon="fa-clock"></mat-icon>
+										<span fxFlex class="mat-caption">{{track.duration | duration}}</span>
+									</span>
+									<a (click)="downloadTrack(track.download_url)" *ngIf="track.downloadable" matTooltip="Download" fxFlex fxLayout="column" fxLayoutAlign="start center">
+										<mat-icon class="material-icons-fas" fontSet="fas" fontIcon="fa-download"></mat-icon>
+									</a>
+									<a [href]="track.purchase_url" target=_blank *ngIf="track.purchase_url" matTooltip="{{ track.purchase_title }}" fxFlex fxLayout="column" fxLayoutAlign="start center">
+										<mat-icon class="material-icons-fas" fontSet="fas" fontIcon="fa-download"></mat-icon>
+									</a>
+									<span fxFlex fxHide.xs="true" fxLayout="column" fxLayoutAlign="start center">
+										<mat-icon class="material-icons-fas" fontSet="fas" fontIcon="fa-heart"></mat-icon>
+										<span fxFlex class="mat-caption">{{track.favoritings_count}}</span>
+									</span>
+									<span fxFlex fxHide.xs="true" fxLayout="column" fxLayoutAlign="start center">
+										<mat-icon class="material-icons-fas" fontSet="fas" fontIcon="fa-comments"></mat-icon>
+										<span fxFlex class="mat-caption">{{track.comment_count}}</span>
+									</span>
+								</span>
+							</div>
+						</mat-card-content>
+					</mat-card>
+				</div>
+
+				<div class="tab-body data" *ngIf="tab === dataTabs[1]">
+					<mat-card *ngFor="let playlist of publicData.playlists; let j = index;" fxHide="{{hideCard(playlist.title)}}">
+						<mat-card-content fxLayout="row">
+							<div fxFlex="18" fxFlex.xs="25" fxLayout="column" fxLayoutAlign="start center">
+								<div class="cover-image-container" fxFlex="0 1 auto">
+									<img class="cover-image" [src]="playlist.artwork_url" (click)="togglePlaylist(j)" matTooltip="Toggle playlist">
+								</div>
+								<div fxFlex="0 1 auto" class="mat-caption center-text">{{playlist.genre}}</div>
+								<div fxFlex="0 1 auto" class="mat-caption center-text">{{playlist.license}}</div>
+							</div>
+							<div fxFlex fxLayout="column" fxLayoutAlign="start stretch">
+								<span fxFlex class="mat-caption">{{playlist.created_at | date:'yyyy-MM-dd'}}</span>
+								<h4 fxFlex class="mat-h4">{{playlist.title}}</h4>
+								<span fxFlex class="description-container">{{playlist.description}}</span>
+								<span class="controls" fxLayout="row" fxLayoutAlign="start stretch">
+									<a (click)="togglePlaylist(j)" fxFlex fxLayout="column" fxLayoutAlign="start center" matTooltip="Toggle playlist">
+										<mat-icon class="material-icons-fas" fontSet="fas" fontIcon="fa-music"></mat-icon>
+										<span fxFlex>{{playlist.track_count}}</span>
+									</a>
+									<span fxFlex fxLayout="column" fxLayoutAlign="start center">
+										<mat-icon class="material-icons-fas" fontSet="fas" fontIcon="fa-clock"></mat-icon>
+										<span fxFlex>{{playlist.duration | duration}}</span>
+									</span>
+									<a [href]="playlist.permalink_url" target=_blank fxFlex fxLayout="column" fxLayoutAlign="start center" matTooltip="Open Soundcloud playlist in a new tab">
+										<mat-icon class="material-icons-fas" fontSet="fas" fontIcon="fa-link"></mat-icon>
+									</a>
+									<span *ngIf="playlist.label_name" fxFlex fxLayout="column" fxLayoutAlign="start center">
+										<mat-icon class="material-icons-fas" fontSet="fas" fontIcon="fa-tag"></mat-icon>
+										<span fxFlex>{{playlist.label_name}}</span>
+									</span>
+									<span *ngIf="playlist.release_year && playlist.release_month && playlist.release_day" fxFlex fxLayout="column" fxLayoutAlign="start center">
+										<mat-icon class="material-icons-fas" fontSet="fas" fontIcon="fa-calendar"></mat-icon>
+										<span fxFlex>{{playlist.release_year}}-{{playlist.release_month}}-{{playlist.release_day}}</span>
+									</span>
+								</span>
+								<table *ngIf="displayPlaylistTracks[j]">
+									<thead>
+										<tr>
+											<th>#</th>
+											<th>Title</th>
+											<th>Genre</th>
+											<th>Duration</th>
+										</tr>
+									</thead>
+									<tbody>
+										<tr *ngFor="let playlistTrack of playlist.tracks; let i = index;">
+											<td>{{i}}</td>
+											<td>{{playlistTrack.title}}</td>
+											<td>{{playlistTrack.genre}}</td>
+											<td>{{playlistTrack.duration | duration}}</td>
+										</tr>
+									</tbody>
+								</table>
+							</div>
+						</mat-card-content>
+					</mat-card>
+				</div>
+
+				<div class="tab-body data" *ngIf="tab === dataTabs[2]">
+
+					<mat-card *ngFor="let track of publicData.favorites" [ngClass]="{ 'selected-track': selectedTrackURI ===  track.stream_url }" fxHide="{{hideCard(track.title)}}">
+						<mat-card-content fxLayout="row">
+							<div fxFlex="18" fxFlex.xs="25" fxLayout="column" fxLayoutAlign="start center">
+								<div class="cover-image-container" fxFlex="0 1 auto">
+									<img class="cover-image" [src]="track.artwork_url" (click)="playTrack(track.stream_url)" matTooltip="Play / Pause">
+								</div>
+								<div fxFlex="0 1 auto" class="mat-caption center-text">{{track.genre}}</div>
+								<div fxFlex="0 1 auto" class="mat-caption center-text">{{track.license}}</div>
+							</div>
+							<div fxFlex fxLayout="column" fxLayoutAlign="start stretch">
+								<span fxFlex class="mat-caption">{{track.created_at | date:'yyyy-MM-dd'}}</span>
+								<h4 fxFlex class="mat-h4">{{track.title}}</h4>
+								<span fxFlex class="waveform-container">
+									<div class="underlay" *ngIf="selectedTrackURI === track.stream_url"></div>
+									<img class="waveform" [src]="track.waveform_url">
+								</span>
+								<span class="controls" fxLayout="row" fxLayoutAlign="start stretch">
+									<a (click)="playTrack(track.stream_url)" matTooltip="Play / Pause" fxFlex fxLayout="column" fxLayoutAlign="start center">
+										<mat-icon class="material-icons-fas" fontSet="fas" fontIcon="fa-pause" *ngIf="audioPlayback && selectedTrackURI ===  track.stream_url"></mat-icon>
+										<mat-icon class="material-icons-fas" fontSet="fas" fontIcon="fa-play" *ngIf="!audioPlayback || (audioPlayback && selectedTrackURI !==  track.stream_url)"></mat-icon>
+										<span fxFlex class="mat-caption">{{track.playback_count}}</span>
+									</a>
+									<a (click)="downloadTrack(track.download_url)" *ngIf="track.downloadable" matTooltip="Download" fxFlex fxLayout="column" fxLayoutAlign="start center">
+										<mat-icon class="material-icons-fas" fontSet="fas" fontIcon="fa-download"></mat-icon>
+									</a>
+									<a [href]="track.purchase_url" target=_blank *ngIf="track.purchase_url" matTooltip="{{ track.purchase_title }}" fxFlex fxLayout="column" fxLayoutAlign="start center">
+										<mat-icon class="material-icons-fas" fontSet="fas" fontIcon="fa-download"></mat-icon>
+									</a>
+									<span fxFlex fxLayout="column" fxLayoutAlign="start center">
+										<mat-icon class="material-icons-fas" fontSet="fas" fontIcon="fa-heart"></mat-icon>
+										<span fxFlex class="mat-caption">{{track.favoritings_count}}</span>
+									</span>
+									<span fxFlex fxLayout="column" fxLayoutAlign="start center">
+										<mat-icon class="material-icons-fas" fontSet="fas" fontIcon="fa-comments"></mat-icon>
+										<span fxFlex class="mat-caption">{{track.comment_count}}</span>
+									</span>
+								</span>
+							</div>
+						</mat-card-content>
+					</mat-card>
+				</div>
+
+				<div class="tab-body data" *ngIf="tab === dataTabs[3]">
+					<mat-card *ngFor="let user of publicData.followers" fxHide="{{hideCard(user.username)}}">
+						<mat-card-content fxLayout="row">
+							<div fxFlex="18" fxFlex.xs="25" fxLayout="column" fxLayoutAlign="start center">
+								<a class="cover-image-container" [href]="user.permalink_url" target=_blank fxFlex="0 1 auto" matTooltip="Open Soundcloud profile in a new tab">
+									<img class="cover-image" [src]="user.avatar_url">
+								</a>
+								<div fxFlex="0 1 auto" class="mat-caption center-text">{{user.plan}}</div>
+								<div fxFlex="0 1 auto" class="mat-caption center-text" [ngClass]="{ 'label-success': user.online, 'label-danger': !user.online }">&nbsp;online&nbsp;</div>
+							</div>
+							<div fxFlex fxLayout="column" fxLayoutAlign="start stretch">
+								<span fxFlex class="mat-caption">{{user.last_modified | date:'yyyy-MM-dd'}}</span>
+								<h4 fxFlex class="mat-h4">{{user.username}}</h4>
+								<span fxFlex class="description-container">{{user.description}}</span>
+								<span class="controls" fxLayout="row" fxLayoutAlign="start stretch">
+									<span fxFlex fxLayout="column" fxLayoutAlign="start center">
+										<mat-icon class="material-icons-fas" fontSet="fas" fontIcon="fa-music"></mat-icon>
+										<span fxFlex class="mat-caption">{{user.track_count}}</span>
+									</span>
+									<span fxFlex fxLayout="column" fxLayoutAlign="start center">
+										<mat-icon class="material-icons-fas" fontSet="fas" fontIcon="fa-th-list"></mat-icon>
+										<span fxFlex class="mat-caption">{{user.playlist_count}}</span>
+									</span>
+									<span fxFlex fxLayout="column" fxLayoutAlign="start center">
+										<mat-icon class="material-icons-fas" fontSet="fas" fontIcon="fa-heart"></mat-icon>
+										<span fxFlex class="mat-caption">{{user.public_favorites_count}}</span>
+									</span>
+									<span fxFlex fxLayout="column" fxLayoutAlign="start center">
+										<mat-icon class="material-icons-fas" fontSet="fas" fontIcon="fa-retweet"></mat-icon>
+										<span fxFlex class="mat-caption">{{user.reposts_count}}</span>
+									</span>
+									<span fxFlex fxLayout="column" fxLayoutAlign="start center">
+										<mat-icon class="material-icons-fas" fontSet="fas" fontIcon="fa-comments"></mat-icon>
+										<span fxFlex class="mat-caption">{{user.comments_count}}</span>
+									</span>
+									<span fxFlex fxLayout="column" fxLayoutAlign="start center">
+										<mat-icon class="material-icons-fa">people</mat-icon>
+										<span fxFlex class="mat-caption">{{user.followers_count}}</span>
+									</span>
+									<span fxFlex fxLayout="column" fxLayoutAlign="start center">
+										<mat-icon class="material-icons-fa">people_outline</mat-icon>
+										<span fxFlex class="mat-caption">{{user.followings_count}}</span>
+									</span>
+									<a [href]="user.website" *ngIf="user.website && user.website_title" matTooltip="Open website in a new tab" fxFlex fxLayout="column" fxLayoutAlign="start center">
+										<mat-icon class="material-icons-fas" fontSet="fas" fontIcon="fa-link"></mat-icon>
+										<span fxFlex class="mat-caption center-text">{{user.website_title}}</span>
+									</a>
+									<a (click)="analyseThisUser(user.permalink)" matTooltip="Analyse this user" fxFlex fxLayout="column" fxLayoutAlign="start center">
+										<mat-icon class="material-icons-fas" fontSet="fas" fontIcon="fa-search"></mat-icon>
+									</a>
+								</span>
+							</div>
+						</mat-card-content>
+					</mat-card>
+				</div>
+
+				<div class="tab-body data" *ngIf="tab === dataTabs[4]">
+					<mat-card *ngFor="let user of publicData.followings" fxHide="{{hideCard(user.username)}}">
+						<mat-card-content fxLayout="row">
+							<div fxFlex="18" fxFlex.xs="25" fxLayout="column" fxLayoutAlign="start center">
+								<a class="cover-image-container" [href]="user.permalink_url" target=_blank fxFlex="0 1 auto" matTooltip="Open Soundcloud profile in a new tab">
+									<img class="cover-image" [src]="user.avatar_url">
+								</a>
+								<div fxFlex="0 1 auto" class="mat-caption center-text">{{user.plan}}</div>
+								<div fxFlex="0 1 auto" class="mat-caption center-text" [ngClass]="{ 'label-success': user.online, 'label-danger': !user.online }">&nbsp;online&nbsp;</div>
+							</div>
+							<div fxFlex fxLayout="column" fxLayoutAlign="start stretch">
+								<span fxFlex class="mat-caption">{{user.last_modified | date:'yyyy-MM-dd'}}</span>
+								<h4 fxFlex class="mat-h4">{{user.username}}</h4>
+								<span fxFlex class="description-container">{{user.description}}</span>
+								<span class="controls" fxLayout="row" fxLayoutAlign="start stretch">
+									<span fxFlex fxLayout="column" fxLayoutAlign="start center">
+										<mat-icon class="material-icons-fas" fontSet="fas" fontIcon="fa-music"></mat-icon>
+										<span fxFlex class="mat-caption">{{user.track_count}}</span>
+									</span>
+									<span fxFlex fxLayout="column" fxLayoutAlign="start center">
+										<mat-icon class="material-icons-fas" fontSet="fas" fontIcon="fa-th-list"></mat-icon>
+										<span fxFlex class="mat-caption">{{user.playlist_count}}</span>
+									</span>
+									<span fxFlex fxLayout="column" fxLayoutAlign="start center">
+										<mat-icon class="material-icons-fas" fontSet="fas" fontIcon="fa-heart"></mat-icon>
+										<span fxFlex class="mat-caption">{{user.public_favorites_count}}</span>
+									</span>
+									<span fxFlex fxLayout="column" fxLayoutAlign="start center">
+										<mat-icon class="material-icons-fas" fontSet="fas" fontIcon="fa-retweet"></mat-icon>
+										<span fxFlex class="mat-caption">{{user.reposts_count}}</span>
+									</span>
+									<span fxFlex fxLayout="column" fxLayoutAlign="start center">
+										<mat-icon class="material-icons-fas" fontSet="fas" fontIcon="fa-comments"></mat-icon>
+										<span fxFlex class="mat-caption">{{user.comments_count}}</span>
+									</span>
+									<span fxFlex fxLayout="column" fxLayoutAlign="start center">
+										<mat-icon class="material-icons-fa">people</mat-icon>
+										<span fxFlex class="mat-caption">{{user.followers_count}}</span>
+									</span>
+									<span fxFlex fxLayout="column" fxLayoutAlign="start center">
+										<mat-icon class="material-icons-fa">people_outline</mat-icon>
+										<span fxFlex class="mat-caption">{{user.followings_count}}</span>
+									</span>
+									<a [href]="user.website" *ngIf="user.website && user.website_title" matTooltip="Open website in a new tab" fxFlex fxLayout="column" fxLayoutAlign="start center">
+										<mat-icon class="material-icons-fas" fontSet="fas" fontIcon="fa-lnk"></mat-icon>
+										<span fxFlex class="mat-caption center-text">{{user.website_title}}</span>
+									</a>
+									<a (click)="analyseThisUser(user.permalink)" matTooltip="Analyse this user" fxFlex fxLayout="column" fxLayoutAlign="start center">
+										<mat-icon class="material-icons-fas" fontSet="fas" fontIcon="fa-search"></mat-icon>
+									</a>
+								</span>
+							</div>
+						</mat-card-content>
+					</mat-card>
+				</div>
+			</mat-tab>
+		</mat-tab-group>
+	</div>
+</div>

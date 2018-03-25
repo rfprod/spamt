@@ -1,31 +1,29 @@
 import { Injectable } from '@angular/core';
-import { Http, Response } from '@angular/http';
+import { HttpClient } from '@angular/common/http';
 
-import { Observable } from 'rxjs/Observable';
-import 'rxjs/Rx';
+import { CustomHttpHandlersService } from '../services/custom-http-handlers.service';
+import { CustomHttpUtilsService } from '../services/custom-http-utils.service';
+
+import { Observable } from 'rxjs';
+import { timeout, take, map, catchError } from 'rxjs/operators';
 
 @Injectable()
 export class UserLogoutService {
-	public appDataUrl: string = window.location.origin + '/api/auth/logout';
-	constructor(private http: Http) {}
 
-	public extractData(res: Response) {
-		const body = res.json();
-		return body || {};
-	}
+	constructor(
+		private http: HttpClient,
+		private handlers: CustomHttpHandlersService,
+		private utils: CustomHttpUtilsService
+	) {}
 
-	public handleError(error: any) {
-		const errBody = (error._body) ? JSON.parse(error._body).message : '';
-		const errMsg = (error.message) ? error.message :
-			(error.status && errBody) ? `${error.status} - ${error.statusText}: ${errBody}` :
-			error.status ? `${error.status} - ${error.statusText}` : 'Server error';
-		return Observable.throw(errMsg);
-	}
+	public appDataUrl: string = this.utils.apiUrl('/api/auth/logout');
 
 	public getData(twitterToken: string, soundcloudToken: string): Observable<any> {
 		const query = (twitterToken) ? '?twitter_token=' + twitterToken : (soundcloudToken) ? '?soundcloud_token=' + soundcloudToken : '';
-		return this.http.get(this.appDataUrl + query)
-			.map(this.extractData)
-			.catch(this.handleError);
+		return this.http.get(this.appDataUrl + query).pipe(
+			timeout(this.utils.timeoutValue),
+			map(this.handlers.extractObject),
+			catchError(this.handlers.handleError)
+		);
 	}
 }

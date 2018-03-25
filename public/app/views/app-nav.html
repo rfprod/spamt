@@ -1,0 +1,42 @@
+<mat-toolbar>
+	<span><h1>SPAMT</h1></span>
+	<span fxFlex="1 1 auto"></span>
+	<span class="mat-toolbar-tools">
+		<button mat-button [ngClass]="{selected: showHelp, inactive: !showHelp}" [fxHide.xs]="true" [fxHide.sm]="true" matTooltip="Highlight controls" (click)="switchNavButtons($event, 'help');">
+			<mat-icon class="material-icons-fas" fontSet="fas" fontIcon="fa-question" title="highlight controls" [ngClass]="{'help-highlight': showHelp}"></mat-icon> Help
+		</button>
+		<button mat-button [ngClass]="{selected: navButtonsState[1], inactive: !navButtonsState[1]}" [fxHide.xs]="true" [fxHide.sm]="true" matTooltip="App intro" [routerLink]="['intro']" (click)="switchNavButtons($event, 'intro')">
+			<mat-icon class="material-icons-fas" fontSet="fas" fontIcon="fa-tachometer-alt" title="app intro" [ngClass]="{'help-highlight': showHelp}"></mat-icon> Intro
+		</button>
+		<button mat-button [ngClass]="{selected: navButtonsState[2], inactive: !navButtonsState[2]}" [fxHide.xs]="true" [fxHide.sm]="true" matTooltip="Soundcloud analyser" [routerLink]="['analyser']" (click)="switchNavButtons($event, 'analyser')">
+			<mat-icon class="material-icons-fas" fontSet="fas" fontIcon="fa-database" title="soundcloud analyser" [ngClass]="{'help-highlight': showHelp}"></mat-icon> Analyser
+		</button>
+		<button mat-button [ngClass]="{selected: navButtonsState[3], inactive: !navButtonsState[3]}" [fxHide.xs]="true" [fxHide.sm]="true" matTooltip="App controls" [routerLink]="['controls']" (click)="switchNavButtons($event, 'controls')">
+			<mat-icon class="material-icons-fas" fontSet="fas" fontIcon="fa-cogs" title="app controls" [ngClass]="{'help-highlight': showHelp}"></mat-icon> Controls
+		</button>
+		<button mat-button [ngClass]="{selected: navButtonsState[4], inactive: !navButtonsState[4]}" [fxHide.xs]="true" [fxHide.sm]="true" matTooltip="User login" [routerLink]="['user']" (click)="switchNavButtons($event, 'user')">
+			<mat-icon class="material-icons-fas" fontSet="fas" fontIcon="fa-user" title="user login" [ngClass]="{'help-highlight': showHelp}"></mat-icon> User
+		</button>
+
+		<button mat-button [matMenuTriggerFor]="mobileMenu" [fxHide.md]="true" [fxHide.lg]="true">
+			<i class="fa fa-ellipsis-v"></i>
+		</button>
+		<mat-menu #mobileMenu="matMenu" [fxHide.md]="true" [fxHide.lg]="true">
+			<button mat-menu-item [ngClass]="{selected: showHelp, inactive: !showHelp}" matTooltip="Highlight controls" (click)="switchNavButtons($event, 'help');">
+				<mat-icon class="material-icons-fas" fontSet="fas" fontIcon="fa-question" title="hightlight controls" [ngClass]="{'help-highlight': showHelp}"></mat-icon> Help
+			</button>
+			<button mat-menu-item [ngClass]="{selected: navButtonsState[1], inactive: !navButtonsState[1]}" matTooltip="App intro" [routerLink]="['intro']" (click)="switchNavButtons($event, 'intro')">
+				<mat-icon class="material-icons-fas" fontSet="fas" fontIcon="fa-tachometer-alt" title="app intro" [ngClass]="{'help-highlight': showHelp}"></mat-icon> Intro
+			</button>
+			<button mat-menu-item [ngClass]="{selected: navButtonsState[2], inactive: !navButtonsState[2]}" matTooltip="Soundcloud analyser" [routerLink]="['analyser']" (click)="switchNavButtons($event, 'analyser')">
+				<mat-icon class="material-icons-fas" fontSet="fas" fontIcon="fa-database" title="soundcloud analyser" [ngClass]="{'help-highlight': showHelp}"></mat-icon> Analyser
+			</button>
+			<button mat-menu-item [ngClass]="{selected: navButtonsState[3], inactive: !navButtonsState[3]}" matTooltip="App controls" [routerLink]="['controls']" (click)="switchNavButtons($event, 'controls')">
+				<mat-icon class="material-icons-fas" fontSet="fas" fontIcon="fa-cogs" title="soundcloud data" [ngClass]="{'help-highlight': showHelp}"></mat-icon> Controls
+			</button>
+			<button mat-menu-item [ngClass]="{selected: navButtonsState[4], inactive: !navButtonsState[4]}" matTooltip="User login" [routerLink]="['user']" (click)="switchNavButtons($event, 'user')">
+				<mat-icon class="material-icons-fas" fontSet="fas" fontIcon="fa-user" title="user login" [ngClass]="{'help-highlight': showHelp}"></mat-icon> User
+			</button>
+		</mat-menu>
+	</span>
+</mat-toolbar>

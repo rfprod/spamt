@@ -1,0 +1,37 @@
+<div fxLayout="row wrap">
+	<h3 fxFlex="100">{{title}}
+		<a (click)="toggleModal()" matTooltip="App diagnostics">
+			<mat-icon class="material-icons-fas" fontSet="fas" fontIcon="fa-heartbeat" title="show help" [ngClass]="{'help-highlight': showHelp}"></mat-icon>
+		</a>
+	</h3>
+	<p fxFlex="100">{{description}}</p>
+
+	<span fxFlex="100">
+		<nvd3 #chart [options]="chartOptions" [data]="appUsageData"></nvd3>
+	</span>
+
+	<span id="modal" *ngIf="showModal">
+		<button type="button" class="close" (click)="toggleModal()"><span>&times;</span></button>
+		<h4>Platform Diagnostics</h4>
+		<table>
+			<tbody>
+				<tr *ngFor="let unit of serverData.static">
+					<td>{{unit.name}}</td>
+					<td>{{unit.value}}</td>
+				</tr>
+			</tbody>
+			<tbody>
+				<tr *ngFor="let unit of serverData.dynamic">
+					<td>{{unit.name}}</td>
+					<td>{{unit.value}}</td>
+				</tr>
+			</tbody>
+		</table>
+	</span>
+
+	<span fxFlex="100" fxLayout="row">
+		<a fxFlex *ngFor="let badge of badges" href="{{badge.link}}" target=_blank title="{{badge.title}}" class="badge">
+			<img src="{{badge.img}}"/>
+		</a>
+	</span>
+</div>

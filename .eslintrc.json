@@ -7,7 +7,7 @@
 	},
 	"extends": "eslint:recommended",
 	"parserOptions": {
-		"ecmaVersion": 6,
+		"ecmaVersion": 2017,
 		"ecmaFeatures": {
 			"jsx": true
 		},
@@ -16,7 +16,8 @@
 	"rules": {
 		"indent": [
 			"error",
-			"tab"
+			"tab",
+			{ "SwitchCase": 1 }
 		],
 		"linebreak-style": [
 			"error",
@@ -34,6 +35,16 @@
 	},
 	"globals": {
 		"angular": true,
-		"$": true
+		"$": true,
+		"System": true,
+		// server tests
+		"it": true,
+		"describe": true,
+		// e2e tests
+		"protractor": true,
+		"browser": true,
+		"expect": true,
+		"element": true,
+		"by": true
 	}
 }

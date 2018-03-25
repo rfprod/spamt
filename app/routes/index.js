@@ -1,35 +1,30 @@
 'use strict';
 
-const path = process.cwd();
-
-module.exports = function(app, passport, User, Query, SrvInfo, DataInit, thenReq, JWT, mailTransporter, crypto, SC, TWTR) { // eslint-disable-line no-unused-vars
-/**
-*	check if data init is needed
-*	data is initialized with dummy data if the DB is empty on server start
-*/
+module.exports = function(cwd, app, passport, User, Query, SrvInfo, DataInit, thenReq, JWT, mailTransporter, crypto, SC, TWTR) { // eslint-disable-line no-unused-vars
+	/**
+	 * check if data init is needed
+	 * data is initialized with dummy data if the DB is empty on server start
+	 */
 	DataInit.initData();
-	// eslint-disable-next-line
-/**
-*	Soundcloud API wrapper
-*/
+	/**
+	 * Soundcloud API wrapper
+	 */
 	const SCapi = new SC(thenReq);
-	// eslint-disable-next-line
-/**
-*	Twitter API wrapper
-*/
+	/**
+	 * Twitter API wrapper
+	 */
 	const TwitterAPI = new TWTR(thenReq, crypto);
-	// eslint-disable-next-line
-/**
-*	Mailer config
-*/
+	/**
+	 * Mailer config
+	 */
 	function sendAccessLink(recipientEmail, accessLink, callback) {
 		if (recipientEmail && accessLink) {
 			let mailOptions = {
 				from: '"SPAMT 👥" <'+process.env.MAILER_EMAIL+'>',
 				to: recipientEmail,
 				subject: 'SPAMT: controls access ✔',
-				text: 'SPAMT: Controls access was requested using your email address.\nIf you did not request it, ignore this message.\nIf you requested access, follow the link: '+accessLink+'.', // plaintext body
-				html: '<h3>SPAMT: Controls access was requested using your email address.</h3><p>If you did not request it, ignore this message.</p><p>If you requested access, follow the link: '+accessLink+'.</p>' // html body
+				text: 'SPAMT: Controls access was requested using your email address.\nIf you did not request it, ignore this message.\nIf you requested access, follow the link: '+accessLink+' .', // plaintext body
+				html: '<h3>SPAMT: Controls access was requested using your email address.</h3><p>If you did not request it, ignore this message.</p><p>If you requested access, follow the link: '+accessLink+' .</p>' // html body
 			};
 			mailTransporter.sendMail(mailOptions, (err, info) => {
 				if (err) {
@@ -40,27 +35,51 @@ module.exports = function(app, passport, User, Query, SrvInfo, DataInit, thenReq
 					}
 				} else {
 					console.log('Message sent: ' + info.response);
-					if (callback) { callback(); }
+					if (callback) { callback(err); }
 				}
 			});
 		}
 	}
-	// eslint-disable-next-line
-/**
-*	routes
-*/
+
+	/**
+	 * routes
+	 */
 	app.get('/', (req, res) => {
 		/**
-		*	serve application page
-		*/
-		res.sendFile(path + '/public/index.html');
+		 * serve application page
+		 */
+		res.sendFile(cwd + '/public/index.html');
+	});
+
+	/**
+	 * Service worker script
+	 * @name Service worker
+	 * @path {GET} /service-worker.js
+	 * @code {200}
+	 * @response {js} service-worker.js Service worker
+	 */
+	app.get('/service-worker.js', (req, res) => {
+		res.sendFile(cwd + '/public/service-worker.js');
+	});
+
+	/**
+	 * Application build hashsum from .env file.
+	 * Is used by service worker when caching.
+	 * @name App-diag build hashsum
+	 * @path {GET} /api/app-diag/hashsum
+	 * @code {200}
+	 * @response {object} {} Object with hashsum key
+	 */
+	app.get('/api/app-diag/hashsum', (req, res) => {
+		console.log('process.env.BUILD_HASH', process.env.BUILD_HASH);
+		res.json({ hashsum: process.env.BUILD_HASH || 'NA' });
 	});
 
 	app.get('/api/sc/get/user', (req, res) => {
 		/**
-		*	Resolves soundcloud resource to get user data,
-		*	return response if user
-		*/
+		 * Resolves soundcloud resource to get user data,
+		 * return response if user
+		 */
 		let scUserName = req.query.name;
 		let output = undefined;
 
@@ -76,8 +95,8 @@ module.exports = function(app, passport, User, Query, SrvInfo, DataInit, thenReq
 			SCapi.resolve('https://soundcloud.com/' + scUserName).done(SCres => {
 				if (SCres.statusCode < 300) {
 					/**
-					*	update Queries collection
-					*/
+					 * update Queries collection
+					 */
 					output = JSON.parse(SCres.getBody());
 					Query.find({}, (err, docs) => {
 						if (err) throw err;
@@ -124,8 +143,8 @@ module.exports = function(app, passport, User, Query, SrvInfo, DataInit, thenReq
 					});
 				} else {
 					/**
-					*	proxy errors from soundcloud API
-					*/
+					 * proxy errors from soundcloud API
+					 */
 					output = { error: JSON.parse(SCres.body.toString('UTF8')).errors[0] };
 				}
 				res.setHeader('Cache-Control', 'no-cache, no-store');
@@ -149,8 +168,8 @@ module.exports = function(app, passport, User, Query, SrvInfo, DataInit, thenReq
 
 	app.get('/api/sc/get/queries', (req, res) => {
 		/**
-		*	get most popular queries
-		*/
+		 * get most popular queries
+		 */
 		let output = {};
 		Query.find({}, (err, docs) => {
 			if (err) throw err;
@@ -172,9 +191,9 @@ module.exports = function(app, passport, User, Query, SrvInfo, DataInit, thenReq
 
 	app.get('/api/sc/get/user/details', (req, res) => {
 		/**
-		*	Requests and returns soundcloud users details by type:
-		* 'tracks', 'playlists', 'favorites', 'followers', 'followings'
-		*/
+		 * Requests and returns soundcloud users details by type:
+		 * 'tracks', 'playlists', 'favorites', 'followers', 'followings'
+		 */
 		const scEndpointUri = req.query.endpoint_uri;
 		let output = undefined, error = false;
 
@@ -216,8 +235,8 @@ module.exports = function(app, passport, User, Query, SrvInfo, DataInit, thenReq
 
 	app.get('/api/sc/get/user/track/download', (req, res) => {
 		/**
-		*	Requests and returns soundcloud user's downloadable track
-		*/
+		 * Requests and returns soundcloud user's downloadable track
+		 */
 		const scEndpointUri = req.query.endpoint_uri;
 		let output = undefined, error = false;
 
@@ -266,8 +285,8 @@ module.exports = function(app, passport, User, Query, SrvInfo, DataInit, thenReq
 
 	app.get('/api/sc/get/user/track/stream', (req, res) => {
 		/**
-		*	Requests and returns soundcloud user's track preview url
-		*/
+		 * Requests and returns soundcloud user's track preview url
+		 */
 		const scEndpointUri = req.query.endpoint_uri;
 		let output = undefined, error = false;
 
@@ -316,8 +335,8 @@ module.exports = function(app, passport, User, Query, SrvInfo, DataInit, thenReq
 
 	app.get('/api/app-diag/usage', (req, res) => {
 		/**
-		*	number of users and administrators 
-		*/
+		 * number of users and administrators 
+		 */
 		User.find({}, (err, docs) => {
 			if (err) { throw err; }
 			console.log('count list', docs.length);
@@ -342,8 +361,8 @@ module.exports = function(app, passport, User, Query, SrvInfo, DataInit, thenReq
 
 	app.get('/api/app-diag/static', (req, res) => {
 		/**
-		* static server information
-		*/
+		 * static server information
+		 */
 		res.setHeader('Cache-Control', 'no-cache, no-store');
 		res.format({
 			'application/json': function(){
@@ -354,8 +373,8 @@ module.exports = function(app, passport, User, Query, SrvInfo, DataInit, thenReq
 
 	app.ws('/api/app-diag/dynamic', (ws) => {
 		/**
-		* dynamic server information
-		*/
+		 * dynamic server information
+		 */
 		console.log('websocket opened /app-diag/dynamic');
 		let sender = null;
 		ws.on('message', (msg) => {
@@ -384,15 +403,15 @@ module.exports = function(app, passport, User, Query, SrvInfo, DataInit, thenReq
 		});
 		ws.on('error', () => {console.log('Persistent websocket: ERROR');});
 	});
-	// eslint-disable-next-line
-/**
-*	Administration endpoints
-*/
+
+	/**
+	 * Administration endpoints
+	 */
 	app.get('/api/request/access', (req, res) => {
 		/**
-		* request controls access
-		* generates token and sends link to user email
-		*/
+		 * request controls access
+		 * generates token and sends link to user email
+		 */
 		const userEmail = req.query.email;
 		if (userEmail) {
 			User.find({'userExtended.email': userEmail}, (err, docs) => {
@@ -415,9 +434,9 @@ module.exports = function(app, passport, User, Query, SrvInfo, DataInit, thenReq
 					// console.log(payload, tokenObj);
 					JWT.setUserJWToken(user._id, tokenObj, () => {
 						let accessLink = process.env.APP_URL + 'controls?user_token=' + tokenObj.token;
-						sendAccessLink(userEmail, accessLink, (error) => {
-							if (error) {
-								res.status(500).json({message: 'mail transporter error'});
+						sendAccessLink(userEmail, accessLink, (err) => {
+							if (err) {
+								res.status(500).json({message: 'mail transporter error', error: err});
 							} else {
 								res.status(200).json({message: 'access link was sent to provided email address'});
 							}
@@ -437,28 +456,36 @@ module.exports = function(app, passport, User, Query, SrvInfo, DataInit, thenReq
 
 	app.all('/api/controls/*', (req, res, next) => {
 		/**
-		* /controls endpoint access restriction
-		* based on bearer token
-		*/
-		passport.authenticate('token-bearer', { session: false }, function(err, user, info) {
+		 * /controls endpoint access restriction
+		 * based on bearer token
+		 */
+		// console.log('req.headers', req.headers);
+		passport.authenticate('bearer', { session: false }, function(err, user, info) {
+			console.log('passport info', info);
 			let userToken = req.query.user_token; // token from url var
 			if (typeof userToken == 'undefined') userToken = req.body.user_token; // token from request body
+			if (typeof userToken == 'undefined' && req.headers.authorization) userToken = req.headers.authorization.split(' ')[1]; // token from request body
 			if (userToken) {
 				JWT.checkJWTokenExpiration(userToken, (tokenStatus) => {
-					req.renewedToken = false;
 					console.log('token status:', tokenStatus);
-					if (tokenStatus.expired) return res.status(401).json({ message: 'token expired' });
-					//if (tokenStatus.renew) return res.status(200).json({ to_be_configured: 'this event should regenerate user token' });
 					if (tokenStatus.renew) {
 						JWT.renewUserToken(req, (tokenObj) => {
 							console.log('new token:', tokenObj);
+							/*
+							*	TODO: set renewed token response header
+							*/
 							req.renewedTokenObj = tokenObj;
 							return next();
 						});
+					} else if (tokenStatus.expired) {
+						return res.status(401).json({ message: 'token expired' });
+					} else if (info.statusCode == 200) {
+						return next();
+					} else if (!info.statusCode) {
+						return res.status(401).json({ message: info });
+					} else {
+						return res.status(info.statusCode).json({ message: info.message });
 					}
-					else if (info.statusCode == 200) return next();
-					else if (!info.statusCode) return res.status(401).json({ message: info });
-					else return res.status(info.statusCode).json({ message: info.message });
 				});
 			} else {
 				const responseMessage = {message: 'Token missing \'user_token\''};
@@ -470,9 +497,9 @@ module.exports = function(app, passport, User, Query, SrvInfo, DataInit, thenReq
 
 	app.get('/api/controls/me', (req, res) => {
 		/**
-		* get authenticated user details
-		*/
-		let userToken = req.query.user_token;
+		 * get authenticated user details
+		 */
+		let userToken = req.query.user_token || req.headers.authorization.split(' ')[1];
 		User.find({jwToken: userToken}, (err, docs) => {
 			if (err) throw err;
 			let output = {};
@@ -489,13 +516,13 @@ module.exports = function(app, passport, User, Query, SrvInfo, DataInit, thenReq
 
 	app.get('/api/controls/list/users', (req, res) => {
 		/**
-		* get users list
-		* returns all records for now
-		*/
-		/**
+		 * get users list
+		 * returns all records for now
+		 */
+		/*
 		* TODO
-		*	return 20 records per request similarly to /controls/list/queries
-		*	query parameter 'page' should control records offset
+		* return 20 records per request similarly to /controls/list/queries
+		* query parameter 'page' should control records offset
 		*/
 		User.find({}, (err, docs) => {
 			if (err) { throw err; }
@@ -528,14 +555,14 @@ module.exports = function(app, passport, User, Query, SrvInfo, DataInit, thenReq
 
 	app.get('/api/controls/list/queries', (req, res) => {
 		/**
-		* get queries list
-		* returns 20 records per request
-		* query parameter 'page' controls records offset
-		*/
+		 * get queries list
+		 * returns 20 records per request
+		 * query parameter 'page' controls records offset
+		 */
 		const page = (req.query.page) ? req.query.page : 1;
 		const limit = 20;
 		const offset = (page > 1) ? limit * page : 0;
-		Query.aggregate({$skip: offset}, {$limit: limit}, (err, docs) => {
+		Query.aggregate([{$skip: offset}, {$limit: limit}], (err, docs) => {
 			if (err) { throw err; }
 			let resData = [],
 				dataUnit = {};
@@ -561,19 +588,19 @@ module.exports = function(app, passport, User, Query, SrvInfo, DataInit, thenReq
 
 	app.get('/api/controls/logout', (req, res) => {
 		/**
-		* log out authenticated user
-		* resets current user token
-		*/
-		let userToken = req.query.user_token; // token from url var
+		 * log out authenticated user
+		 * resets current user token
+		 */
+		let userToken = req.query.user_token || req.headers.authorization.split(' ')[1];
 		JWT.resetUserJWToken(null, userToken, (err) => {
 			if (err) { res.status(401).json(err); }
 			else { res.status(200).json({message: 'logged out, token reset'}); }
 		});
 	});
-	// eslint-disable-next-line
-/**
-*	social networks authentication
-*/
+
+	/**
+	 * social networks authentication
+	 */
 	app.get('/api/auth/soundcloud', passport.authenticate('soundcloud'));
 	app.get('/api/auth/soundcloud/callback', passport.authenticate('soundcloud', {
 		successRedirect: process.env.APP_URL + 'user/dashboard',
@@ -608,9 +635,9 @@ module.exports = function(app, passport, User, Query, SrvInfo, DataInit, thenReq
 	});
 	app.get('/api/auth/logout', (req, res) => {
 		/**
-		* log out authenticated user
-		* resets current user token
-		*/
+		 * log out authenticated user
+		 * resets current user token
+		 */
 		// console.log('/auth/logout, query:', req.query);
 		const twitterToken = (req.query.twitter_token) ? req.query.twitter_token : '';
 		const soundcloudToken = (req.query.soundcloud_token) ? req.query.soundcloud_token : '';
@@ -651,15 +678,15 @@ module.exports = function(app, passport, User, Query, SrvInfo, DataInit, thenReq
 			res.status(200).json({message: 'logged out successfully'});
 		}
 	});
-	// eslint-disable-next-line
-/*
-*	Twitter endpoints
-*/
+
+	/**
+	 * Twitter endpoints
+	 */
 	app.get('/api/auth/twitter/verify-credentials', (req, res) => {
 		/**
-		* log out authenticated user
-		* resets current user token
-		*/
+		 * log out authenticated user
+		 * resets current user token
+		 */
 		console.log('req.query:', req.query);
 		const oauth_token = (req.query.oauth_token) ? req.query.oauth_token : '';
 		res.setHeader('Cache-Control', 'no-cache, no-store');
@@ -689,9 +716,9 @@ module.exports = function(app, passport, User, Query, SrvInfo, DataInit, thenReq
 	});
 
 	app.post('/api/test', (req, res) => {
-		/*
-		*	endpoint for testing of requests proxied to third pary APIs
-		*/
+		/**
+		 * endpoint for testing of requests proxied to third pary APIs
+		 */
 		console.log('\n', ' >> TEST ENDPOINT CALL', '\n');
 		console.log(' > req.headers:', req.headers);
 		console.log(' > req.query:', req.query);

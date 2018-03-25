@@ -1,8 +1,13 @@
-import { Injectable } from '@angular/core';
+import { Injectable, Inject } from '@angular/core';
 
 @Injectable()
 export class UserService {
-	constructor(public window: Window) {}
+
+	constructor(
+		@Inject('Window') private window: Window
+	) {
+		this.restoreUser();
+	}
 
 	public model: any = {
 		email: '',
@@ -30,11 +35,26 @@ export class UserService {
 		soundcloud_oauth_token: '',
 	};
 
-	public modelKeys(): any[] {
+	public getUser(): any {
+		return this.model;
+	}
+
+	public isLoggedIn(): boolean {
+		return (this.model.user_token) ? true : false;
+	}
+
+	public modelKeys(): string[] {
 		return Object.keys(this.model);
 	}
 
-	public saveUser(): void {
+	public saveUser(newValues: any): void {
+		console.log('SaveUser', newValues);
+		const validKeys = this.modelKeys();
+		for (const key of validKeys) {
+			if (newValues.hasOwnProperty(key)) {
+				this.model[key] = newValues[key];
+			}
+		}
 		this.window.localStorage.setItem('SPAMT', JSON.stringify(this.model));
 	}
 
@@ -46,6 +66,8 @@ export class UserService {
 			*/
 			console.log('this.window.localStorage.getItem(\'SPAMT\'): ', this.window.localStorage.getItem('SPAMT'));
 			if (callback) { callback(); }
+		} else {
+			this.window.localStorage.setItem('SPAMT', JSON.stringify(this.model));
 		}
 	}
 
@@ -53,6 +75,6 @@ export class UserService {
 		for (const key of this.modelKeys()) {
 			this.model[key] = '';
 		}
-		this.saveUser();
+		this.window.localStorage.setItem('SPAMT', JSON.stringify(this.model));
 	}
 }

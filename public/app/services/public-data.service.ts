@@ -1,28 +1,28 @@
 import { Injectable } from '@angular/core';
-import { Http, Response } from '@angular/http';
+import { HttpClient } from '@angular/common/http';
 
-import { Observable } from 'rxjs/Rx';
+import { CustomHttpHandlersService } from '../services/custom-http-handlers.service';
+import { CustomHttpUtilsService } from '../services/custom-http-utils.service';
+
+import { Observable } from 'rxjs';
+import { timeout, take, map, catchError } from 'rxjs/operators';
 
 @Injectable()
 export class PublicDataService {
-	public appDataUrl: string = window.location.origin + '/api/app-diag/usage';
-	constructor(private http: Http) {}
 
-	public extractData(res: Response) {
-		const body = res.json();
-		return body || {};
-	}
+	constructor(
+		private http: HttpClient,
+		private handlers: CustomHttpHandlersService,
+		private utils: CustomHttpUtilsService
+	) {}
 
-	public handleError(error: any) {
-		const errMsg = (error.message) ? error.message :
-			error.status ? `${error.status} - ${error.statusText}` : 'Server error';
-		console.log(errMsg);
-		return Observable.throw(errMsg);
-	}
+	public appDataUrl: string = this.utils.apiUrl('/api/app-diag/usage');
 
-	public getData(): Observable<any[]> { // tslint:disable-line
-		return this.http.get(this.appDataUrl)
-			.map(this.extractData)
-			.catch(this.handleError);
+	public getData(): Observable<any[]> {
+		return this.http.get(this.appDataUrl).pipe(
+			timeout(this.utils.timeoutValue),
+			map(this.handlers.extractArray),
+			catchError(this.handlers.handleError)
+		);
 	}
 }

@@ -6,10 +6,10 @@
 	<h3>
 		{{title}}
 		<a (click)="toggleModal()" mdTooltip="Your SPAMT profile">
-			<i class="fa fa-user" [ngClass]="{ 'help-highlight': showHelp }"></i>
+			<mat-icon class="material-icons-fas" fontSet="fas" fontIcon="fa-user" [ngClass]="{ 'help-highlight': showHelp }"></mat-icon>
 		</a>
 		<a (click)="logout()" mdTooltip="Log out of SPAMT User Panel">
-			<i class="fa fa-sign-out" [ngClass]="{ 'help-highlight': showHelp }"></i>
+			<mat-icon class="material-icons-fas" fontSet="fas" fontIcon="fa-sign-out-alt" [ngClass]="{ 'help-highlight': showHelp }"></mat-icon>
 		</a>
 	</h3>
 	<p>{{description.authenticated}}</p>
@@ -18,19 +18,19 @@
 <div fxFlex *ngIf="errorMessage || successMessage">
 	<div *ngIf="errorMessage" class="feedback warning" fxLayout="row" fxLayoutAlign="start stretch">
 		<span fxFlex="90" fxLayout="row" fxLayoutAlign="start center">
-			<i class="fa fa-warning"></i> {{errorMessage}}
+			<mat-icon class="material-icons-fas" fontSet="fas" fontIcon="fa-exclamation-triangle"></mat-icon> {{errorMessage}}
 		</span>
 		<button type="button" class="close" (click)="dismissMessages()" aria-label="Close">&times;</button>
 	</div>
 	<div *ngIf="successMessage" class="feedback success" fxLayout="row" fxLayoutAlign="start stretch">
 		<span fxFlex="90"  fxLayout="row" fxLayoutAlign="start center">
-			<i class="fa fa-check-circle"></i> {{successMessage}}
+			<mat-icon class="material-icons-fas" fontSet="fas" fontIcon="fa-check"></mat-icon> {{successMessage}}
 		</span>
 		<button fxFlex="10" type="button" class="close" (click)="dismissMessages()" aria-label="Close">&times;</button>
 	</div>
 </div>
 
-<div fxFlex *ngIf="!isLoggedIn()" fxLayout="row" fxLayoutAlign="start center" fxLayoutWrap>
+<div fxFlex *ngIf="!isLoggedIn()" fxLayout="row wrap" fxLayoutAlign="start center">
 	<a fxFlex href="api/auth/soundcloud" fxLayout="column" fxLayoutAlign="start stretch" class="login-button" mdTooltip="Soundcloud login">
 		<img fxFlex src="/public/img/SoundCloud_logo.svg" alt="soundcloud logo"/>
 	</a>

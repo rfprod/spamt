@@ -3,14 +3,18 @@ import { EventEmitterService } from '../services/event-emitter.service';
 
 @Directive({ selector: '[audioPlayer]' })
 export class AudioPlayerDirective implements OnInit, OnDestroy {
+
 	constructor(
 		private el: ElementRef,
 		private renderer: Renderer,
 		private emitter: EventEmitterService
 	) {
-		console.log('AudioPlayerDirective element: ', el.nativeElement);
+		console.log('AudioPlayerDirective element: ', this.el.nativeElement);
 	}
-	private subscription: any;
+
+	private subscriptions: any[] = [];
+
+	private interval: any;
 
 	private progressInterval: any;
 	public reportProgress(): void {
@@ -20,14 +24,12 @@ export class AudioPlayerDirective implements OnInit, OnDestroy {
 		selectedTrackObj.querySelector('.underlay').style.width = (waveformWidth * progress / 100) + 'px';
 	}
 
-	private interval: any;
-
 	public ngOnInit() {
 		console.log('ngOnInit: AudioPlayerDirective initialized');
-		this.subscription = this.emitter.getEmitter().subscribe((message) => {
-			if (message.audio) {
-				console.log('AudioPlayerDirective consuming control signal: ', message.audio);
-				if (message.audio === 'play') {
+		const sub = this.emitter.getEmitter().subscribe((event: any) => {
+			if (event.audio) {
+				console.log('AudioPlayerDirective control event: ', event.audio);
+				if (event.audio === 'play') {
 						this.interval = setInterval(() => {
 						console.log('this.el.nativeElement.readyState: ', this.el.nativeElement.readyState);
 						/*
@@ -44,18 +46,20 @@ export class AudioPlayerDirective implements OnInit, OnDestroy {
 						}
 					}, 1500);
 				}
-				if (message.audio === 'pause') {
+				if (event.audio === 'pause') {
 					this.el.nativeElement.pause();
 					clearInterval(this.interval);
 				}
-				if (message.audio === 'volume+') {
+				if (event.audio === 'volume+') {
 					this.el.nativeElement.volume += 0.1;
 				}
-				if (message.audio === 'volume-') {
+				if (event.audio === 'volume-') {
 					this.el.nativeElement.volume -= 0.1;
 				}
 			}
 		});
+		this.subscriptions.push(sub);
+
 		this.progressInterval = setInterval(() => {
 			if (this.el.nativeElement.readyState === 4) {
 				// console.log('reporting progress: ', this.el.nativeElement.readyState);
@@ -76,7 +80,11 @@ export class AudioPlayerDirective implements OnInit, OnDestroy {
 	}
 	public ngOnDestroy() {
 		console.log('ngOnDestroy: AudioPlayerDirective destroyed');
-		this.subscription.unsubscribe();
+		if (this.subscriptions.length) {
+			for (const sub of this.subscriptions) {
+				sub.unsubscribe();
+			}
+		}
 		clearInterval(this.interval);
 		clearInterval(this.progressInterval);
 	}

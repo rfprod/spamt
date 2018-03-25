@@ -1,6 +1,6 @@
 import { NgModule, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 
-import { LocationStrategy, PathLocationStrategy  } from '@angular/common';
+import { APP_BASE_HREF, LocationStrategy, PathLocationStrategy } from '@angular/common';
 
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
@@ -8,7 +8,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { FlexLayoutModule } from '@angular/flex-layout';
 
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { HttpModule } from '@angular/http';
+import { HttpClientModule } from '@angular/common/http';
 import { RouterModule } from '@angular/router';
 import { APP_ROUTES } from './app.routes';
 
@@ -17,19 +17,25 @@ import { APP_ROUTES } from './app.routes';
 *	CustomMaterialModule loads exact material modules
 */
 import '../../node_modules/hammerjs/hammer.js';
-import { MaterialModule } from '@angular/material';
+import { CustomMaterialModule } from './modules/custom-material.module';
 
 import { AppComponent } from './app.component';
 import { AppNavComponent } from './components/app-nav.component';
-import { AppInfoComponent } from './components/app-info.component';
-import { DashboardIntroComponent } from './components/dashboard-intro.component';
-import { DashboardDetailsComponent } from './components/dashboard-details.component';
-import { DashboardControlsComponent } from './components/dashboard-controls.component';
-import { DashboardUserComponent } from './components/dashboard-user.component';
+import { AppIntroComponent } from './components/app-intro.component';
+import { AppAnalyserSoundcloudComponent } from './components/app-analyser-soundcloud.component';
+import { AppControlsComponent } from './components/app-controls.component';
+import { AppUserComponent } from './components/app-user.component';
 
 import { AudioPlayerDirective } from './directives/audio-player.directive';
 
 import { ConvertDuration } from './pipes/convert-duration.pipe';
+
+import { CustomServiceWorkerService } from './services/custom-service-worker.service';
+import { CustomDeferredService } from './services/custom-deferred.service';
+
+import { CustomHttpWithAuthService } from './services/custom-http-with-auth.service';
+import { CustomHttpHandlersService } from './services/custom-http-handlers.service';
+import { CustomHttpUtilsService } from './services/custom-http-utils.service';
 
 import { EventEmitterService } from './services/event-emitter.service';
 import { WebsocketService } from './services/websocket.service';
@@ -51,14 +57,16 @@ import { ControlsQueriesListService } from './services/controls-queries-list.ser
 import { NvD3Component } from 'ng2-nvd3';
 
 @NgModule({
-	declarations: [ AppComponent, AppNavComponent, AppInfoComponent, DashboardIntroComponent, DashboardDetailsComponent, DashboardControlsComponent, DashboardUserComponent, /*nvD3,*/NvD3Component, AudioPlayerDirective, ConvertDuration ],
-	imports 		: [ BrowserModule, BrowserAnimationsModule, FormsModule, FlexLayoutModule, MaterialModule, ReactiveFormsModule, HttpModule, RouterModule.forRoot(APP_ROUTES) ],
+	declarations: [ AppComponent, AppNavComponent, AppIntroComponent, AppAnalyserSoundcloudComponent, AppControlsComponent, AppUserComponent, NvD3Component, AudioPlayerDirective, ConvertDuration ],
+	imports 		: [ BrowserModule, BrowserAnimationsModule, FormsModule, FlexLayoutModule, CustomMaterialModule, ReactiveFormsModule, HttpClientModule, RouterModule.forRoot(APP_ROUTES) ],
 	providers 	: [
+									{provide: APP_BASE_HREF, useValue: '/'},
 									{ provide: LocationStrategy, useClass: PathLocationStrategy },
-									{ provide: Window, useValue: window },
-									EventEmitterService, WebsocketService, UserService, UserLogoutService, ServerStaticDataService, PublicDataService,
-									SCgetQueriesService, SCgetUserService, SCgetUserDetailsService, SCgetUserTrackDownloadService, SCgetUserTrackStreamService,
-									ControlsLoginService, ControlsLogoutService, ControlsMeService, ControlsUsersListService, ControlsQueriesListService
+									{ provide: 'Window', useValue: window },
+									EventEmitterService, WebsocketService, CustomServiceWorkerService, CustomDeferredService, CustomHttpWithAuthService, CustomHttpHandlersService, CustomHttpUtilsService, UserService, UserLogoutService,
+									ServerStaticDataService, PublicDataService, SCgetQueriesService, SCgetUserService, SCgetUserDetailsService,
+									SCgetUserTrackDownloadService, SCgetUserTrackStreamService, ControlsLoginService, ControlsLogoutService, ControlsMeService,
+									ControlsUsersListService, ControlsQueriesListService
 								],
 	schemas 		: [ CUSTOM_ELEMENTS_SCHEMA ],
 	bootstrap 	: [ AppComponent ]

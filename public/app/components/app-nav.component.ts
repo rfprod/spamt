@@ -1,19 +1,29 @@
-import { Router, NavigationEnd } from '@angular/router';
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, ElementRef } from '@angular/core';
 import { EventEmitterService } from '../services/event-emitter.service';
+
+import { Router, NavigationEnd } from '@angular/router';
 
 @Component({
 	selector: 'app-nav',
-	templateUrl: '/public/app/views/dashboard-nav.html',
+	templateUrl: '/public/app/views/app-nav.html',
 })
 export class AppNavComponent implements OnInit, OnDestroy {
+
 	constructor(
+		private el: ElementRef,
 		private emitter: EventEmitterService,
 		private router: Router
-	) {}
-	private subscription: any;
+	) {
+		console.log('AppNavComponent element:', this.el.nativeElement);
+	}
+
+	/**
+	 * Component subscriptions.
+	 */
+	private subscriptions: any[] = [];
+
 	public navButtonsState: boolean[] = [false, false, false, false, false];
-	private showHelp: boolean = false;
+	public showHelp: boolean = false;
 	public switchNavButtons(event: any, path?: string) {
 		let index;
 		console.log('switchNavButtons:', event);
@@ -27,7 +37,7 @@ export class AppNavComponent implements OnInit, OnDestroy {
 		}
 		if (path.indexOf('intro') !== -1) {
 			index = '1';
-		} else if (path.indexOf('data') !== -1) {
+		} else if (path.indexOf('analyser') !== -1) {
 			index = '2';
 		} else if (path.indexOf('controls') !== -1) {
 			index = '3';
@@ -55,7 +65,7 @@ export class AppNavComponent implements OnInit, OnDestroy {
 	public ngOnInit(): void {
 		console.log('ngOnInit: AppNavComponent initialized');
 		// check active route on app init - app-nav loads once on app init
-		this.subscription = this.router.events.subscribe((event) => {
+		const sub = this.router.events.subscribe((event: any) => {
 			// console.log(' > ROUTER EVENT:', event);
 			if (event instanceof NavigationEnd) {
 				if (!event.hasOwnProperty('reason')) {
@@ -70,9 +80,14 @@ export class AppNavComponent implements OnInit, OnDestroy {
 				this.showHelp = false;
 			}
 		});
+		this.subscriptions.push(sub);
 	}
 	public ngOnDestroy(): void {
 		console.log('ngOnDestroy: AppNavComponent destroyed');
-		this.subscription.unsubscribe();
+		if (this.subscriptions.length) {
+			for (const sub of this.subscriptions) {
+				sub.unsubscribe();
+			}
+		}
 	}
 }

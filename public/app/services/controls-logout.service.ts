@@ -1,30 +1,28 @@
 import { Injectable } from '@angular/core';
-import { Http, Response } from '@angular/http';
 
-import { Observable } from 'rxjs/Observable';
-import 'rxjs/Rx';
+import { CustomHttpWithAuthService } from '../services/custom-http-with-auth.service';
+import { CustomHttpHandlersService } from '../services/custom-http-handlers.service';
+import { CustomHttpUtilsService } from '../services/custom-http-utils.service';
+
+import { Observable } from 'rxjs';
+import { timeout, take, map, catchError } from 'rxjs/operators';
 
 @Injectable()
 export class ControlsLogoutService {
-	public appDataUrl: string = window.location.origin + '/api/controls/logout?user_token=';
-	constructor(private http: Http) {}
 
-	public extractData(res: Response) {
-		const body = res.json();
-		return body || {};
-	}
+	constructor(
+		private http: CustomHttpWithAuthService,
+		private handlers: CustomHttpHandlersService,
+		private utils: CustomHttpUtilsService
+	) {}
 
-	public handleError(error: any) {
-		const errBody = (error._body) ? JSON.parse(error._body).message : '';
-		const errMsg = (error.message) ? error.message :
-			(error.status && errBody) ? `${error.status} - ${error.statusText}: ${errBody}` :
-			error.status ? `${error.status} - ${error.statusText}` : 'Server error';
-		return Observable.throw(errMsg);
-	}
+	public appDataUrl: string = this.utils.apiUrl('/api/controls/logout');
 
-	public getData(userToken: string): Observable<any> { // tslint:disable-line
-		return this.http.get(this.appDataUrl + userToken)
-			.map(this.extractData)
-			.catch(this.handleError);
+	public getData(): Observable<any> {
+		return this.http.get(this.appDataUrl, false).pipe(
+			timeout(this.utils.timeoutValue),
+			map(this.handlers.extractObject),
+			catchError(this.handlers.handleError)
+		);
 	}
 }

@@ -1,30 +1,33 @@
-import { Component, OnInit, OnDestroy, ElementRef, ViewChild } from '@angular/core';
+import { Component, OnInit, AfterViewInit, OnDestroy, ElementRef, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, FormControl, Validators } from '@angular/forms';
 import { Location } from '@angular/common';
 import { Router } from '@angular/router';
-import { MdTabGroup } from '@angular/material';
+
+import { MatTabGroup } from '@angular/material';
+
 import { EventEmitterService } from '../services/event-emitter.service';
+import { UserService } from '../services/user.service';
+
 import { ServerStaticDataService } from '../services/server-static-data.service';
 import { PublicDataService } from '../services/public-data.service';
-import { UserService } from '../services/user.service';
+
 import { ControlsLoginService } from '../services/controls-login.service';
 import { ControlsLogoutService } from '../services/controls-logout.service';
 import { ControlsMeService } from '../services/controls-me.service';
 import { ControlsUsersListService } from '../services/controls-users-list.service';
 import { ControlsQueriesListService } from '../services/controls-queries-list.service';
 
-// declare let d3: any;
-
 @Component({
-	selector: 'dashboard-controls',
-	templateUrl: '/public/app/views/dashboard-controls.html',
+	selector: 'app-controls',
+	templateUrl: '/public/app/views/app-controls.html',
 	host: {
 		class: 'mat-body-1'
 	}
 })
-export class DashboardControlsComponent implements OnInit, OnDestroy {
+export class AppControlsComponent implements OnInit, AfterViewInit, OnDestroy {
+
 	constructor(
-		public el: ElementRef,
+		private el: ElementRef,
 		private emitter: EventEmitterService,
 		private serverStaticDataService: ServerStaticDataService,
 		private publicDataService: PublicDataService,
@@ -38,15 +41,30 @@ export class DashboardControlsComponent implements OnInit, OnDestroy {
 		private router: Router,
 		private location: Location
 	) {
-		console.log('this.el.nativeElement:', this.el.nativeElement);
+		console.log('AppControlsComponent element:', this.el.nativeElement);
 		this.resetForm();
 	}
-	private subscription: any;
+
+	/**
+	 * Component subscriptions.
+	 */
+	private subscriptions: any[] = [];
+
+	/**
+	 * View title.
+	 */
 	public title: string = 'SPAMT Controls';
+	/**
+	 * View description.
+	 */
 	public description: object = {
 		welcome: 'In order to gain access to Social Profile Analysis and Management Tool Controls you should have an account associated with an email address. Provide this email address to get an authentication link.',
 		authenticated: 'Social Profile Analysis and Management Tool Controls',
 	};
+
+	/**
+	 * NVD3 chart options.
+	 */
 	public chartOptions: object = {
 		chart: {
 			type: 'pieChart',
@@ -70,6 +88,9 @@ export class DashboardControlsComponent implements OnInit, OnDestroy {
 			},
 		},
 	};
+	/**
+	 * Application usage chart data.
+	 */
 	public appUsageData: any[] = [
 		{
 			key: 'Default',
@@ -80,6 +101,9 @@ export class DashboardControlsComponent implements OnInit, OnDestroy {
 			y: 1,
 		},
 	];
+	/**
+	 * Queries chart data.
+	 */
 	public queriesData: any[] = [
 		{
 			key: 'Default',
@@ -88,74 +112,109 @@ export class DashboardControlsComponent implements OnInit, OnDestroy {
 		{
 			key: 'Default',
 			y: 1,
-		},
+		}
 	];
+	/**
+	 * Server data.
+	 */
 	public serverData: any = {
-		static: [],
+		static: []
 	};
+	/**
+	 * Users array.
+	 */
 	public usersList: any[] = [];
+	/**
+	 * Queries array.
+	 */
 	public queries: any = {
-		qieriesList: 0,
+		queriesList: [],
 		page: 0,
 	};
+	/**
+	 * UI error message.
+	 */
 	public errorMessage: string;
+	/**
+	 * UI success message.
+	 */
 	public successMessage: string;
-	private dismissMessages(): void {
+	/**
+	 * Dismisses UI messages - user actions feedback.
+	 */
+	public dismissMessages(): void {
 		this.errorMessage = '';
 		this.successMessage = '';
 	}
+
+	/**
+	 * Gets static server data.
+	 */
 	private getServerStaticData(callback): void {
-		this.emitSpinnerStartEvent();
+		this.emitter.emitSpinnerStartEvent();
 		this.serverStaticDataService.getData().subscribe(
-			(data) => this.serverData.static = data,
-			(error) => {
-				this.errorMessage = error as any;
-				this.emitSpinnerStopEvent();
+			(data: any) => this.serverData.static = data,
+			(error: any) => {
+				this.errorMessage = error;
+				this.emitter.emitSpinnerStopEvent();
 			},
 			() => {
 				console.log('getServerStaticData done, data:', this.serverData.static);
-				this.emitSpinnerStopEvent();
+				this.emitter.emitSpinnerStopEvent();
 				if (callback) { callback(); }
 			}
 		);
 	}
+	/**
+	 * Gets public data.
+	 */
 	private getPublicData(callback): void {
-		this.emitSpinnerStartEvent();
+		this.emitter.emitSpinnerStartEvent();
 		this.publicDataService.getData().subscribe(
-			(data) => {
-				this.nvd3usage.clearElement();
+			(data: any) => {
+				if (this.nvd3usage) {
+					this.nvd3usage.clearElement();
+				}
 				this.appUsageData = data;
 			},
-			(error) => {
-				this.errorMessage = error as any;
-				this.emitSpinnerStopEvent();
+			(error: any) => {
+				this.errorMessage = error;
+				this.emitter.emitSpinnerStopEvent();
 			},
 			() => {
 				console.log('getPublicData done, data:', this.appUsageData);
-				this.emitSpinnerStopEvent();
+				this.emitter.emitSpinnerStopEvent();
 				if (callback) { callback(); }
 			}
 		);
 	}
+	/**
+	 * Gets users list.
+	 */
 	private getUsersList(): void {
-		this.emitSpinnerStartEvent();
-		this.controlsUsersListService.getData(this.userService.model.user_token).subscribe(
-			(data) => this.usersList = data,
-			(error) => {
-				this.errorMessage = error as any;
-				this.emitSpinnerStopEvent();
+		this.emitter.emitSpinnerStartEvent();
+		this.controlsUsersListService.getData().subscribe(
+			(data: any) => this.usersList = data,
+			(error: any) => {
+				this.errorMessage = error;
+				this.emitter.emitSpinnerStopEvent();
 			},
 			() => {
 				console.log('getUsersList done, data:', this.usersList);
-				this.emitSpinnerStopEvent();
+				this.emitter.emitSpinnerStopEvent();
 			}
 		);
 	}
+	/**
+	 * Gets queries list.
+	 */
 	private getQueriesList(): void {
-		this.emitSpinnerStartEvent();
-		this.controlsQueriesListService.getData(this.userService.model.user_token, this.queries.page).subscribe(
-			(data) => {
-				this.nvd3queries.clearElement();
+		this.emitter.emitSpinnerStartEvent();
+		this.controlsQueriesListService.getData(this.queries.page).subscribe(
+			(data: any) => {
+				if (this.nvd3queries) {
+					this.nvd3queries.clearElement();
+				}
 				this.queries.queriesList = data;
 				this.queriesData = [];
 				for (const query of this.queries.queriesList) {
@@ -167,65 +226,81 @@ export class DashboardControlsComponent implements OnInit, OnDestroy {
 					this.queriesData.push(obj);
 				}
 			},
-			(error) => {
-				this.errorMessage = error as any;
-				this.emitSpinnerStopEvent();
+			(error: any) => {
+				this.errorMessage = error;
+				this.emitter.emitSpinnerStopEvent();
 			},
 			() => {
 				console.log('getQueriesList done, data:', this.queries.queriesList);
-				this.emitSpinnerStopEvent();
+				this.emitter.emitSpinnerStopEvent();
 			}
 		);
 	}
 
+	/**
+	 * Requests controls acces using provided user credentials.
+	 */
 	private requestControlsAccess(): void {
-		this.emitSpinnerStartEvent();
+		this.emitter.emitSpinnerStartEvent();
 		this.dismissMessages();
 		this.controlsLoginService.getData(this.userService.model.email).subscribe(
-			(data) => this.successMessage = data.message,
-			(error) => {
-				this.errorMessage = error as any;
-				this.emitSpinnerStopEvent();
+			(data: any) => this.successMessage = data.message,
+			(error: any) => {
+				this.errorMessage = error;
+				this.emitter.emitSpinnerStopEvent();
 			},
 			() => {
 				console.log('requestControlsAccess done');
-				this.emitSpinnerStopEvent();
+				this.emitter.emitSpinnerStopEvent();
 			}
 		);
 	}
 
+	/**
+	 * Gets authenticated user details.
+	 */
 	private getMe(): void {
-		this.emitSpinnerStartEvent();
+		this.emitter.emitSpinnerStartEvent();
 		this.dismissMessages();
-		this.controlsMeService.getData(this.userService.model.user_token).subscribe(
-			(data) => {
-				this.userService.model.role = data.role;
-				this.userService.model.login = data.login;
-				this.userService.model.full_name = data.full_name;
-				this.userService.model.last_login = data.last_login;
-				this.userService.model.registered = data.registered;
+		this.controlsMeService.getData().subscribe(
+			(data: any) => {
 				this.successMessage = 'Successful login';
-				this.userService.saveUser();
+				const newValues: any = {
+					role: data.role,
+					login: data.login,
+					full_name: data.full_name,
+					last_login: data.last_login,
+					registered: data.registered
+				};
+				this.userService.saveUser(newValues);
 			},
-			(error) => {
-				this.errorMessage = error as any;
+			(error: any) => {
+				this.errorMessage = error;
 				this.userService.resetUser();
-				this.emitter.emitEvent({appInfo: 'show'});
-				this.emitSpinnerStopEvent();
+				this.emitter.emitSpinnerStopEvent();
 				this.router.navigateByUrl('/controls');
 			},
 			() => {
 				console.log('getMe done');
-				this.emitSpinnerStopEvent();
+				this.emitter.emitSpinnerStopEvent();
 			}
 		);
 	}
 
-	private authForm: FormGroup;
-	private activate: any = {
+	/**
+	 * Authentication form.
+	 */
+	public authForm: FormGroup;
+	/**
+	 * Authentication form state.
+	 */
+	public activate: any = {
 		form: true as boolean
 	};
-	private resetForm(reinitForm?: boolean): void {
+	/**
+	 * Resets authentication form.
+	 */
+	public resetForm(reinitForm?: boolean): void {
 		/*
 		*	resets user local storage and register form
 		*/
@@ -251,80 +326,127 @@ export class DashboardControlsComponent implements OnInit, OnDestroy {
 		});
 	}
 
-	private login(): void { /* tslint:disable-line */
-		this.userService.model.email = this.authForm.controls.email.value;
-		console.log('login attempt with email', this.userService.model.email);
-		this.userService.saveUser();
+	/**
+	 * Loggs user in.
+	 */
+	public login(): void {
+		console.log('login attempt with email', this.authForm.controls.email.value);
+		this.userService.saveUser({ email: this.authForm.controls.email.value });
 		this.requestControlsAccess();
 	}
 
-	private logout(): void { /* tslint:disable-line */
+	/**
+	 * Loggs user out.
+	 */
+	public logout(): void {
 		console.log('logging out, resetting token');
-		this.emitSpinnerStartEvent();
+		this.emitter.emitSpinnerStartEvent();
 		this.dismissMessages();
-		this.controlsLogoutService.getData(this.userService.model.user_token).subscribe(
+		this.controlsLogoutService.getData().subscribe(
 			(data) => {
 				this.successMessage = 'Logout success';
 				this.userService.resetUser();
 				this.resetForm();
 				this.activate.form = true;
-				this.emitter.emitEvent({appInfo: 'show'});
 				this.router.navigateByUrl('/controls');
 			},
 			(error) => {
 				this.errorMessage = error as any;
-				this.emitSpinnerStopEvent();
+				this.emitter.emitSpinnerStopEvent();
 			},
 			() => {
 				console.log('logout done');
-				this.emitSpinnerStopEvent();
+				this.emitter.emitSpinnerStopEvent();
 			}
 		);
 	}
 
-	private emitSpinnerStartEvent(): void {
-		// console.log('root spinner start event emitted');
-		this.emitter.emitEvent({spinner: 'start'});
-	}
-	private emitSpinnerStopEvent(): void {
-		// console.log('root spinner stop event emitted');
-		this.emitter.emitEvent({spinner: 'stop'});
-	}
-
-// Modal
-	private showModal: boolean = false;
-	private toggleModal(): void { /* tslint:disable-line */
+	/**
+	 * If modal custom should be shown or not.
+	 */
+	public showModal: boolean = false;
+	/**
+	 * Toggles custom modal visibility.
+	 */
+	public toggleModal(): void {
 		this.showModal = (!this.showModal) ? true : false;
 	}
 
-// Tabs
-	private dataTabs: string[] = ['Users', 'Queries']; // tslint:disable-line
-	@ViewChild('tabGroup') private tabGroup: MdTabGroup;
+	/**
+	 * Basic controls view tabs names.
+	 */
+	public dataTabs: string[] = ['Users', 'Queries'];
+	/**
+	 * Basic controls view tab group.
+	 */
+	@ViewChild('tabGroup') private tabGroup: MatTabGroup;
 
-// Help
-	private showHelp: boolean = false; // controls help labells visibility, catches events from nav component
+	/**
+	 * Subscribes to Tab Group change events.
+	 */
+	private tabGroupChangeSubscribe(): void {
+		const sub = this.tabGroup.selectedTabChange.subscribe((event: any) => {
+			console.log('tabs chage event:', event, '| active tab index', event.index, '| tab name', this.dataTabs[event.index]);
+			if (this.dataTabs[event.index] === 'Users') {
+				/*
+				* TODO:client do something on users selection
+				*/
+			}
+			if (this.dataTabs[event.index] === 'Queries') {
+				/*
+				* TODO:client do something on queries selection
+				*/
+			}
+		});
+		this.subscriptions.push(sub);
+	}
 
-// Charts
+	/**
+	 * If controls should be highlighted or not.
+	 * Controls help labells visibility, is controlled by events from nav component.
+	 */
+	public showHelp: boolean = false;
+
+	/**
+	 * Application usage chart.
+	 */
 	@ViewChild('appUsageChart') private nvd3usage: any;
+	/**
+	 * Queries data chart.
+	 */
 	@ViewChild('queriesDataChart') private nvd3queries: any;
 
+	/**
+	 * Lifecycle hook called after component view is destroyed.
+	 */
 	public ngOnInit(): void {
-		console.log('ngOnInit: DashboardControlsComponent initialized');
-		this.emitter.emitEvent({appInfo: 'show'});
+		console.log('ngOnInit: AppControlsComponent initialized');
 
 		const route = this.router.url;
 		const urlParams = route.substring(route.lastIndexOf('?') + 1, route.length);
 		if (/^user_token\=[^&]+$/.test(urlParams)) {
 			const token = urlParams.split('=')[1];
 			console.log('user got token, save it:', token);
-			this.userService.model.user_token = token;
-			this.userService.saveUser();
+			this.userService.saveUser({ user_token: token });
 			this.location.replaceState('controls');
 		}
 
+		/**
+		 * Subscribe to Event Emitter Service events.
+		 */
+		const sub = this.emitter.getEmitter().subscribe((event: any) => {
+			if (event.help === 'toggle') {
+				console.log('AppControlsComponent emitter event:', event, ' | toggling help labels visibility', this.showHelp);
+				this.showHelp = (this.showHelp) ? false : true;
+			}
+		});
+		this.subscriptions.push(sub);
+
+		/**
+		 * Load data.
+		 */
 		this.userService.restoreUser(() => {
 			if (this.userService.model.user_token) {
-				this.emitter.emitEvent({appInfo: 'hide'});
 				this.activate.form = false;
 				this.getMe();
 				this.getUsersList();
@@ -338,16 +460,26 @@ export class DashboardControlsComponent implements OnInit, OnDestroy {
 				console.log('local storage is empty');
 			}
 		});
-
-		this.subscription = this.emitter.getEmitter().subscribe((message) => {
-			if (message.help === 'toggle') {
-				console.log('/controls consuming event:', message, ' | toggling help labels visibility', this.showHelp);
-				this.showHelp = (this.showHelp) ? false : true;
-			}
-		});
 	}
+	/**
+	 * Lifecycle hook called after component view is initialized.
+	 */
+	public ngAfterViewInit(): void {
+		if (this.userService.isLoggedIn()) {
+			this.tabGroupChangeSubscribe();
+			// this.nvd3usage.updateSize();
+			// this.nvd3queries.updateSize();
+		}
+	}
+	/**
+	 * Lifecycle hook called after component view is destroyed.
+	 */
 	public ngOnDestroy(): void {
-		console.log('ngOnDestroy: DashboardControlsComponent destroyed');
-		this.subscription.unsubscribe();
+		console.log('ngOnDestroy: AppControlsComponent destroyed');
+		if (this.subscriptions.length) {
+			for (const sub of this.subscriptions) {
+				sub.unsubscribe();
+			}
+		}
 	}
 }

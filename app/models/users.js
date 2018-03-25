@@ -7,8 +7,8 @@ let User = new Schema({
 	role:								String,	// gen
 	salt:								String,	// gen
 	jwToken:						String,	// gen
-	registered:					String,	// gen
-	lastLogin:					String,	// gen
+	registered:					Number,	// gen
+	lastLogin:					Number,	// gen
 	userExtended: {
 		login:						String, // gen
 		email:						String,	// input

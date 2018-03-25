@@ -1,7 +1,7 @@
 'use strict';
 
-const os = require('os'),
-	exec = require('child_process').execSync;
+const os = require('os');
+const exec = require('child_process').execSync;
 
 exports.static = function () {
 	return [

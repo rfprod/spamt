@@ -5,13 +5,14 @@ import { UserService } from '../services/user.service';
 import { UserLogoutService } from '../services/user-logout.service';
 
 @Component({
-	selector: 'dashboard-user',
-	templateUrl: '/public/app/views/dashboard-user.html',
+	selector: 'app-user',
+	templateUrl: '/public/app/views/app-user.html',
 	host: {
 		class: 'mat-body-1'
 	}
 })
-export class DashboardUserComponent implements OnInit, OnDestroy {
+export class AppUserComponent implements OnInit, OnDestroy {
+
 	constructor(
 		private el: ElementRef,
 		private router: Router,
@@ -20,9 +21,10 @@ export class DashboardUserComponent implements OnInit, OnDestroy {
 		private userService: UserService,
 		private userLogoutService: UserLogoutService
 	) {
-		console.log('this.el.nativeElement:', this.el.nativeElement);
+		console.log('AppUserComponent element:', this.el.nativeElement);
 	}
-	private subscription: any;
+
+	private subscriptions: any[] = [];
 
 	public title: string = 'User Panel';
 	public description: object = {
@@ -31,11 +33,10 @@ export class DashboardUserComponent implements OnInit, OnDestroy {
 	};
 	public errorMessage: string = '';
 	public successMessage: string = '';
-	private dismissMessages(): void {
+	public dismissMessages(): void {
 		this.errorMessage = '';
 		this.successMessage = '';
 	}
-	private routerSubscription: any;
 
 // Authentication checker
 	private checkUrlParams(): void {
@@ -53,8 +54,7 @@ export class DashboardUserComponent implements OnInit, OnDestroy {
 				if (param[0] === 'twitter_auth_error' && param[1] === 'true') {
 					this.errorMessage = 'Failed to log in with Twitter credentials. Please, try again.';
 					// reset existing tokens if any in case of twitter_auth_error is present and truthy
-					this.userService.model.twitter_oauth_token = '';
-					this.userService.saveUser();
+					this.userService.saveUser({ twitter_oauth_token: '' });
 					break getError;
 				}
 			}
@@ -65,12 +65,11 @@ export class DashboardUserComponent implements OnInit, OnDestroy {
 			console.log(params);
 			for (const param of params) {
 				if (param[0] === 'twitter_oauth_token') {
-					this.userService.model.twitter_oauth_token = param[1];
+					this.userService.saveUser({ twitter_oauth_token: param[1] });
 				}
 			}
 			this.dismissMessages();
 			this.successMessage = 'Successful login';
-			this.userService.saveUser();
 		}
 		// Soundcloud
 	}
@@ -79,52 +78,39 @@ export class DashboardUserComponent implements OnInit, OnDestroy {
 		return this.userService.model.twitter_oauth_token || this.userService.model.soundcloud_oauth_token;
 	}
 
-	private logout(): void { /* tslint:disable-line */
+	public logout(): void {
 		console.log('logging out, resetting token');
-		this.emitSpinnerStartEvent();
+		this.emitter.emitSpinnerStartEvent();
 		this.dismissMessages();
 		this.userLogoutService.getData(this.userService.model.twitter_oauth_token, null).subscribe(
 			(data) => {
 				this.successMessage = 'Logout success';
-				this.userService.model.twitter_oauth_token = '';
-				this.userService.saveUser();
-				this.emitter.emitEvent({appInfo: 'show'});
+				this.userService.saveUser({ twitter_oauth_token: '' });
 				this.router.navigateByUrl('/user');
 			},
 			(error) => {
 				this.errorMessage = error as any;
-				this.emitSpinnerStopEvent();
+				this.emitter.emitSpinnerStopEvent();
 			},
 			() => {
 				console.log('logout done');
-				this.emitSpinnerStopEvent();
+				this.emitter.emitSpinnerStopEvent();
 			}
 		);
 	}
 
-// Spinner
-	private emitSpinnerStartEvent(): void {
-		console.log('root spinner start event emitted');
-		this.emitter.emitEvent({spinner: 'start'});
-	}
-	private emitSpinnerStopEvent(): void {
-		console.log('root spinner stop event emitted');
-		this.emitter.emitEvent({spinner: 'stop'});
-	}
-
 // Modal
-	private showModal: boolean = false;
-	private toggleModal(): void { /* tslint:disable-line */
+	public showModal: boolean = false;
+	public toggleModal(): void {
 		this.showModal = (!this.showModal) ? true : false;
 	}
 
 // Help
-	private showHelp: boolean = false; // controls help labells visibility, catches events from nav component
+	public showHelp: boolean = false; // controls help labells visibility, catches events from nav component
 
 	public ngOnInit(): void {
-		console.log('ngOnInit: UserComponent initialized');
-		this.emitSpinnerStartEvent();
-		this.emitter.emitEvent({appInfo: 'hide'});
+		console.log('ngOnInit: AppUserComponent initialized');
+		this.emitter.emitSpinnerStartEvent();
 
 		this.checkUrlParams();
 
@@ -137,7 +123,6 @@ export class DashboardUserComponent implements OnInit, OnDestroy {
 					this.router.navigateByUrl('/user');
 				} else {
 					console.log('restored user selection: user is not logged in');
-					this.emitter.emitEvent({appInfo: 'show'});
 				}
 			});
 		} else {
@@ -145,21 +130,28 @@ export class DashboardUserComponent implements OnInit, OnDestroy {
 			this.router.navigateByUrl('/user');
 		}
 
-		this.subscription = this.emitter.getEmitter().subscribe((message) => {
-			console.log('UserComponent consuming message:', message);
-			if (message.help === 'toggle') {
-				console.log('/controls consuming event:', message, ' | toggling help labels visibility', this.showHelp);
+		let sub = this.emitter.getEmitter().subscribe((event: any) => {
+			console.log('AppUserComponent consuming event:', event);
+			if (event.help === 'toggle') {
+				console.log('AppUserComponent emitter event:', event, ' | toggling help labels visibility', this.showHelp);
 				this.showHelp = (this.showHelp) ? false : true;
 			}
 		});
-		this.routerSubscription = this.activatedRoute.params.subscribe((params: Params) => {
+		this.subscriptions.push(sub);
+
+		sub = this.activatedRoute.params.subscribe((params: Params) => {
 			console.log('url params chaned:', params);
 		});
-		this.emitSpinnerStopEvent();
+		this.subscriptions.push(sub);
+
+		this.emitter.emitSpinnerStopEvent();
 	}
 	public ngOnDestroy(): void {
-		console.log('ngOnDestroy: UserComponent destroyed');
-		this.subscription.unsubscribe();
-		this.routerSubscription.unsubscribe();
+		console.log('ngOnDestroy: AppUserComponent destroyed');
+		if (this.subscriptions.length) {
+			for (const sub of this.subscriptions) {
+				sub.unsubscribe();
+			}
+		}
 	}
 }

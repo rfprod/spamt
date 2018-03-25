@@ -2,11 +2,22 @@ import { EventEmitter, Injectable } from '@angular/core';
 
 @Injectable()
 export class EventEmitterService {
-	public emitter: EventEmitter<object> = new EventEmitter();
-	public emitEvent(object): void {
-		this.emitter.emit(object);
-	}
+
+	private emitter: EventEmitter<object> = new EventEmitter();
+
 	public getEmitter(): EventEmitter<object> {
 		return this.emitter;
 	}
+
+	public emitEvent(object): void {
+		this.emitter.emit(object);
+	}
+
+	public emitSpinnerStartEvent(): void {
+		this.emitter.emit({spinner: 'start'});
+	}
+	public emitSpinnerStopEvent(): void {
+		this.emitter.emit({spinner: 'stop'});
+	}
+
 }

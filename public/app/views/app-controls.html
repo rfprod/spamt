@@ -1,16 +1,16 @@
 <div fxLayout="column" fxLayoutFill>
-	<span *ngIf="!userService.model.user_token" fxFlex>
+	<span *ngIf="!userService.isLoggedIn()" fxFlex>
 		<h3>{{title}}</h3>
 		<p>{{description.welcome}}</p>
 	</span>
-	<span *ngIf="userService.model.user_token" fxFlex>
+	<span *ngIf="userService.isLoggedIn()" fxFlex>
 		<h3 fxLayout="row" fxLayoutAlign="start center">
 			{{title}}
-			<a md-button (click)="toggleModal()" mdTooltip="Application stats">
-				<i class="fa fa-bar-chart" [ngClass]="{ 'help-highlight': showHelp }"></i>
+			<a mat-icon-button (click)="toggleModal()" matTooltip="Application stats">
+				<mat-icon class="material-icons-fas" fontSet="fas" fontIcon="fa-chart-bar" [ngClass]="{ 'help-highlight': showHelp }"></mat-icon>
 			</a>
-			<a md-button (click)="logout()" mdTooltip="Log out of SPAMT Controls">
-				<i class="fa fa-sign-out" [ngClass]="{ 'help-highlight': showHelp }"></i>
+			<a mat-icon-button (click)="logout()" matTooltip="Log out of SPAMT Controls">
+				<mat-icon class="material-icons-fas" fontSet="fas" fontIcon="fa-sign-out-alt" [ngClass]="{ 'help-highlight': showHelp }"></mat-icon>
 			</a>
 		</h3>
 		<p>{{description.authenticated}}</p>
@@ -19,48 +19,48 @@
 	<div fxFlex *ngIf="errorMessage || successMessage">
 		<div *ngIf="errorMessage" class="feedback warning" fxLayout="row" fxLayoutAlign="start stretch">
 			<span fxFlex="90" fxLayout="row" fxLayoutAlign="start center">
-				<i class="fa fa-warning"></i> {{errorMessage}}
+				<mat-icon class="material-icons-fas" fontSet="fas" fontIcon="fa-exclamation-triangle"></mat-icon> {{errorMessage}}
 			</span>
 			<button type="button" class="close" (click)="dismissMessages()" aria-label="Close">&times;</button>
 		</div>
 		<div *ngIf="successMessage" class="feedback success" fxLayout="row" fxLayoutAlign="start stretch">
 			<span fxFlex="90" fxLayout="row" fxLayoutAlign="start center">
-				<i class="fa fa-check-circle"></i> {{successMessage}}
+				<mat-icon class="material-icons-fas" fontSet="fas" fontIcon="fa-check"></mat-icon> {{successMessage}}
 			</span>
 			<button fxFlex="10" type="button" class="close" (click)="dismissMessages()" aria-label="Close">&times;</button>
 		</div>
 	</div>
 
-	<form id="auth-form" fxFlex fxLayout="column" fxLayoutAlign="start stretch" [formGroup]="authForm" (ngSubmit)="login()" *ngIf="!userService.model.user_token && activate.form" novalidate>
-		<md-form-field class="full-width">
-			<input mdInput type="email" id="email" name="email" [formControl]="authForm.controls.email" pattern="^[\w%+-]+@[\w.-]+" title="email" placeholder="email" required />
-			<md-icon mdSuffix class="material-icons">email</md-icon>
-			<md-error *ngIf="!authForm.controls.email.error">
+	<form id="auth-form" fxFlex fxLayout="column" fxLayoutAlign="start stretch" [formGroup]="authForm" (ngSubmit)="login()" *ngIf="!userService.isLoggedIn() && activate.form" novalidate>
+		<mat-form-field class="full-width">
+			<input matInput type="email" id="email" name="email" [formControl]="authForm.controls.email" pattern="^[\w%+-]+@[\w.-]+" title="email" placeholder="email" required />
+			<mat-icon matSuffix class="material-icons">email</mat-icon>
+			<mat-error *ngIf="!authForm.controls.email.error">
 				Invalid value, should be email
-			</md-error>
-		</md-form-field>
+			</mat-error>
+		</mat-form-field>
 		<div fxLayout="row" fxLayoutAlign="start stretch" class="controls">
 			<span fxFlex="1 1 auto"></span>
 			<span fxFlex="0 1 auto" *ngIf="authForm.controls.email.value">
-				<a md-button (click)="resetForm(true)">Reset Form</a>
+				<a mat-button (click)="resetForm(true)">Reset Form</a>
 			</span>
 		</div>
 		<div fxLayout="row" fxLayoutAlign="start stretch" class="controls">
-			<button md-button fxFlex type="submit" [disabled]="authForm.invalid" [attr.aria-label]="submit">Submit</button>
+			<button mat-button fxFlex type="submit" [disabled]="authForm.invalid" [attr.aria-label]="submit">Submit</button>
 		</div>
 	</form>
 
-	<span *ngIf="userService.model.user_token" fxFlex>
+	<span *ngIf="userService.isLoggedIn()" fxFlex>
+
 		<div fxLayout="row" fxLayoutAlign="start center">
 			<p fxFlex>Logged in as:</p>
-			<p fxFlex mdTooltip="Login">{{userService.model.login}}</p>
-			<p fxFlex mdTooltip="Role">{{userService.model.role}}</p>
-			<p fxFlex mdTooltip="Full Name">{{userService.model.full_name}}</p>
+			<p fxFlex matTooltip="Login">{{userService.model.login}}</p>
+			<p fxFlex matTooltip="Role">{{userService.model.role}}</p>
+			<p fxFlex matTooltip="Full Name">{{userService.model.full_name}}</p>
 		</div>
 
-		<md-tab-group #tabGroup>
-			<md-tab label="{{dataTabs[0]}}">
-				<nvd3 #appUsageChart *ngIf="tabGroup.selectedIndex === 0" [options]="chartOptions" [data]="appUsageData"></nvd3>
+		<mat-tab-group #tabGroup>
+			<mat-tab label="{{dataTabs[0]}}">
 				<table>
 					<thead>
 						<tr>
@@ -83,9 +83,8 @@
 						</tr>
 					</tbody>
 				</table>
-			</md-tab>
-			<md-tab label="{{dataTabs[1]}}">
-				<nvd3 #queriesDataChart *ngIf="tabGroup.selectedIndex === 1" [options]="chartOptions" [data]="queriesData"></nvd3>
+			</mat-tab>
+			<mat-tab label="{{dataTabs[1]}}">
 				<table>
 					<thead>
 						<tr>
@@ -102,8 +101,17 @@
 						</tr>
 					</tbody>
 				</table>
-			</md-tab>
-		</md-tab-group>
+			</mat-tab>
+		</mat-tab-group>
+
+		<div fxLayout="row" fxLayoutAlign="center center" *ngIf="tabGroup.selectedIndex === 0">
+			<nvd3 fxFlex #appUsageChart [options]="chartOptions" [data]="appUsageData"></nvd3>
+		</div>
+
+		<div fxLayout="row" fxLayoutAlign="center center" *ngIf="tabGroup.selectedIndex === 1">
+			<nvd3 fxFlex #queriesDataChart [options]="chartOptions" [data]="queriesData"></nvd3>
+		</div>
+
 	</span>
 
 	<span id="modal" *ngIf="showModal">

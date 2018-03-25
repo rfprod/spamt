@@ -18,12 +18,7 @@ charset = utf-8
 indent_style = tab
 indent_size = 4
 
-# 2 space indentation for code
-[*.{js,ts,json,sh}]
-indent_style = tab
-indent_size = 2
-
-# Matches the exact files: package.json, bower.json, .bowerrc
-[{.eslintignore,.gitignore,.bowerrc}]
+# 2 space indentation for code, and configuration files
+[*.{js,ts,json,sh,.eslintignore,.gitignore}]
 indent_style = tab
 indent_size = 2
