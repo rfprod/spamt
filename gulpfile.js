@@ -22,14 +22,17 @@ let node,
 	tsc;
 
 function killProcessByName(name){
-	exec('ps -e | grep '+name, (error, stdout, stderr) => {
-		if (error) throw error;
+	exec('pgrep ' + name, (error, stdout, stderr) => {
+		if (error) {
+			// throw error;
+			console.log('killProcessByName, error', error);
+		}
 		if (stderr) console.log('stderr: ',stderr);
 		if (stdout) {
 			//console.log('killing running processes:', stdout);
 			const runningProcessesIDs = stdout.match(/\d{3,6}/);
 			runningProcessesIDs.forEach((id) => {
-				exec('kill -9 '+id, (error, stdout, stderr) => {
+				exec('kill -9 ' + id, (error, stdout, stderr) => {
 					if (error) throw error;
 					if (stderr) console.log('stdout: ', stdout);
 					if (stdout) console.log('stderr: ', stderr);
@@ -39,17 +42,18 @@ function killProcessByName(name){
 	});
 }
 
-gulp.task('database', () => {
+gulp.task('database', (done) => {
 	if (mongo) mongo.kill();
-	mongo = spawn('mongod', ['--smallfiles', '--nojournal'], {stdio: 'inherit'});
+	mongo = spawn('npm', ['run', 'mongo-start'], {stdio: 'inherit'});
 	mongo.on('close', (code) => {
 		if (code === 8) {
 			console.log('Error detected, waiting for changes...');
 		}
 	});
+	done();
 });
 
-gulp.task('server', () => {
+gulp.task('server', (done) => {
 	if (node) node.kill();
 	node = spawn('node', ['server.js'], {stdio: 'inherit'});
 	node.on('close', (code) => {
@@ -57,6 +61,7 @@ gulp.task('server', () => {
 			console.log('Error detected, waiting for changes...');
 		}
 	});
+	done();
 });
 
 gulp.task('tsc', (done) => {
@@ -115,12 +120,9 @@ gulp.task('client-unit-test-single-run', (done) => {
 
 	server.on('run_complete', (browsers, results) => {
 		if (results.failed) {
-			// throw new Error('=====\nKarma > Tests Failed\n=====\n', results);
-			console.log('=====\nKarma > Tests Failed\n=====\n', results);
-		} else {
-			console.log('=====\nKarma > Complete With No Failures\n=====\n', results);
+			throw new Error('=====\nKarma > Tests Failed\n=====\n', results);
 		}
-
+		console.log('=====\nKarma > Complete With No Failures\n=====\n', results);
 		done();
 	});
 
@@ -135,11 +137,11 @@ gulp.task('build-system-js', () => {
 	*	nonangular components related to design, styling, data visualization etc.
 	*	are built by another task
 	*/
-	const builder = systemjsBuilder('/','./systemjs.config.js');
-	return builder.buildStatic('app', 'bundle.min.js', {
-		minify: true,
-		mangle: true
-	})
+	return systemjsBuilder('/','./systemjs.config.js')
+		.buildStatic('app', 'bundle.min.js', {
+			minify: true,
+			mangle: true
+		})
 		.pipe(gulp.dest('./public/js'));
 });
 
@@ -149,11 +151,7 @@ gulp.task('pack-vendor-js', () => {
 	*	components related to design, styling, data visualization etc.
 	*/
 	return gulp.src([
-		/*
-		*	add paths to required third party js files
-		*
-		*	note: sequence is essential
-		*/
+		// sequence is essential
 		'./node_modules/core-js/client/shim.js',
 
 		'./node_modules/jquery/dist/jquery.js',
@@ -267,11 +265,7 @@ gulp.task('lint', (done) => {
 });
 
 gulp.task('default', (done) => {
-	runSequence('database', 'server', 'build', 'lint', 'watch', done);
-});
-
-gulp.task('production-start', (done) => {
-	runSequence('database', 'server', 'build', done);
+	runSequence('lint', 'build', 'database', 'server', 'watch', done);
 });
 
 process.on('exit', () => {
