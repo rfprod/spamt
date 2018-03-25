@@ -1,8 +1,9 @@
 import { Injectable } from '@angular/core';
 import { Http, Response } from '@angular/http';
 
-import { Observable } from 'rxjs/Observable';
-import 'rxjs/Rx';
+import { Observable } from 'rxjs/Rx';
+import 'rxjs/add/operator/map';
+import 'rxjs/add/operator/catch';
 
 @Injectable()
 export class ControlsQueriesListService {
@@ -22,7 +23,7 @@ export class ControlsQueriesListService {
 		return Observable.throw(errMsg);
 	}
 
-	public getData(userToken: string, page: number = 1): Observable<any> { // tslint:disable-line
+	public getData(userToken: string, page: number = 1): Observable<any> {
 		return this.http.get(this.appDataUrl + userToken + '&page=' + page)
 			.map(this.extractData)
 			.catch(this.handleError);

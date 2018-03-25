@@ -1,6 +1,6 @@
 import { NgModule, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 
-import { LocationStrategy, PathLocationStrategy  } from '@angular/common';
+import { APP_BASE_HREF, LocationStrategy, PathLocationStrategy } from '@angular/common';
 
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
@@ -17,7 +17,7 @@ import { APP_ROUTES } from './app.routes';
 *	CustomMaterialModule loads exact material modules
 */
 import '../../node_modules/hammerjs/hammer.js';
-import { MaterialModule } from '@angular/material';
+import { CustomMaterialModule } from './custom-material.module';
 
 import { AppComponent } from './app.component';
 import { AppNavComponent } from './components/app-nav.component';
@@ -52,8 +52,9 @@ import { NvD3Component } from 'ng2-nvd3';
 
 @NgModule({
 	declarations: [ AppComponent, AppNavComponent, AppInfoComponent, DashboardIntroComponent, DashboardDetailsComponent, DashboardControlsComponent, DashboardUserComponent, /*nvD3,*/NvD3Component, AudioPlayerDirective, ConvertDuration ],
-	imports 		: [ BrowserModule, BrowserAnimationsModule, FormsModule, FlexLayoutModule, MaterialModule, ReactiveFormsModule, HttpModule, RouterModule.forRoot(APP_ROUTES) ],
+	imports 		: [ BrowserModule, BrowserAnimationsModule, FormsModule, FlexLayoutModule, CustomMaterialModule, ReactiveFormsModule, HttpModule, RouterModule.forRoot(APP_ROUTES) ],
 	providers 	: [
+									{provide: APP_BASE_HREF, useValue: '/'},
 									{ provide: LocationStrategy, useClass: PathLocationStrategy },
 									{ provide: Window, useValue: window },
 									EventEmitterService, WebsocketService, UserService, UserLogoutService, ServerStaticDataService, PublicDataService,

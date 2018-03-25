@@ -1,12 +1,12 @@
-'use strict';
-
-import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
+import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
+import { APP_BASE_HREF } from '@angular/common';
+import { BrowserDynamicTestingModule } from '@angular/platform-browser-dynamic/testing';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 
 import { FlexLayoutModule } from '@angular/flex-layout';
 import '../../node_modules/hammerjs/hammer.js';
-import { MaterialModule } from '@angular/material';
+import { CustomMaterialModule } from '../../public/app/custom-material.module';
 
 import { EventEmitterService } from '../../public/app/services/event-emitter.service';
 
@@ -17,8 +17,9 @@ describe('AppInfoComponent', () => {
 	beforeEach((done) => {
 		TestBed.configureTestingModule({
 			declarations: [ AppInfoComponent ],
-			imports: [ NoopAnimationsModule, MaterialModule, FlexLayoutModule ],
+			imports: [ NoopAnimationsModule, CustomMaterialModule, FlexLayoutModule ],
 			providers: [
+				{ provide: APP_BASE_HREF, useValue: '/' },
 				{ provide: Window, useValue: { location: { host: 'localhost', protocol: 'http' } } },
 				EventEmitterService
 			],

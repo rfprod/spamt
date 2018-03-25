@@ -2,6 +2,8 @@ import { Injectable } from '@angular/core';
 import { Http, Response } from '@angular/http';
 
 import { Observable } from 'rxjs/Rx';
+import 'rxjs/add/operator/map';
+import 'rxjs/add/operator/catch';
 
 @Injectable()
 export class PublicDataService {
@@ -20,7 +22,7 @@ export class PublicDataService {
 		return Observable.throw(errMsg);
 	}
 
-	public getData(): Observable<any[]> { // tslint:disable-line
+	public getData(): Observable<any> {
 		return this.http.get(this.appDataUrl)
 			.map(this.extractData)
 			.catch(this.handleError);

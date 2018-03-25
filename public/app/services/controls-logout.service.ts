@@ -1,8 +1,9 @@
 import { Injectable } from '@angular/core';
 import { Http, Response } from '@angular/http';
 
-import { Observable } from 'rxjs/Observable';
-import 'rxjs/Rx';
+import { Observable } from 'rxjs/Rx';
+import 'rxjs/add/operator/map';
+import 'rxjs/add/operator/catch';
 
 @Injectable()
 export class ControlsLogoutService {
@@ -22,7 +23,7 @@ export class ControlsLogoutService {
 		return Observable.throw(errMsg);
 	}
 
-	public getData(userToken: string): Observable<any> { // tslint:disable-line
+	public getData(userToken: string): Observable<any> {
 		return this.http.get(this.appDataUrl + userToken)
 			.map(this.extractData)
 			.catch(this.handleError);

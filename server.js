@@ -1,6 +1,7 @@
 'use strict';
 
 const express = require('express'),
+	compression = require('compression'),
 	routes = require('./app/routes/index.js'),
 	mongoose = require('mongoose'),
 	passport = require('passport'),
@@ -50,6 +51,14 @@ const TWTR = require('./app/utils/twitter-api-wrapper.js');
 process.title = 'spamt';
 
 const cwd = process.cwd();
+
+/*
+*	use compression for all responses
+*/
+app.use(compression({
+	threshold: 0,
+	level: -1
+}));
 
 app.use('/public', express.static(cwd + '/public'));
 app.use('/node_modules', express.static(cwd + '/node_modules'));

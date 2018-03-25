@@ -20,17 +20,21 @@ module.exports = function(config){
 			'node_modules/zone.js/dist/async-test.js',
 			'node_modules/zone.js/dist/fake-async-test.js',
 
+			'node_modules/moment/min/moment-with-locales.min.js',
+
 			'node_modules/systemjs/dist/system.src.js',
+			{ pattern: 'node_modules/@angular/material/prebuilt-themes/deeppurple-amber.css' },
 
 			{ pattern: 'systemjs.config.js', included: false, watched: false },
 			{ pattern: 'systemjs.karma.config.js', included: false, watched: false },
 			{ pattern: 'systemjs.config.extras.js', included: false, watched: false },
 			{ pattern: 'node_modules/traceur/bin/traceur.js', included: false, watched: false },
-			
+
 			'node_modules/hammerjs/hammer.js',
 			{ pattern: 'node_modules/@angular/**', included: false, watched: false },
-			
 			{ pattern: 'node_modules/rxjs/**', included: false, watched: false },
+			{ pattern: 'node_modules/tslib/**', included: false, watched: false },
+			{ pattern: 'node_modules/traceur/**', included: false, watched: false },
 
 			'test/karma.test-shim.js',
 			{ pattern: 'test/client/**', included: false, watched: false },
@@ -74,6 +78,9 @@ module.exports = function(config){
 			'public/app/**/!(*.spec).js': ['coverage'],
 			'public/app/**/*.js': ['sourcemap']
 		},
+
+		browserNoActivityTimeout: 20000,
+		browserDisconnectTimeout: 20000,
 
 		redirectPreprocessor: {
 			// stripPrefix: '',

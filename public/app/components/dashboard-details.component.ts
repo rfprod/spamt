@@ -1,6 +1,6 @@
 import { Component, ElementRef, ViewChild, OnInit, OnDestroy } from '@angular/core';
 import { FormControl, Validators } from '@angular/forms';
-import { MdTabGroup } from '@angular/material';
+import { MatTabGroup } from '@angular/material';
 import { EventEmitterService } from '../services/event-emitter.service';
 import { SCgetQueriesService } from '../services/sc-get-queries.service';
 import { SCgetUserService } from '../services/sc-get-user.service';
@@ -128,7 +128,7 @@ export class DashboardDetailsComponent implements OnInit, OnDestroy {
 	}
 
 // Data tabs
-	@ViewChild('tabGroup') private tabGroup: MdTabGroup;
+	@ViewChild('tabGroup') private tabGroup: MatTabGroup;
 	private setTabChangeListener(): void {
 		this.tabGroup.selectedIndex = 0;
 		this.subscription.tabChange = this.tabGroup.selectChange.subscribe((message) => {
