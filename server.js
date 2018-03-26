@@ -1,38 +1,38 @@
 'use strict';
 
-const express = require('express'),
-	compression = require('compression'),
-	routes = require('./app/routes/index.js'),
-	mongoose = require('mongoose'),
-	passport = require('passport'),
-	session = require('express-session'),
-	MongoStore = require('connect-mongodb-session')(session),
-	app = express(),
-	expressWs = require('express-ws')(app), // eslint-disable-line no-unused-vars
-	bodyParser = require('body-parser'),
-	jwt = require('jwt-simple'),
-	flash = require('connect-flash'),
-	thenReq = require('then-request'),
-	nodemailer = require('nodemailer'),
-	crypto = require('crypto'),
-	cluster = require('cluster'),
-	os = require('os');
+const express = require('express');
+const compression = require('compression');
+const routes = require('./app/routes/index.js');
+const mongoose = require('mongoose');
+const passport = require('passport');
+const session = require('express-session');
+const MongoStore = require('connect-mongodb-session')(session);
+const app = express();
+const expressWs = require('express-ws')(app); // eslint-disable-line no-unused-vars
+const bodyParser = require('body-parser');
+const jwt = require('jwt-simple');
+const flash = require('connect-flash');
+const thenReq = require('then-request');
+const nodemailer = require('nodemailer');
+const crypto = require('crypto');
+const cluster = require('cluster');
+const os = require('os');
+
 let clusterStop = false;
 
-if (!process.env.OPENSHIFT_MONGODB_DB_HOST) {
-	require('dotenv').load();
-}
+require('dotenv').load();
+
 require('./app/config/passport')(passport);
 
-const mongo_uri = process.env.MONGO_URI || process.env.OPENSHIFT_MONGODB_DB_URL;
+const mongo_uri = process.env.MONGO_URI;
 mongoose.connect(mongo_uri);
 /*
 *	database models and data initialization methods
 */
-const User = require('./app/models/users.js'),
-	Query = require('./app/models/queries.js'),
-	SrvInfo = require('./app/utils/srv-info.js'),
-	DataInit = require('./app/utils/data-init.js');
+const User = require('./app/models/users.js');
+const Query = require('./app/models/queries.js');
+const SrvInfo = require('./app/utils/srv-info.js');
+const DataInit = require('./app/utils/data-init.js');
 /*
 *	JWT methods
 */
@@ -50,7 +50,7 @@ const TWTR = require('./app/utils/twitter-api-wrapper.js');
 
 process.title = 'spamt';
 
-const cwd = process.cwd();
+const cwd = __dirname;
 
 /*
 *	use compression for all responses
@@ -132,13 +132,18 @@ let smtpConfig = {
 		clientId: process.env.MAILER_CLIENT_ID,
 		clientSecret: process.env.MAILER_CLIENT_SECRET,
 		refreshToken: process.env.MAILER_REFRESH_TOKEN,
-		accessToken: 'empty'
+		accessToken: process.env.MAILER_ACCESS_TOKEN,
+		/*
+		*	accessUrl value differs from the one in nodemailer config by default,
+		*	the value is taken from https://developers.google.com/oauthplayground
+		*/
+		accessUrl: 'https://www.googleapis.com/oauth2/v4/token'
 	}
 };
 // set proxy for smtp for development environment
 if (process.env.DEV_ENV) {
 	console.log('mail transporter >> development environment launch detected, setting proxy for smtpConfig');
-	smtpConfig.proxy = 'socks5://127.0.0.1:9150/';
+	smtpConfig.proxy = 'socks5://127.0.0.1:9050/';
 }
 
 const mailTransporter = nodemailer.createTransport(smtpConfig); // reusable transporter object using the default SMTP transport
@@ -155,72 +160,64 @@ if (process.env.DEV_ENV) {
 	mailTransporter.set('proxy_socks_module', require('socks'));
 }
 
-routes(app, passport, User, Query, SrvInfo, DataInit, thenReq, JWT, mailTransporter, crypto, SC, TWTR);
+routes(cwd, app, passport, User, Query, SrvInfo, DataInit, thenReq, JWT, mailTransporter, crypto, SC, TWTR);
 
-const port = process.env.PORT || process.env.OPENSHIFT_NODEJS_PORT || 8080,
-	ip = process.env.OPENSHIFT_NODEJS_IP; // "127.0.0.1" is not specified here on purpose, this env var should be included in .openshift.env
+const port = process.env.PORT || 8080;
+const ip = process.env.IP;
 
 function terminator(sig) {
 	if (typeof sig === 'string') {
-		console.log('%s: Received %s - terminating app '+sig+'...', Date(Date.now()));
+		console.log(`${new Date().toUTCString()}: Received ${sig} - terminating app...`);
 		if (cluster.isMaster && !clusterStop) {
 			cluster.fork();
 		}else{
 			process.exit(0);
-			if (!cluster.isMaster) { console.log('%s: Node server stopped', Date(Date.now())); }
+			if (!cluster.isMaster) { console.log(`${new Date().toUTCString()}: Node server stopped`); }
 		}
 	}
 }
 
-if (!ip){
+(() => {
 	/*
-	*   development
+	*   termination handlers
 	*/
-	app.listen(port, () => {
-		console.log('$> development > Node.js listening on port '+port+'...');
-	});
-}else{
-	/*
-	*   deployment - OPENSHIFT SPECIFIC
-	*/
-	(() => {
-		/*
-		*   termination handlers
-		*/
-		process.on('exit', () => { terminator('exit'); });
-		// Removed 'SIGPIPE' from the list - bugz 852598.
-		['SIGHUP', 'SIGINT', 'SIGQUIT', 'SIGILL', 'SIGTRAP', 'SIGABRT',
-			'SIGBUS', 'SIGFPE', 'SIGUSR1', 'SIGSEGV', 'SIGUSR2', 'SIGTERM'
-		].forEach((element) => {
-			process.on(element, () => {
-				clusterStop = true;
-				terminator(element);
-			});
+	process.on('exit', () => { terminator('exit'); });
+	// Removed 'SIGPIPE' from the list - bugz 852598.
+	['SIGHUP', 'SIGINT', 'SIGQUIT', 'SIGILL', 'SIGTRAP', 'SIGABRT',
+		'SIGBUS', 'SIGFPE', 'SIGUSR1', 'SIGSEGV', 'SIGUSR2', 'SIGTERM'
+	].forEach((element) => {
+		process.on(element, () => {
+			clusterStop = true;
+			terminator(element);
 		});
-	})();
+	});
+})();
 
-	if (cluster.isMaster) {
-		const workersCount = os.cpus().length;
-		console.log('%s: Node.js listening on '+ip+':'+port+'...');
-		console.log('Cluster setup, workers count:',workersCount);
-		for (let i=0; i<workersCount; i++) {
-			console.log('Starting worker',i);
+if (cluster.isMaster) {
+	const workersCount = os.cpus().length;
+	console.log(`${new Date().toUTCString()}: Node.js listening on ${ip}:${port}...`);
+	console.log(`Cluster setup, workers count: ${workersCount}`);
+	for (let i = 0; i < workersCount; i++) {
+		console.log(`Starting worker ${i}`);
+		cluster.fork();
+	}
+	cluster.on('online', (worker,error) => {
+		if (error) throw error;
+		console.log(`Worker pid ${worker.process.pid} is online`);
+	});
+	cluster.on('exit', (worker, code, signal) => {
+		console.log(`Worker pid ${worker.process.pid} exited with code ${code} and signal ${signal}`);
+		if (!clusterStop) {
+			console.log('Starting a new worker...');
 			cluster.fork();
 		}
-		cluster.on('online', (worker,error) => {
-			if (error) throw error;
-			console.log('Worker pid',worker.process.pid,'is online');
-		});
-		cluster.on('exit', (worker, code, signal) => {
-			console.log('Worker pid',worker.process.pid,'exited with code',code,'and signal',signal);
-			if (!clusterStop) {
-				console.log('Starting a new worker...');
-				cluster.fork();
-			}
-		});
-	}else{
-		app.listen(port, ip, () => {
-			console.log('%s: Node.js listening on '+ip+':'+port+'...');
-		});
-	}
+	});
+} else if (ip) {
+	app.listen(port, ip, () => {
+		console.log(`${new Date().toUTCString()}: Node.js listening on ${ip}:${port}...`);
+	});
+} else {
+	app.listen(port, () => {
+		console.log(`${new Date().toUTCString()}: Node.js listening on port ${port}...`);
+	});
 }

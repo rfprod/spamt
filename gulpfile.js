@@ -161,7 +161,9 @@ gulp.task('pack-vendor-js', () => {
 		// angular dependencies start here
 		'./node_modules/zone.js/dist/zone.min.js',
 		'./node_modules/reflect-metadata/Reflect.js',
-		'./node-modules/web-animations-js/web-animations.min.js'
+		'./node-modules/web-animations-js/web-animations.min.js',
+
+		'https://raw.githubusercontent.com/soundcloud/soundcloud-custom-player/master/js/soundcloud.player.api.js'
 	])
 		.pipe(plumber())
 		.pipe(concat('vendor-bundle.js'))
@@ -237,31 +239,37 @@ gulp.task('tslint', () => {
 });
 
 gulp.task('watch', () => {
-	gulp.watch(['./server.js', './app/config/*.js', './app/routes/*.js', './app/utils/*.js'], ['server']); // watch server and database changes and restart server
-	gulp.watch(['./server.js', './app/models/*.js'], ['database']); // watch database changes and restart database
-	gulp.watch(['./public/app/*.js', './public/app/**/*.js'], ['build-system-js']); // watch app js changes and build system
-	gulp.watch('./public/app/scss/*.scss', ['sass-autoprefix-minify-css']); // watch app css changes, pack css, minify and put in respective folder
-	gulp.watch(['./test/server/test.js'], ['server-test']); // watch server tests changes and run tests
-	gulp.watch(['./app/**', './public/js/*.js', './*.js', './.eslintignore', './.eslintrc.json'], ['eslint']); // watch js files to be linted or eslint config and lint on change
-	gulp.watch(['./public/app/*.ts', './public/app/**/*.ts', './test/client/**/*.ts', './tslint.json'], ['tslint']); // watch ts files to be linted or tslint config and lint on change
+	gulp.watch(['./server.js', './app/**/*.js'], ['database', 'server']);
+	gulp.watch(['./test/server/*.js'], ['server-test']);
+	gulp.watch(['./gulpfile.js'], ['pack-vendor-js', 'pack-vendor-css', 'move-vendor-fonts']);
+	gulp.watch('./public/app/scss/*.scss', ['sass-autoprefix-minify-css']);
+	gulp.watch(['./public/app/*.ts', './public/app/**/*.ts', './test/client/**/*.ts', './tslint.json'], ['rebuild-app']);
+	gulp.watch(['./app/**', './public/js/*.js', './*.js', './.eslintignore', './.eslintrc.json'], ['eslint']);
 });
 
 gulp.task('watch-and-lint', () => {
 	gulp.watch(['./app/**', './public/js/*.js', './*.js', './.eslintignore', './.eslintrc.json'], ['eslint']); // watch js files to be linted or eslint config and lint on change
-	gulp.watch(['./public/app/*.ts', './public/app/**/*.ts', './tslint.json'], ['tslint']); // watch ts files to be linted or tslint config and lint on change
+	gulp.watch(['./public/app/*.ts', './public/app/**/*.ts', './test/client/**/*.ts', './tslint.json'], ['tslint']); // watch ts files to be linted or tslint config and lint on change
 });
 
 gulp.task('watch-client-and-test', () => {
-	gulp.watch(['./public/app/*.ts','./test/client/*.ts'], ['tsc']);
-	gulp.watch(['./public/app/*.js','./test/client/*.js','./test/karma.conf.js','./test/karma.test-shim.js'], ['client-unit-test']); //watch unit test changes and run tests
-});
-
-gulp.task('compile-and-build', (done) => {
-	runSequence('tsc', 'build-system-js', 'pack-vendor-js', 'pack-vendor-css', 'move-vendor-fonts', 'sass-autoprefix-minify-css', done);
+	gulp.watch(['./public/app/*.ts', './public/app/**/*.ts', './test/client/**/*.ts', './test/karma.conf.js','./test/karma.test-shim.js'], ['compile-and-test']);
 });
 
 gulp.task('build', (done) => {
 	runSequence('build-system-js', 'pack-vendor-js', 'pack-vendor-css', 'move-vendor-fonts', 'sass-autoprefix-minify-css', done);
+});
+
+gulp.task('compile-and-build', (done) => {
+	runSequence('tsc', 'build', done);
+});
+
+gulp.task('compile-and-test', (done) => {
+	runSequence('tsc', 'client-unit-test', done);
+});
+
+gulp.task('rebuild-app', (done) => { // watcher task, see above
+	runSequence('tslint', 'tsc', 'build-system-js', done);
 });
 
 gulp.task('lint', (done) => {
@@ -269,7 +277,11 @@ gulp.task('lint', (done) => {
 });
 
 gulp.task('default', (done) => {
-	runSequence('lint', 'build', 'database', 'server', 'watch', done);
+	runSequence('lint', 'compile-and-build', 'database', 'server', 'watch', done);
+});
+
+gulp.task('start-prebuilt', (done) => {
+	runSequence('database', 'server', 'watch', done);
 });
 
 process.on('exit', () => {

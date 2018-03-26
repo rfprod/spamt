@@ -129,10 +129,30 @@ edit local `.env` file manually, set Heroku mongo uri instead of local one
 MONGODB_URI=value-got-previously-from-heroku
 ```
 
+get Heroku deployment url, use the value when setting `APP_URL` environment variable later
+
+```
+heroku info
+```
+
+set environment variables (all listed in under **Local Environment Variables** subheading above)
+
+```
+...
+heroku config:set PORT=8080
+...
+```
+
+edit local `.env` file manually, set Heroku mongo uri instead of local one to make requests to database deployed on Heroku
+
+```
+MONGODB_URI=value-got-previously-from-heroku
+```
+
 build application and push to heroku
 
 ```
-gulp build
+gulp compile-and-build
 git push heroku master
 ```
 

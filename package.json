@@ -51,7 +51,6 @@
 		"body-parser": "^1.18.2",
 		"components-font-awesome": "^4.6.3",
 		"compression": "^1.7.2",
-		"concurrently": "^3.5.1",
 		"connect-flash": "^0.1.1",
 		"connect-mongodb-session": "^2.0.1",
 		"core-js": "^2.5.3",
@@ -120,8 +119,9 @@
 	},
 	"scripts": {
 		"prestart": "npm install && npm run clear-ts-build",
-		"start": "tsc && concurrently \"gulp\" \"npm run tsc:w\"",
-		"build": "gulp build",
+		"start": "gulp",
+		"start-prebuilt": "gulp start-prebuilt",
+		"build": "gulp compile-and-build",
 		"pretest": "npm install",
 		"test": "echo 'WARNING: npm test is not configured yet\nUse one of these depending on what do you want to test:\nnpm run client-test\nnpm run client-test-single-run\nnpm run server-test' && exit 1",
 		"client-test": "gulp watch-client-and-test",
@@ -142,7 +142,7 @@
 		"mongo-kill": "killall -15 mongod",
 		"mongo-start": "./check-db-dir.sh && ./mongo-start.sh",
 		"mongo-repair": "./check-db-dir.sh && ./mongo-repair.sh",
-		"heroku-deploy": "git push heroku master",
-		"heroku-start": "gulp build && node server.js"
+		"heroku-deploy": "gulp compile-and-build && git push heroku master",
+		"heroku-start": "gulp compile-and-build && node server.js"
 	}
 }
