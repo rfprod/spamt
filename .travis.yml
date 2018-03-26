@@ -29,6 +29,6 @@ before_script:
   - sleep 2
 # build app, start it, and run tests
 script:
-  - gulp build
+  - gulp compile-and-build
   - gulp client-unit-test-single-run # run only unit tests for not
   # TODO add server tests and client e2e
