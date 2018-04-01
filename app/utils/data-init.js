@@ -16,7 +16,7 @@ module.exports = {
 				newUser.jwToken = '';
 				newUser.userExtended = {
 					login: 'admin',
-					email: 'temp@rfprod.tk',
+					email: 'connect@rfprod.tk',
 					firstName: 'first name 0',
 					lastName: 'last name 0'
 				};
