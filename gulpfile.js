@@ -243,7 +243,7 @@ gulp.task('watch', () => {
 	gulp.watch(['./test/server/*.js'], ['server-test']);
 	gulp.watch(['./gulpfile.js'], ['pack-vendor-js', 'pack-vendor-css', 'move-vendor-fonts']);
 	gulp.watch('./public/app/scss/*.scss', ['sass-autoprefix-minify-css']);
-	gulp.watch(['./public/app/*.ts', './public/app/**/*.ts', './test/client/**/*.ts', './tslint.json'], ['rebuild-app']);
+	gulp.watch(['./public/app/*.ts', './public/app/**/*.ts', './test/client/**/*.ts', './tslint.json'], ['spawn-rebuild-app']);
 	gulp.watch(['./app/**', './public/js/*.js', './*.js', './.eslintignore', './.eslintrc.json'], ['eslint']);
 });
 
@@ -268,8 +268,18 @@ gulp.task('compile-and-test', (done) => {
 	runSequence('tsc', 'client-unit-test', done);
 });
 
-gulp.task('rebuild-app', (done) => { // watcher task, see above
+gulp.task('rebuild-app', (done) => {
 	runSequence('tslint', 'tsc', 'build-system-js', done);
+});
+
+let rebuildApp;
+gulp.task('spawn-rebuild-app', (done) => {
+	if (rebuildApp) rebuildApp.kill();
+	rebuildApp = spawn('gulp', ['rebuild-app'], {stdio: 'inherit'});
+	rebuildApp.on('close', (code) => {
+		console.log(`rebuildApp closed with code ${code}`);
+	});
+	done();
 });
 
 gulp.task('lint', (done) => {
@@ -284,20 +294,7 @@ gulp.task('start-prebuilt', (done) => {
 	runSequence('database', 'server', 'watch', done);
 });
 
-process.on('exit', () => {
-	if (node) node.kill();
-	if (mongo) mongo.kill();
-	if (tsc) tsc.kill();
-	killProcessByName('gulp');
-});
-
-['SIGHUP', 'SIGINT', 'SIGQUIT', 'SIGILL', 'SIGTRAP', 'SIGABRT',
-	'SIGBUS', 'SIGFPE', 'SIGUSR1', 'SIGSEGV', 'SIGUSR2', 'SIGTERM'
-].forEach((element) => {
-	process.on(element, () => {
-		if (node) node.kill();
-		if (mongo) mongo.kill();
-		if (tsc) tsc.kill();
-		killProcessByName('gulp');
-	});
+process.on('exit', (code) => {
+	console.log(`PROCESS EXIT CODE ${code}`);
+	// killProcessByName('gulp');
 });
