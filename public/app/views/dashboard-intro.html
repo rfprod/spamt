@@ -1,7 +1,7 @@
 <div fxLayout="column" fxLayoutFill>
 	<h3>{{title}}
 		<a (click)="toggleModal()" matTooltip="App diagnostics">
-			<i class="fa fa-heartbeat" [ngClass]="{'help-highlight': showHelp}"></i>
+			<mat-icon class="material-icons-fas" fontSet="fas" fontIcon="fa-heartbeat" title="show help" [ngClass]="{'help-highlight': showHelp}"></mat-icon>
 		</a>
 	</h3>
 	<p>{{description}}</p>

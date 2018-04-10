@@ -1,19 +1,29 @@
-import { Router, NavigationEnd } from '@angular/router';
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, ElementRef } from '@angular/core';
 import { EventEmitterService } from '../services/event-emitter.service';
+
+import { Router, NavigationEnd } from '@angular/router';
+
+import { Subject } from 'rxjs/Subject';
+import 'rxjs/add/operator/takeUntil';
 
 @Component({
 	selector: 'app-nav',
 	templateUrl: '/public/app/views/dashboard-nav.html',
 })
 export class AppNavComponent implements OnInit, OnDestroy {
+
 	constructor(
+		private el: ElementRef,
 		private emitter: EventEmitterService,
 		private router: Router
-	) {}
-	private subscription: any;
+	) {
+		console.log('AppNavComponent element:', this.el.nativeElement);
+	}
+
+	private ngUnsubscribe: Subject<void> = new Subject();
+
 	public navButtonsState: boolean[] = [false, false, false, false, false];
-	private showHelp: boolean = false;
+	public showHelp: boolean = false;
 	public switchNavButtons(event: any, path?: string) {
 		let index;
 		console.log('switchNavButtons:', event);
@@ -55,7 +65,7 @@ export class AppNavComponent implements OnInit, OnDestroy {
 	public ngOnInit(): void {
 		console.log('ngOnInit: AppNavComponent initialized');
 		// check active route on app init - app-nav loads once on app init
-		this.subscription = this.router.events.subscribe((event) => {
+		this.router.events.takeUntil(this.ngUnsubscribe).subscribe((event: any) => {
 			// console.log(' > ROUTER EVENT:', event);
 			if (event instanceof NavigationEnd) {
 				if (!event.hasOwnProperty('reason')) {
@@ -73,6 +83,7 @@ export class AppNavComponent implements OnInit, OnDestroy {
 	}
 	public ngOnDestroy(): void {
 		console.log('ngOnDestroy: AppNavComponent destroyed');
-		this.subscription.unsubscribe();
+		this.ngUnsubscribe.next();
+		this.ngUnsubscribe.complete();
 	}
 }

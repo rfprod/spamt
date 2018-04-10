@@ -1,6 +1,9 @@
 import { Component, OnInit, OnDestroy, ElementRef } from '@angular/core';
 import { EventEmitterService } from '../services/event-emitter.service';
 
+import { Subject } from 'rxjs/Subject';
+import 'rxjs/add/operator/takeUntil';
+
 @Component({
 	selector: 'app-info',
 	template: `
@@ -12,15 +15,18 @@ import { EventEmitterService } from '../services/event-emitter.service';
 	`
 })
 export class AppInfoComponent implements OnInit, OnDestroy {
+
 	constructor(
-		public el: ElementRef,
+		private el: ElementRef,
 		private emitter: EventEmitterService
 	) {
-		console.log('this.el.nativeElement:', this.el.nativeElement);
+		console.log('AppInfoComponent element:', this.el.nativeElement);
 	}
-	private subscription: any;
-	private hideInfo: boolean = false;
-	private badges: any[] = [ // tslint:disable-line
+
+	private ngUnsubscribe: Subject<void> = new Subject();
+
+	public hideInfo: boolean = false;
+	public badges: any[] = [
 		{
 			title: 'Node.js - an open-source, cross-platform runtime environment for developing server-side Web applications.',
 			link: 'https://en.wikipedia.org/wiki/Node.js',
@@ -45,16 +51,17 @@ export class AppInfoComponent implements OnInit, OnDestroy {
 
 	public ngOnInit(): void {
 		console.log('ngOnInit: AppInfoComponent initialized');
-		this.subscription = this.emitter.getEmitter().subscribe((message) => {
-			if (message.appInfo) {
-				console.log('app-info consuming event:', message);
-				if (message.appInfo === 'hide') { this.hideInfo = true; }
-				if (message.appInfo === 'show') { this.hideInfo = false; }
+		this.emitter.getEmitter().takeUntil(this.ngUnsubscribe).subscribe((event: any) => {
+			if (event.appInfo) {
+				console.log('app-info consuming event:', event);
+				if (event.appInfo === 'hide') { this.hideInfo = true; }
+				if (event.appInfo === 'show') { this.hideInfo = false; }
 			}
 		});
 	}
 	public ngOnDestroy(): void {
 		console.log('ngOnDestroy: AppInfoComponent destroyed');
-		this.subscription.unsubscribe();
+		this.ngUnsubscribe.next();
+		this.ngUnsubscribe.complete();
 	}
 }

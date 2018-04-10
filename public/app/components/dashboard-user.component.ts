@@ -4,6 +4,10 @@ import { EventEmitterService } from '../services/event-emitter.service';
 import { UserService } from '../services/user.service';
 import { UserLogoutService } from '../services/user-logout.service';
 
+import { Subject } from 'rxjs/Subject';
+import 'rxjs/add/operator/takeUntil';
+import 'rxjs/add/operator/first';
+
 @Component({
 	selector: 'dashboard-user',
 	templateUrl: '/public/app/views/dashboard-user.html',
@@ -12,6 +16,7 @@ import { UserLogoutService } from '../services/user-logout.service';
 	}
 })
 export class DashboardUserComponent implements OnInit, OnDestroy {
+
 	constructor(
 		private el: ElementRef,
 		private router: Router,
@@ -20,9 +25,10 @@ export class DashboardUserComponent implements OnInit, OnDestroy {
 		private userService: UserService,
 		private userLogoutService: UserLogoutService
 	) {
-		console.log('this.el.nativeElement:', this.el.nativeElement);
+		console.log('DashboardUserComponent element:', this.el.nativeElement);
 	}
-	private subscription: any;
+
+	private ngUnsubscribe: Subject<void> = new Subject();
 
 	public title: string = 'User Panel';
 	public description: object = {
@@ -31,11 +37,10 @@ export class DashboardUserComponent implements OnInit, OnDestroy {
 	};
 	public errorMessage: string = '';
 	public successMessage: string = '';
-	private dismissMessages(): void {
+	public dismissMessages(): void {
 		this.errorMessage = '';
 		this.successMessage = '';
 	}
-	private routerSubscription: any;
 
 // Authentication checker
 	private checkUrlParams(): void {
@@ -79,7 +84,7 @@ export class DashboardUserComponent implements OnInit, OnDestroy {
 		return this.userService.model.twitter_oauth_token || this.userService.model.soundcloud_oauth_token;
 	}
 
-	private logout(): void { /* tslint:disable-line */
+	public logout(): void {
 		console.log('logging out, resetting token');
 		this.emitSpinnerStartEvent();
 		this.dismissMessages();
@@ -104,22 +109,22 @@ export class DashboardUserComponent implements OnInit, OnDestroy {
 
 // Spinner
 	private emitSpinnerStartEvent(): void {
-		console.log('root spinner start event emitted');
+		// console.log('root spinner start event emitted');
 		this.emitter.emitEvent({spinner: 'start'});
 	}
 	private emitSpinnerStopEvent(): void {
-		console.log('root spinner stop event emitted');
+		// console.log('root spinner stop event emitted');
 		this.emitter.emitEvent({spinner: 'stop'});
 	}
 
 // Modal
-	private showModal: boolean = false;
-	private toggleModal(): void { /* tslint:disable-line */
+	public showModal: boolean = false;
+	public toggleModal(): void {
 		this.showModal = (!this.showModal) ? true : false;
 	}
 
 // Help
-	private showHelp: boolean = false; // controls help labells visibility, catches events from nav component
+	public showHelp: boolean = false; // controls help labells visibility, catches events from nav component
 
 	public ngOnInit(): void {
 		console.log('ngOnInit: UserComponent initialized');
@@ -145,21 +150,21 @@ export class DashboardUserComponent implements OnInit, OnDestroy {
 			this.router.navigateByUrl('/user');
 		}
 
-		this.subscription = this.emitter.getEmitter().subscribe((message) => {
-			console.log('UserComponent consuming message:', message);
-			if (message.help === 'toggle') {
-				console.log('/controls consuming event:', message, ' | toggling help labels visibility', this.showHelp);
+		this.emitter.getEmitter().takeUntil(this.ngUnsubscribe).subscribe((event: any) => {
+			console.log('UserComponent consuming event:', event);
+			if (event.help === 'toggle') {
+				console.log('/controls consuming event:', event, ' | toggling help labels visibility', this.showHelp);
 				this.showHelp = (this.showHelp) ? false : true;
 			}
 		});
-		this.routerSubscription = this.activatedRoute.params.subscribe((params: Params) => {
+		this.activatedRoute.params.takeUntil(this.ngUnsubscribe).subscribe((params: Params) => {
 			console.log('url params chaned:', params);
 		});
 		this.emitSpinnerStopEvent();
 	}
 	public ngOnDestroy(): void {
 		console.log('ngOnDestroy: UserComponent destroyed');
-		this.subscription.unsubscribe();
-		this.routerSubscription.unsubscribe();
+		this.ngUnsubscribe.next();
+		this.ngUnsubscribe.complete();
 	}
 }

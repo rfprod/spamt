@@ -118,15 +118,15 @@ describe('DashboardIntroComponent', () => {
 		expect(c.ngOnDestroy).toEqual(jasmine.any(Function));
 	});
 
-	it('should emit spinner start control message on respective method call', (done) => {
+	it('should emit spinner start control event on respective method call', (done) => {
 		const c = this.component;
-		c.emitter.getEmitter().subscribe(message => { expect(message.spinner).toEqual('start'); done(); });
+		c.emitter.getEmitter().subscribe(event => { expect(event.spinner).toEqual('start'); done(); });
 		c.emitSpinnerStartEvent();
 	});
 
-	it('should emit spinner stop control message on respective method call', (done) => {
+	it('should emit spinner stop control event on respective method call', (done) => {
 		const c = this.component;
-		c.emitter.getEmitter().subscribe(message => { expect(message.spinner).toEqual('stop'); done(); });
+		c.emitter.getEmitter().subscribe(event => { expect(event.spinner).toEqual('stop'); done(); });
 		c.emitSpinnerStopEvent();
 	});
 
@@ -163,7 +163,6 @@ describe('DashboardIntroComponent', () => {
 
 	it('should init on ngOnInit', () => {
 		const c = this.component;
-		expect(typeof c.subscription === 'undefined').toBeTruthy();
 		expect(c.serverData.static.length).toEqual(0);
 		expect(c.appUsageData.length).toEqual(5); // it is prefilled with dummy data structure for convenience
 		c.ngOnInit();
@@ -173,18 +172,18 @@ describe('DashboardIntroComponent', () => {
 		expect(c.serverData.static.length).toBeGreaterThan(0);
 		expect(c.appUsageData.length).toEqual(2); // this is actual data
 		expect(c.emitSpinnerStopEvent).toHaveBeenCalled();
-		expect(typeof c.subscription === 'undefined').toBeFalsy();
 	});
 
 	it('should cleanup on ngOnDestroy', () => {
 		const c = this.component;
-		spyOn(c.ws, 'close');
 		c.ngOnInit();
-		expect(typeof c.subscription === 'undefined').toBeFalsy();
-		spyOn(c.subscription, 'unsubscribe').and.callThrough();
+		spyOn(c.ws, 'close');
+		spyOn(c.ngUnsubscribe, 'next').and.callThrough();
+		spyOn(c.ngUnsubscribe, 'complete').and.callThrough();
 		c.ngOnDestroy();
 		expect(c.ws.close).toHaveBeenCalled();
-		expect(c.subscription.unsubscribe).toHaveBeenCalled();
+		expect(c.ngUnsubscribe.next).toHaveBeenCalled();
+		expect(c.ngUnsubscribe.complete).toHaveBeenCalled();
 	});
 
 	/*

@@ -4,6 +4,10 @@ import { ServerStaticDataService } from '../services/server-static-data.service'
 import { PublicDataService } from '../services/public-data.service';
 import { WebsocketService } from '../services/websocket.service';
 
+import { Subject } from 'rxjs/Subject';
+import 'rxjs/add/operator/takeUntil';
+import 'rxjs/add/operator/first';
+
 // declare let d3: any;
 
 @Component({
@@ -14,16 +18,19 @@ import { WebsocketService } from '../services/websocket.service';
 	}
 })
 export class DashboardIntroComponent implements OnInit, OnDestroy {
+
 	constructor(
-		public el: ElementRef,
+		private el: ElementRef,
 		private emitter: EventEmitterService,
 		private websocket: WebsocketService,
 		private serverStaticDataService: ServerStaticDataService,
 		private publicDataService: PublicDataService
 	) {
-		console.log('this.el.nativeElement:', this.el.nativeElement);
+		console.log('DashboardIntroComponent element:', this.el.nativeElement);
 	}
-	private subscription: any;
+
+	private ngUnsubscribe: Subject<void> = new Subject();
+
 	public title: string = 'SPAMT';
 	public description: string = 'Social Profile Analysis and Management Tool';
 	public chartOptions: object = {
@@ -79,9 +86,9 @@ export class DashboardIntroComponent implements OnInit, OnDestroy {
 	public errorMessage: string;
 
 	private getServerStaticData(callback): void {
-		this.serverStaticDataService.getData().subscribe(
-			(data) => this.serverData.static = data,
-			(error) => this.errorMessage = error as any,
+		this.serverStaticDataService.getData().first().subscribe(
+			(data: any) => this.serverData.static = data,
+			(error: any) => this.errorMessage = error,
 			() => {
 				console.log('getServerStaticData done, data:', this.serverData.static);
 				if (callback) { callback(); }
@@ -89,12 +96,12 @@ export class DashboardIntroComponent implements OnInit, OnDestroy {
 		);
 	}
 	private getPublicData(callback): void {
-		this.publicDataService.getData().subscribe(
-			(data) => {
+		this.publicDataService.getData().first().subscribe(
+			(data: any) => {
 				this.nvd3.clearElement();
 				this.appUsageData = data;
 			},
-			(error) => this.errorMessage = error as any,
+			(error: any) => this.errorMessage = error,
 			() => {
 				console.log('getPublicData done, data:', this.appUsageData);
 				if (callback) { callback(); }
@@ -113,8 +120,8 @@ export class DashboardIntroComponent implements OnInit, OnDestroy {
 	}
 
 // Modal
-	private showModal: boolean = false;
-	private toggleModal(): void { /* tslint:disable-line */
+	public showModal: boolean = false;
+	public toggleModal(): void {
 		if (this.showModal) {
 			this.ws.send(JSON.stringify({action: 'pause'}));
 		} else { this.ws.send(JSON.stringify({action: 'get'})); }
@@ -131,7 +138,7 @@ export class DashboardIntroComponent implements OnInit, OnDestroy {
 		this.emitSpinnerStartEvent();
 		this.emitter.emitEvent({appInfo: 'show'});
 
-		this.ws.onopen = (evt) => {
+		this.ws.onopen = (evt: any) => {
 			console.log('websocket opened:', evt);
 			/*
 			*	ws connection is established, but data is requested
@@ -140,32 +147,31 @@ export class DashboardIntroComponent implements OnInit, OnDestroy {
 			*/
 			// this.ws.send(JSON.stringify({action: 'get'}));
 		};
-		this.ws.onmessage = (message) => {
-			console.log('websocket incoming message:', message);
+		this.ws.onmessage = (event: any) => {
+			console.log('websocket incoming message event:', event);
 			this.serverData.dynamic = [];
-			const data = JSON.parse(message.data);
+			const data = JSON.parse(event.data);
 			for (const d in data) {
 				if (data[d]) { this.serverData.dynamic.push(data[d]); }
 			}
 			console.log('this.serverData.dynamic:', this.serverData.dynamic);
 		};
-		this.ws.onerror = (evt) => {
+		this.ws.onerror = (evt: any) => {
 			console.log('websocket error:', evt);
 			this.ws.close();
 		};
-		this.ws.onclose = (evt) => {
+		this.ws.onclose = (evt: any) => {
 			console.log('websocket closed:', evt);
 		};
 
-		this.subscription = this.emitter.getEmitter().subscribe((message) => {
-			if (message.sys === 'close websocket') {
-				console.log('/intro consuming event:', message);
+		this.emitter.getEmitter().takeUntil(this.ngUnsubscribe).subscribe((event: any) => {
+			if (event.sys === 'close websocket') {
+				console.log('/intro consuming event:', event);
 				console.log('closing webcosket');
-				this.subscription.unsubscribe();
 				this.ws.close();
 			}
-			if (message.help === 'toggle') {
-				console.log('/intro consuming event:', message);
+			if (event.help === 'toggle') {
+				console.log('/intro consuming event:', event);
 				console.log('toggling help labels visibility', this.showHelp);
 				this.showHelp = (this.showHelp) ? false : true;
 			}
@@ -179,7 +185,8 @@ export class DashboardIntroComponent implements OnInit, OnDestroy {
 	}
 	public ngOnDestroy(): void {
 		console.log('ngOnDestroy: DashboardIntroComponent destroyed');
-		this.subscription.unsubscribe();
 		this.ws.close();
+		this.ngUnsubscribe.next();
+		this.ngUnsubscribe.complete();
 	}
 }

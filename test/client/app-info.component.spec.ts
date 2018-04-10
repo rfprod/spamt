@@ -41,7 +41,6 @@ describe('AppInfoComponent', () => {
 		const c = this.component;
 		expect(c.el).toBeDefined();
 		expect(c.emitter).toBeDefined();
-		expect(typeof c.subscription === 'undefined').toBeTruthy();
 		expect(c.hideInfo).toBeDefined();
 		expect(c.hideInfo).toEqual(jasmine.any(Boolean));
 		expect(c.hideInfo).toEqual(false);
@@ -76,10 +75,8 @@ describe('AppInfoComponent', () => {
 
 	it('should init on ngOnInit, listen to emitter messages and change hideInfo variable state on respective messages', () => {
 		const c = this.component;
-		expect(typeof c.subscription === 'undefined').toBeTruthy();
 		c.ngOnInit();
 		expect(c.hideInfo).toEqual(false);
-		expect(typeof c.subscription === 'undefined').toBeFalsy();
 		c.emitter.emitEvent({appInfo: 'show'});
 		expect(c.hideInfo).toEqual(false);
 		c.emitter.emitEvent({appInfo: 'hide'});
@@ -89,10 +86,11 @@ describe('AppInfoComponent', () => {
 	it('should cleanup on ngOnDestroy', () => {
 		const c = this.component;
 		c.ngOnInit();
-		expect(typeof c.subscription === 'undefined').toBeFalsy();
-		spyOn(c.subscription, 'unsubscribe').and.callThrough();
+		spyOn(c.ngUnsubscribe, 'next').and.callThrough();
+		spyOn(c.ngUnsubscribe, 'complete').and.callThrough();
 		c.ngOnDestroy();
-		expect(c.subscription.unsubscribe).toHaveBeenCalled();
+		expect(c.ngUnsubscribe.next).toHaveBeenCalled();
+		expect(c.ngUnsubscribe.complete).toHaveBeenCalled();
 	});
 });
 

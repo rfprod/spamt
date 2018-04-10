@@ -1,6 +1,10 @@
 import { Component, OnInit, OnDestroy, ElementRef } from '@angular/core';
 import { EventEmitterService } from './services/event-emitter.service';
-import { trigger, state, style, transition, animate } from '@angular/animations';
+
+import { MatIconRegistry } from '@angular/material';
+
+import { Subject } from 'rxjs/Subject';
+import 'rxjs/add/operator/takeUntil';
 
 declare let $: JQueryStatic;
 
@@ -11,42 +15,60 @@ declare let $: JQueryStatic;
 		<loading-indicator *ngIf="showSpinner"></loading-indicator>
 		<router-outlet></router-outlet>
 		<app-info *ngIf="showAppInfo"></app-info>
-	`,
-	animations: [
-		trigger('empty', [])
-	]
+	`
 })
 export class AppComponent implements OnInit, OnDestroy {
-	private subscription: any;
-	constructor( public el: ElementRef, private emitter: EventEmitterService ) {
-		console.log('this.el.nativeElement', this.el.nativeElement);
+
+	constructor(
+		private el: ElementRef,
+		private emitter: EventEmitterService,
+		private matIconRegistry: MatIconRegistry
+	) {
+		console.log('AppComponent element', this.el.nativeElement);
 	}
-	private showAppInfo: boolean = true;
-	private showSpinner: boolean = false;
+
+	private ngUnsubscribe: Subject<void> = new Subject();
+
+	public showAppInfo: boolean = true;
+	public showSpinner: boolean = false;
+
 	public ngOnInit() {
 		console.log('ngOnInit: AppComponent initialized');
 		$('#init-spinner').remove();
-		this.subscription = this.emitter.getEmitter().subscribe((message) => {
-			console.log('app consuming event:', message);
-			if (message.appInfo) {
-				if (message.appInfo === 'hide') {
+
+		this.emitter.getEmitter().takeUntil(this.ngUnsubscribe).subscribe((event: any) => {
+			console.log('app consuming event:', event);
+			if (event.appInfo) {
+				if (event.appInfo === 'hide') {
 					this.showAppInfo = false;
-				} else if (message.appInfo === 'show') {
+				} else if (event.appInfo === 'show') {
 					this.showAppInfo = true;
 				}
 			}
-			if (message.spinner) {
-				if (message.spinner === 'start') {
+			if (event.spinner) {
+				if (event.spinner === 'start') {
 					this.showSpinner = true;
 				}
-				if (message.spinner === 'stop') {
+				if (event.spinner === 'stop') {
 					this.showSpinner = false;
 				}
 			}
 		});
+
+		/*
+		*	register fontawesome for usage in mat-icon by adding directives
+		*	fontSet="fab" fontIcon="fa-icon"
+		*	fontSet="fas" fontIcon="fa-icon"
+		*
+		*	free plan includes only fab (font-awesome-brands) and fas (font-awesome-solid) groups
+		*
+		*	icons reference: https://fontawesome.com/icons/
+		*/
+		this.matIconRegistry.registerFontClassAlias('fontawesome-all');
 	}
 	public ngOnDestroy() {
 		console.log('ngOnDestroy: AppComponent destroyed');
-		this.subscription.unsubscribe();
+		this.ngUnsubscribe.next();
+		this.ngUnsubscribe.complete();
 	}
 }
