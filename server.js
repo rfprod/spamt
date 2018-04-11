@@ -158,7 +158,6 @@ if (process.env.DEV_ENV) {
 routes(cwd, app, passport, User, Query, SrvInfo, DataInit, thenReq, JWT, mailTransporter, crypto, SC, TWTR);
 
 const port = process.env.PORT || 8080;
-const ip = process.env.IP;
 
 function terminator(sig) {
 	if (typeof sig === 'string') {
@@ -190,7 +189,7 @@ function terminator(sig) {
 
 if (cluster.isMaster) {
 	const workersCount = os.cpus().length;
-	console.log(`${new Date().toUTCString()}: Node.js listening on ${ip}:${port}...`);
+	console.log(`${new Date().toUTCString()}: Node.js listening on ${port}...`);
 	console.log(`Cluster setup, workers count: ${workersCount}`);
 	for (let i = 0; i < workersCount; i++) {
 		console.log(`Starting worker ${i}`);
@@ -206,10 +205,6 @@ if (cluster.isMaster) {
 			console.log('Starting a new worker...');
 			cluster.fork();
 		}
-	});
-} else if (ip) {
-	app.listen(port, ip, () => {
-		console.log(`${new Date().toUTCString()}: Node.js listening on ${ip}:${port}...`);
 	});
 } else {
 	app.listen(port, () => {
