@@ -62,8 +62,12 @@ function setBuildHashENV(done) {
 		const hash = crypto.createHmac('sha256', data.toString()).digest('hex');
 		console.log('BUILD_HASH', hash);
 		fs.readFile('./.env', (err, data) => {
-			if (err) throw err;
-			let env = data.toString();
+			let env;
+			if (err) {
+				env = '';
+			} else {
+				env = data.toString();
+			}
 			// console.log('ENV', env);
 			if (env.indexOf('BUILD_HASH') !== -1) {
 				// console.log('contains hash, replace');
