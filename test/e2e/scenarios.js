@@ -1,7 +1,5 @@
 'use strict';
 
-/*global browser, expect, element, by */
-
 /*
 *	API DOC: http://www.protractor.org/#/api
 */
