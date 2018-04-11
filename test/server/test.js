@@ -1,13 +1,13 @@
 'use strict';
 
-const assert = require('chai').assert,
-	expect = require('chai').expect;
+const assert = require('chai').assert;
+const expect = require('chai').expect;
 
 const webSocket = require('ws');
 
 const request = require('request');
-const cheerio = require('cheerio'),
-	str = require('string');
+const cheerio = require('cheerio');
+const str = require('string');
 
 require('dotenv').load();
 const baseUrl = 'http://localhost:'+process.env.PORT;
@@ -32,6 +32,24 @@ describe('/ endpoint', function() {
 			assert.equal(1, $('spamt').length);
 			expect($('spamt').html() === '').to.be.ok;
 			
+			done();
+		});
+	});
+});
+
+describe('/api/app-diag/hashsum endpoint', function() {
+	it('should deliver app hashsum', function(done) {
+		request(baseUrl+'/api/app-diag/hashsum', function(error, response/*, body*/) {
+
+			expect(error).to.be.not.ok;
+			expect(response).to.be.not.a('undefined');
+			expect(response.statusCode).to.be.equal(200);
+
+			const responseData = JSON.parse(response.body);
+
+			assert.isObject(responseData);
+			assert.isString(responseData.hashsum);
+
 			done();
 		});
 	});

@@ -15,6 +15,9 @@ const gulp = require('gulp'),
 	cssnano = require('gulp-cssnano'),
 	autoprefixer = require('gulp-autoprefixer'),
 	systemjsBuilder = require('gulp-systemjs-builder'),
+	hashsum = require('gulp-hashsum'),
+	crypto = require('crypto'),
+	fs = require('fs'),
 	spawn = require('child_process').spawn,
 	exec = require('child_process').exec;
 let node,
@@ -41,6 +44,47 @@ function killProcessByName(name){
 		}
 	});
 }
+
+/*
+*	hashsum identifies build
+*
+*	after build SHA1SUMS.json is generated with sha1 sums for different files
+*	then sha256 is calculated using stringified file contents
+*/
+gulp.task('hashsum', () => {
+	return gulp.src(['./public/*', '!./public/SHA1SUMS.json', './public/app/views/**', './public/css/**', './public/webfonts/**', './public/img/**', './public/js/**'])
+		.pipe(hashsum({ filename: 'public/SHA1SUMS.json', hash: 'sha1', json: true }));
+});
+
+function setBuildHashENV(done) {
+	fs.readFile('./public/SHA1SUMS.json', (err, data) => {
+		if (err) throw err;
+		const hash = crypto.createHmac('sha256', data.toString()).digest('hex');
+		console.log('BUILD_HASH', hash);
+		fs.readFile('./.env', (err, data) => {
+			if (err) throw err;
+			let env = data.toString();
+			// console.log('ENV', env);
+			if (env.indexOf('BUILD_HASH') !== -1) {
+				// console.log('contains hash, replace');
+				env = env.replace(/BUILD_HASH=.*\n/, 'BUILD_HASH=' + hash + '\n');
+			} else {
+				// console.log('does not contain hash, add');
+				env += 'BUILD_HASH=' + hash + '\n';
+			}
+			// console.log('env.split(\'\n\')', env);
+			fs.writeFile('./.env', env, (err) => {
+				if (err) throw err;
+				console.log('# > ENV > .env file was created');
+				if (done) done();
+			});
+		});
+	});
+}
+
+gulp.task('set-build-hash', (done) => {
+	setBuildHashENV(done);
+});
 
 gulp.task('database', (done) => {
 	if (mongo) mongo.kill();
@@ -147,21 +191,20 @@ gulp.task('build-system-js', () => {
 
 gulp.task('pack-vendor-js', () => {
 	/*
-	*	nonangular js bundle
-	*	components related to design, styling, data visualization etc.
+	*	third party js files
 	*/
 	return gulp.src([
-		// sequence is essential
+		// angular requirements
 		'./node_modules/core-js/client/shim.js',
+		'./node_modules/zone.js/dist/zone.min.js',
+		'./node_modules/reflect-metadata/Reflect.js',
+		'./node_modules/web-animations-js/web-animations.min.js',
 
 		'./node_modules/jquery/dist/jquery.js',
 
+		// ng2nvd3 dependency
 		'./node_modules/d3/d3.js',
 		'./node_modules/nvd3/build/nv.d3.js',
-		// angular dependencies start here
-		'./node_modules/zone.js/dist/zone.min.js',
-		'./node_modules/reflect-metadata/Reflect.js',
-		'./node-modules/web-animations-js/web-animations.min.js',
 
 		'https://raw.githubusercontent.com/soundcloud/soundcloud-custom-player/master/js/soundcloud.player.api.js'
 	])
@@ -174,6 +217,9 @@ gulp.task('pack-vendor-js', () => {
 });
 
 gulp.task('pack-vendor-css', () => {
+	/*
+	*	third party css files
+	*/
 	return gulp.src([
 		'./node_modules/nvd3/build/nv.d3.css',
 		'./node_modules/components-font-awesome/css/fontawesome-all.css',
@@ -254,7 +300,7 @@ gulp.task('watch-client-and-test', () => {
 });
 
 gulp.task('build', (done) => {
-	runSequence('build-system-js', 'pack-vendor-js', 'pack-vendor-css', 'move-vendor-fonts', 'sass-autoprefix-minify-css', done);
+	runSequence('build-system-js', 'pack-vendor-js', 'pack-vendor-css', 'move-vendor-fonts', 'sass-autoprefix-minify-css', 'hashsum', 'set-build-hash', done);
 });
 
 gulp.task('compile-and-build', (done) => {
@@ -266,7 +312,7 @@ gulp.task('compile-and-test', (done) => {
 });
 
 gulp.task('rebuild-app', (done) => {
-	runSequence('tslint', 'tsc', 'build-system-js', done);
+	runSequence('tslint', 'tsc', 'build-system-js', 'hashsum', 'set-build-hash', done);
 });
 
 let rebuildApp;
