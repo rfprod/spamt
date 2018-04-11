@@ -20,9 +20,12 @@ public/app/**/*.js.map
 # compiled client tests
 test/client/*.js
 test/client/*.js.map
+test/client/**/*.js
+test/client/**/*.js.map
 
 # built client app files
 public/js/*.min.js
 public/css/*.min.css
-public/fonts/*.*
-!public/fonts/*.gitkeep
+public/webfonts/*.*
+!public/webfonts/*.gitkeep
+public/SHA1SUMS.json
