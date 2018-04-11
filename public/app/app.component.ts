@@ -3,6 +3,8 @@ import { EventEmitterService } from './services/event-emitter.service';
 
 import { MatIconRegistry } from '@angular/material';
 
+import { CustomServiceWorkerService } from './services/custom-service-worker.service';
+
 import { Subject } from 'rxjs/Subject';
 import 'rxjs/add/operator/takeUntil';
 
@@ -22,7 +24,8 @@ export class AppComponent implements OnInit, OnDestroy {
 	constructor(
 		private el: ElementRef,
 		private emitter: EventEmitterService,
-		private matIconRegistry: MatIconRegistry
+		private matIconRegistry: MatIconRegistry,
+		private serviceWorker: CustomServiceWorkerService,
 	) {
 		console.log('AppComponent element', this.el.nativeElement);
 	}
@@ -68,6 +71,7 @@ export class AppComponent implements OnInit, OnDestroy {
 	}
 	public ngOnDestroy() {
 		console.log('ngOnDestroy: AppComponent destroyed');
+		this.serviceWorker.disableServiceWorker();
 		this.ngUnsubscribe.next();
 		this.ngUnsubscribe.complete();
 	}

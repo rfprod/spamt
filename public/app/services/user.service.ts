@@ -1,8 +1,11 @@
-import { Injectable } from '@angular/core';
+import { Injectable, Inject } from '@angular/core';
 
 @Injectable()
 export class UserService {
-	constructor(public window: Window) {}
+
+	constructor(
+		@Inject('Window') private window: Window
+	) {}
 
 	public model: any = {
 		email: '',

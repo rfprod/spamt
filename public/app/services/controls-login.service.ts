@@ -7,8 +7,10 @@ import 'rxjs/add/operator/catch';
 
 @Injectable()
 export class ControlsLoginService {
-	public appDataUrl: string = window.location.origin + '/api/request/access?email=';
+
 	constructor(private http: Http) {}
+
+	public appDataUrl: string = window.location.origin + '/api/request/access?email=';
 
 	public extractData(res: Response) {
 		const body = res.json();

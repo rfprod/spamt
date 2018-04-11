@@ -7,8 +7,10 @@ import 'rxjs/add/operator/catch';
 
 @Injectable()
 export class ControlsQueriesListService {
-	public appDataUrl: string = window.location.origin + '/api/controls/list/queries?user_token=';
+
 	constructor(private http: Http) {}
+
+	public appDataUrl: string = window.location.origin + '/api/controls/list/queries?user_token=';
 
 	public extractData(res: Response) {
 		const body = res.json();

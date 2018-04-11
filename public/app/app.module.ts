@@ -31,6 +31,9 @@ import { AudioPlayerDirective } from './directives/audio-player.directive';
 
 import { ConvertDuration } from './pipes/convert-duration.pipe';
 
+import { CustomServiceWorkerService } from './services/custom-service-worker.service';
+import { CustomDeferredService } from './services/custom-deferred.service';
+
 import { EventEmitterService } from './services/event-emitter.service';
 import { WebsocketService } from './services/websocket.service';
 import { UserService } from './services/user.service';
@@ -56,10 +59,11 @@ import { NvD3Component } from 'ng2-nvd3';
 	providers 	: [
 									{provide: APP_BASE_HREF, useValue: '/'},
 									{ provide: LocationStrategy, useClass: PathLocationStrategy },
-									{ provide: Window, useValue: window },
-									EventEmitterService, WebsocketService, UserService, UserLogoutService, ServerStaticDataService, PublicDataService,
-									SCgetQueriesService, SCgetUserService, SCgetUserDetailsService, SCgetUserTrackDownloadService, SCgetUserTrackStreamService,
-									ControlsLoginService, ControlsLogoutService, ControlsMeService, ControlsUsersListService, ControlsQueriesListService
+									{ provide: 'Window', useValue: window },
+									EventEmitterService, WebsocketService, CustomServiceWorkerService, CustomDeferredService, UserService, UserLogoutService,
+									ServerStaticDataService, PublicDataService, SCgetQueriesService, SCgetUserService, SCgetUserDetailsService,
+									SCgetUserTrackDownloadService, SCgetUserTrackStreamService, ControlsLoginService, ControlsLogoutService, ControlsMeService,
+									ControlsUsersListService, ControlsQueriesListService
 								],
 	schemas 		: [ CUSTOM_ELEMENTS_SCHEMA ],
 	bootstrap 	: [ AppComponent ]

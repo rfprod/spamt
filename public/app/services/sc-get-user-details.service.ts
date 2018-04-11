@@ -7,8 +7,10 @@ import 'rxjs/add/operator/catch';
 
 @Injectable()
 export class SCgetUserDetailsService {
-	public appDataUrl: string = window.location.origin + '/api/sc/get/user/details?endpoint_uri=';
+
 	constructor(private http: Http) {}
+
+	public appDataUrl: string = window.location.origin + '/api/sc/get/user/details?endpoint_uri=';
 
 	public extractData(res: Response) {
 		const body = res.json();

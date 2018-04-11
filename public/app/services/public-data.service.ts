@@ -7,8 +7,10 @@ import 'rxjs/add/operator/catch';
 
 @Injectable()
 export class PublicDataService {
-	public appDataUrl: string = window.location.origin + '/api/app-diag/usage';
+
 	constructor(private http: Http) {}
+
+	public appDataUrl: string = window.location.origin + '/api/app-diag/usage';
 
 	public extractData(res: Response) {
 		const body = res.json();

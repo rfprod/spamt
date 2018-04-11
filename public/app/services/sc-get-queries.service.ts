@@ -7,8 +7,10 @@ import 'rxjs/add/operator/catch';
 
 @Injectable()
 export class SCgetQueriesService {
-	public appDataUrl: string = window.location.origin + '/api/sc/get/queries';
+
 	constructor(private http: Http) {}
+
+	public appDataUrl: string = window.location.origin + '/api/sc/get/queries';
 
 	public extractData(res: Response) {
 		const body = res.json();

@@ -7,8 +7,10 @@ import 'rxjs/add/operator/catch';
 
 @Injectable()
 export class SCgetUserTrackStreamService {
-	public appDataUrl: string = window.location.origin + '/api/sc/get/user/track/stream?endpoint_uri=';
+
 	constructor(private http: Http) {}
+
+	public appDataUrl: string = window.location.origin + '/api/sc/get/user/track/stream?endpoint_uri=';
 
 	public extractData(res: Response) {
 		console.log('extractData: ', res);

@@ -7,8 +7,10 @@ import 'rxjs/add/operator/catch';
 
 @Injectable()
 export class UserLogoutService {
-	public appDataUrl: string = window.location.origin + '/api/auth/logout';
+
 	constructor(private http: Http) {}
+
+	public appDataUrl: string = window.location.origin + '/api/auth/logout';
 
 	public extractData(res: Response) {
 		const body = res.json();
