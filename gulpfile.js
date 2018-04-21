@@ -45,6 +45,37 @@ function killProcessByName(name){
 	});
 }
 
+function setDevEnv(value, done) {
+	if (typeof value === 'boolean') {
+		fs.readFile('./.env', (err, data) => {
+			let env;
+			if (err) {
+				env = '';
+			} else {
+				env = data.toString();
+			}
+			if (env.indexOf('DEV_ENV=true') !== -1) {
+				env = env.replace(/DEV_ENV=true.*\n/, 'DEV_ENV=false\n');
+			}
+			fs.writeFile('./.env', env, (err) => {
+				if (err) throw err;
+				console.log('# > ENV > .env file was created');
+				if (done) done();
+			});
+		});
+	} else {
+		throw new TypeError('first argument must be boolean');
+	}
+}
+
+gulp.task('dont-use-cluster', (done) => {
+	setDevEnv(false, done);
+});
+
+gulp.task('use-cluster', (done) => {
+	setDevEnv(true, done);
+});
+
 function dontGitignoreBuild(gitignore, done) {
 	fs.writeFile('./.gitignore', gitignore, (err) => {
 		if (err) throw err;
