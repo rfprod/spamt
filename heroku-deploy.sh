@@ -24,7 +24,7 @@ printf "${LIGHT_GREEN} * heroku-deploy > ${GREEN}step 6:${YELLOW} commit${DEFAUL
 git commit -m "(build) heroku build"
 
 printf "${LIGHT_GREEN} * heroku-deploy > ${GREEN}step 7:${YELLOW} puh to heroku${DEFAULT}\n"
-git push heroku master
+git push heroku master --force
 
 printf "${LIGHT_GREEN} * heroku-deploy > ${GREEN}step 8:${YELLOW} checkout master${DEFAULT}\n"
 git checkout master
