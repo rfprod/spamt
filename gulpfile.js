@@ -45,6 +45,32 @@ function killProcessByName(name){
 	});
 }
 
+function dontGitignoreBuild(gitignore, done) {
+	fs.writeFile('./.gitignore', gitignore, (err) => {
+		if (err) throw err;
+		console.log('# > ENV > .gitignore file was updated');
+		done();
+	});
+}
+
+gulp.task('dont-gitignore-build', (done) => {
+	fs.readFile('./.gitignore', (err, data) => {
+		let gitignore = '';
+		if (err) {
+			console.log('./.gitignore does not exist');
+			dontGitignoreBuild(gitignore, done);
+		} else {
+			gitignore = data.toString()
+				.replace(/public\/js\/\*\.min\.js\n/, '')
+				.replace(/public\/css\/\*\.min\.css\n/, '')
+				.replace(/public\/webfonts\/\*\.\*\n/, '')
+				.replace(/public\/SHA1SUMS\.json\n/, '');
+			console.log('./.gitignore exists, updated gitignore', gitignore);
+			dontGitignoreBuild(gitignore, done);
+		}
+	});
+});
+
 /*
 *	hashsum identifies build
 *
