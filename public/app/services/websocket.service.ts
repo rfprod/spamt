@@ -13,7 +13,7 @@ export class WebsocketService {
 	/**
 	 * Generates websocket url.
 	 */
-	public generateUrl(endpoint: string): string {		
+	public generateUrl(endpoint: string): string {
 		return (this.host.indexOf('localhost') !== -1) ? this.wsProtocol + this.host + endpoint : this.wsProtocol + this.host + endpoint;
 	}
 }
