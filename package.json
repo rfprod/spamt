@@ -8,7 +8,7 @@
 	"main": "server.js",
 	"repository": "https://github.com/rfprod/spamt.git",
 	"bugs": "https://github.com/rfprod/spamt/issues",
-	"homepage": "https://spamt-ecapseman.rhcloud.com/",
+	"homepage": "https://spamt.herokuapp.com/",
 	"keywords": [
 		"MongoDB",
 		"Mongoose",
@@ -26,7 +26,7 @@
 		"management"
 	],
 	"engines": {
-		"node": ">= 8.9.1",
+		"node": "= 8.10.0",
 		"npm": ">= 5.1.0"
 	},
 	"dependencies": {
@@ -51,6 +51,7 @@
 		"body-parser": "^1.18.2",
 		"components-font-awesome": "^5.0.6",
 		"compression": "^1.7.2",
+		"concurrently": "^3.5.1",
 		"connect-flash": "^0.1.1",
 		"connect-mongodb-session": "^2.0.2",
 		"core-js": "^2.5.5",
@@ -144,6 +145,6 @@
 		"mongo-start": "./check-db-dir.sh && ./mongo-start.sh",
 		"mongo-repair": "./check-db-dir.sh && ./mongo-repair.sh",
 		"heroku-deploy": "./heroku-deploy.sh",
-		"heroku-start": "node server.js"
+		"heroku-start": "npm install -g concurrently; concurrently \"node server.js\" \"node node_modules/gulp/bin/gulp compile-and-build\""
 	}
 }
