@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
-import { Http, Response } from '@angular/http';
+import { Response } from '@angular/http';
+import { CustomHttpWithAuthService } from '../services/custom-http-with-auth.service';
 
 import { Observable } from 'rxjs/Rx';
 import 'rxjs/add/operator/map';
@@ -8,7 +9,9 @@ import 'rxjs/add/operator/catch';
 @Injectable()
 export class ControlsLogoutService {
 
-	constructor(private http: Http) {}
+	constructor(
+		private http: CustomHttpWithAuthService
+	) {}
 
 	public appDataUrl: string = window.location.origin + '/api/controls/logout';
 
@@ -25,13 +28,9 @@ export class ControlsLogoutService {
 		return Observable.throw(errMsg);
 	}
 
-	public getData(userToken: string): Observable<any> {
-		const options: any = {
-			headers: {
-				'Authorization': 'Bearer ' + userToken
-			}
-		};
-		return this.http.get(this.appDataUrl, options)
+	public getData(): Observable<any> {
+		const isBlob = false;
+		return this.http.get(this.appDataUrl, false)
 			.map(this.extractData)
 			.catch(this.handleError);
 	}

@@ -591,7 +591,7 @@ module.exports = function(cwd, app, passport, User, Query, SrvInfo, DataInit, th
 		 * log out authenticated user
 		 * resets current user token
 		 */
-		let userToken = req.query.user_token; // token from url var
+		let userToken = req.query.user_token || req.headers.authorization.split(' ')[1];
 		JWT.resetUserJWToken(null, userToken, (err) => {
 			if (err) { res.status(401).json(err); }
 			else { res.status(200).json({message: 'logged out, token reset'}); }

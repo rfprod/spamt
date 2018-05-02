@@ -81,10 +81,12 @@ export class DashboardDetailsComponent implements OnInit, OnDestroy {
 		this.scUserName = new FormControl('', Validators.compose([Validators.pattern('.{3,}')]));
 		this.selectedTab = '';
 		this.selectedEndpoint = '';
-		this.userService.model.analyser_query = this.scUserName.value;
-		this.userService.model.analyser_user_id = '';
-		this.userService.model.analyser_user_uri = '';
-		this.userService.saveUser();
+		const newValues: any = {
+			analyser_query: this.scUserName.value,
+			analyser_user_id: '',
+			analyser_user_uri: ''
+		};
+		this.userService.saveUser(newValues);
 		this.emitter.emitEvent({appInfo: 'show'});
 	}
 	public scUserName: FormControl = new FormControl('', Validators.compose([Validators.pattern('.{3,}')]));
@@ -100,12 +102,12 @@ export class DashboardDetailsComponent implements OnInit, OnDestroy {
 				this.emitter.emitEvent({appInfo: 'hide'});
 				this.publicData.user = data;
 				this.dismissMessages();
-				console.log('this.userService: ', this.userService);
-				this.userService.model.analyser_query = this.scUserName.value;
-				this.userService.model.analyser_user_id = this.publicData.user.id;
-				this.userService.model.analyser_user_uri = this.publicData.user.uri;
-				console.log('this.userService.model update:', this.userService.model);
-				this.userService.saveUser();
+				const newValues: any = {
+					analyser_query: this.scUserName.value,
+					analyser_user_id: this.publicData.user.id,
+					analyser_user_uri: this.publicData.user.uri
+				};
+				this.userService.saveUser(newValues);
 			},
 			(error: any) => {
 				this.errorMessage = error;

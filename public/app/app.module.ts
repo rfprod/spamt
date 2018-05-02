@@ -34,6 +34,8 @@ import { ConvertDuration } from './pipes/convert-duration.pipe';
 import { CustomServiceWorkerService } from './services/custom-service-worker.service';
 import { CustomDeferredService } from './services/custom-deferred.service';
 
+import { CustomHttpWithAuthService } from './services/custom-http-with-auth.service';
+
 import { EventEmitterService } from './services/event-emitter.service';
 import { WebsocketService } from './services/websocket.service';
 import { UserService } from './services/user.service';
@@ -60,7 +62,7 @@ import { NvD3Component } from 'ng2-nvd3';
 									{provide: APP_BASE_HREF, useValue: '/'},
 									{ provide: LocationStrategy, useClass: PathLocationStrategy },
 									{ provide: 'Window', useValue: window },
-									EventEmitterService, WebsocketService, CustomServiceWorkerService, CustomDeferredService, UserService, UserLogoutService,
+									EventEmitterService, WebsocketService, CustomServiceWorkerService, CustomDeferredService, CustomHttpWithAuthService, UserService, UserLogoutService,
 									ServerStaticDataService, PublicDataService, SCgetQueriesService, SCgetUserService, SCgetUserDetailsService,
 									SCgetUserTrackDownloadService, SCgetUserTrackStreamService, ControlsLoginService, ControlsLogoutService, ControlsMeService,
 									ControlsUsersListService, ControlsQueriesListService

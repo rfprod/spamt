@@ -146,7 +146,7 @@ export class DashboardControlsComponent implements OnInit, OnDestroy {
 	}
 	private getUsersList(): void {
 		this.emitSpinnerStartEvent();
-		this.controlsUsersListService.getData(this.userService.model.user_token).first().subscribe(
+		this.controlsUsersListService.getData().first().subscribe(
 			(data: any) => this.usersList = data,
 			(error: any) => {
 				this.errorMessage = error;
@@ -160,7 +160,7 @@ export class DashboardControlsComponent implements OnInit, OnDestroy {
 	}
 	private getQueriesList(): void {
 		this.emitSpinnerStartEvent();
-		this.controlsQueriesListService.getData(this.userService.model.user_token, this.queries.page).first().subscribe(
+		this.controlsQueriesListService.getData(this.queries.page).first().subscribe(
 			(data: any) => {
 				this.nvd3queries.clearElement();
 				this.queries.queriesList = data;
@@ -204,15 +204,17 @@ export class DashboardControlsComponent implements OnInit, OnDestroy {
 	private getMe(): void {
 		this.emitSpinnerStartEvent();
 		this.dismissMessages();
-		this.controlsMeService.getData(this.userService.model.user_token).first().subscribe(
+		this.controlsMeService.getData().first().subscribe(
 			(data: any) => {
-				this.userService.model.role = data.role;
-				this.userService.model.login = data.login;
-				this.userService.model.full_name = data.full_name;
-				this.userService.model.last_login = data.last_login;
-				this.userService.model.registered = data.registered;
 				this.successMessage = 'Successful login';
-				this.userService.saveUser();
+				const newValues: any = {
+					role: data.role,
+					login: data.login,
+					full_name: data.full_name,
+					last_login: data.last_login,
+					registered: data.registered
+				};
+				this.userService.saveUser(newValues);
 			},
 			(error: any) => {
 				this.errorMessage = error;
@@ -258,18 +260,17 @@ export class DashboardControlsComponent implements OnInit, OnDestroy {
 		});
 	}
 
-	public login(): void { /* tslint:disable-line */
-		this.userService.model.email = this.authForm.controls.email.value;
-		console.log('login attempt with email', this.userService.model.email);
-		this.userService.saveUser();
+	public login(): void {
+		console.log('login attempt with email', this.authForm.controls.email.value);
+		this.userService.saveUser({ email: this.authForm.controls.email.value });
 		this.requestControlsAccess();
 	}
 
-	public logout(): void { /* tslint:disable-line */
+	public logout(): void {
 		console.log('logging out, resetting token');
 		this.emitSpinnerStartEvent();
 		this.dismissMessages();
-		this.controlsLogoutService.getData(this.userService.model.user_token).subscribe(
+		this.controlsLogoutService.getData().subscribe(
 			(data) => {
 				this.successMessage = 'Logout success';
 				this.userService.resetUser();
@@ -324,8 +325,7 @@ export class DashboardControlsComponent implements OnInit, OnDestroy {
 		if (/^user_token\=[^&]+$/.test(urlParams)) {
 			const token = urlParams.split('=')[1];
 			console.log('user got token, save it:', token);
-			this.userService.model.user_token = token;
-			this.userService.saveUser();
+			this.userService.saveUser({ user_token: token });
 			this.location.replaceState('controls');
 		}
 

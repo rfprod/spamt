@@ -58,8 +58,7 @@ export class DashboardUserComponent implements OnInit, OnDestroy {
 				if (param[0] === 'twitter_auth_error' && param[1] === 'true') {
 					this.errorMessage = 'Failed to log in with Twitter credentials. Please, try again.';
 					// reset existing tokens if any in case of twitter_auth_error is present and truthy
-					this.userService.model.twitter_oauth_token = '';
-					this.userService.saveUser();
+					this.userService.saveUser({ twitter_oauth_token: '' });
 					break getError;
 				}
 			}
@@ -70,12 +69,11 @@ export class DashboardUserComponent implements OnInit, OnDestroy {
 			console.log(params);
 			for (const param of params) {
 				if (param[0] === 'twitter_oauth_token') {
-					this.userService.model.twitter_oauth_token = param[1];
+					this.userService.saveUser({ twitter_oauth_token: param[1] });
 				}
 			}
 			this.dismissMessages();
 			this.successMessage = 'Successful login';
-			this.userService.saveUser();
 		}
 		// Soundcloud
 	}
@@ -91,8 +89,7 @@ export class DashboardUserComponent implements OnInit, OnDestroy {
 		this.userLogoutService.getData(this.userService.model.twitter_oauth_token, null).subscribe(
 			(data) => {
 				this.successMessage = 'Logout success';
-				this.userService.model.twitter_oauth_token = '';
-				this.userService.saveUser();
+				this.userService.saveUser({ twitter_oauth_token: '' });
 				this.emitter.emitEvent({appInfo: 'show'});
 				this.router.navigateByUrl('/user');
 			},
