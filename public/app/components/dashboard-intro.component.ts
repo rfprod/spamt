@@ -109,16 +109,6 @@ export class DashboardIntroComponent implements OnInit, OnDestroy {
 		);
 	}
 
-// Spinner
-	private emitSpinnerStartEvent(): void {
-		// console.log('root spinner start event emitted');
-		this.emitter.emitEvent({spinner: 'start'});
-	}
-	private emitSpinnerStopEvent(): void {
-		// console.log('root spinner stop event emitted');
-		this.emitter.emitEvent({spinner: 'stop'});
-	}
-
 // Modal
 	public showModal: boolean = false;
 	public toggleModal(): void {
@@ -135,8 +125,7 @@ export class DashboardIntroComponent implements OnInit, OnDestroy {
 
 	public ngOnInit(): void {
 		console.log('ngOnInit: DashboardIntroComponent initialized');
-		this.emitSpinnerStartEvent();
-		this.emitter.emitEvent({appInfo: 'show'});
+		this.emitter.emitSpinnerStartEvent();
 
 		this.ws.onopen = (evt: any) => {
 			console.log('websocket opened:', evt);
@@ -166,12 +155,12 @@ export class DashboardIntroComponent implements OnInit, OnDestroy {
 
 		this.emitter.getEmitter().takeUntil(this.ngUnsubscribe).subscribe((event: any) => {
 			if (event.sys === 'close websocket') {
-				console.log('/intro consuming event:', event);
+				console.log('DashboardIntroComponent emitter event:', event);
 				console.log('closing webcosket');
 				this.ws.close();
 			}
 			if (event.help === 'toggle') {
-				console.log('/intro consuming event:', event);
+				console.log('DashboardIntroComponent emitter event:', event);
 				console.log('toggling help labels visibility', this.showHelp);
 				this.showHelp = (this.showHelp) ? false : true;
 			}
@@ -179,7 +168,7 @@ export class DashboardIntroComponent implements OnInit, OnDestroy {
 
 		this.getPublicData(() => {
 			this.getServerStaticData(() => {
-				this.emitSpinnerStopEvent();
+				this.emitter.emitSpinnerStopEvent();
 			});
 		});
 	}

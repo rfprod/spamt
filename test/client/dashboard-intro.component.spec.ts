@@ -59,9 +59,9 @@ describe('DashboardIntroComponent', () => {
 			this.component = this.fixture.componentInstance;
 			spyOn(this.component.serverStaticDataService, 'getData').and.returnValue(Observable.of(mockedResponse));
 			spyOn(this.component.publicDataService, 'getData').and.returnValue(Observable.of(mockedResponse));
-			spyOn(this.component, 'emitSpinnerStartEvent').and.callThrough();
-			spyOn(this.component, 'emitSpinnerStopEvent').and.callThrough();
 			this.eventEmitterSrv = TestBed.get(EventEmitterService) as EventEmitterService;
+			spyOn(this.eventEmitterSrv, 'emitSpinnerStartEvent').and.callThrough();
+			spyOn(this.eventEmitterSrv, 'emitSpinnerStopEvent').and.callThrough();
 			spyOn(this.eventEmitterSrv, 'emitEvent').and.callThrough();
 			this.serverStaticDataSrv = TestBed.get(ServerStaticDataService) as ServerStaticDataService;
 			this.publicDataSrv = TestBed.get(PublicDataService) as PublicDataService;
@@ -100,10 +100,6 @@ describe('DashboardIntroComponent', () => {
 		expect(c.getPublicData).toBeDefined();
 		expect(c.getPublicData).toEqual(jasmine.any(Function));
 		expect(c.emitter).toBeDefined();
-		expect(c.emitSpinnerStartEvent).toBeDefined();
-		expect(c.emitSpinnerStartEvent).toEqual(jasmine.any(Function));
-		expect(c.emitSpinnerStopEvent).toBeDefined();
-		expect(c.emitSpinnerStopEvent).toEqual(jasmine.any(Function));
 		expect(c.showModal).toBeDefined();
 		expect(c.showModal).toEqual(jasmine.any(Boolean));
 		expect(c.showModal).toBeFalsy();
@@ -116,18 +112,6 @@ describe('DashboardIntroComponent', () => {
 		expect(c.ngOnInit).toEqual(jasmine.any(Function));
 		expect(c.ngOnDestroy).toBeDefined();
 		expect(c.ngOnDestroy).toEqual(jasmine.any(Function));
-	});
-
-	it('should emit spinner start control event on respective method call', (done) => {
-		const c = this.component;
-		c.emitter.getEmitter().subscribe(event => { expect(event.spinner).toEqual('start'); done(); });
-		c.emitSpinnerStartEvent();
-	});
-
-	it('should emit spinner stop control event on respective method call', (done) => {
-		const c = this.component;
-		c.emitter.getEmitter().subscribe(event => { expect(event.spinner).toEqual('stop'); done(); });
-		c.emitSpinnerStopEvent();
 	});
 
 	it('should toggle modal state and control websocket connection on respective method call', (done) => {
@@ -166,12 +150,12 @@ describe('DashboardIntroComponent', () => {
 		expect(c.serverData.static.length).toEqual(0);
 		expect(c.appUsageData.length).toEqual(5); // it is prefilled with dummy data structure for convenience
 		c.ngOnInit();
-		expect(c.emitSpinnerStartEvent).toHaveBeenCalled();
+		expect(this.eventEmitterSrv.emitSpinnerStartEvent).toHaveBeenCalled();
 		expect(c.serverStaticDataService.getData).toHaveBeenCalled();
 		expect(c.publicDataService.getData).toHaveBeenCalled();
 		expect(c.serverData.static.length).toBeGreaterThan(0);
 		expect(c.appUsageData.length).toEqual(2); // this is actual data
-		expect(c.emitSpinnerStopEvent).toHaveBeenCalled();
+		expect(this.eventEmitterSrv.emitSpinnerStopEvent).toHaveBeenCalled();
 	});
 
 	it('should cleanup on ngOnDestroy', () => {

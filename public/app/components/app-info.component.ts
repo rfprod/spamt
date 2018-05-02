@@ -7,7 +7,7 @@ import 'rxjs/add/operator/takeUntil';
 @Component({
 	selector: 'app-info',
 	template: `
-		<span class="app-info" *ngIf="!hideInfo">
+		<span class="app-info">
 			<a class="flex-item" *ngFor="let badge of badges" href="{{badge.link}}" target=_blank title="{{badge.title}}">
 				<img src="{{badge.img}}"/>
 			</a>
@@ -25,7 +25,6 @@ export class AppInfoComponent implements OnInit, OnDestroy {
 
 	private ngUnsubscribe: Subject<void> = new Subject();
 
-	public hideInfo: boolean = false;
 	public badges: any[] = [
 		{
 			title: 'Node.js - an open-source, cross-platform runtime environment for developing server-side Web applications.',
@@ -52,11 +51,7 @@ export class AppInfoComponent implements OnInit, OnDestroy {
 	public ngOnInit(): void {
 		console.log('ngOnInit: AppInfoComponent initialized');
 		this.emitter.getEmitter().takeUntil(this.ngUnsubscribe).subscribe((event: any) => {
-			if (event.appInfo) {
-				console.log('app-info consuming event:', event);
-				if (event.appInfo === 'hide') { this.hideInfo = true; }
-				if (event.appInfo === 'show') { this.hideInfo = false; }
-			}
+			console.log('AppInfoComponent emitter event:', event);
 		});
 	}
 	public ngOnDestroy(): void {

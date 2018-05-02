@@ -56,7 +56,7 @@ export class DashboardDetailsComponent implements OnInit, OnDestroy {
 // popular queries
 	public queries: any;
 	private getQueries(): void {
-		this.emitSpinnerStartEvent();
+		this.emitter.emitSpinnerStartEvent();
 		this.scGetQueriesService.getData().first().subscribe(
 			(data: any) => {
 				this.queries = data;
@@ -65,7 +65,7 @@ export class DashboardDetailsComponent implements OnInit, OnDestroy {
 			(error: any) => this.errorMessage = error,
 			() => {
 				console.log('getQueriesService done');
-				this.emitSpinnerStopEvent();
+				this.emitter.emitSpinnerStopEvent();
 			}
 		);
 	}
@@ -87,7 +87,6 @@ export class DashboardDetailsComponent implements OnInit, OnDestroy {
 			analyser_user_uri: ''
 		};
 		this.userService.saveUser(newValues);
-		this.emitter.emitEvent({appInfo: 'show'});
 	}
 	public scUserName: FormControl = new FormControl('', Validators.compose([Validators.pattern('.{3,}')]));
 	public scUserNameKey(event): void {
@@ -96,10 +95,9 @@ export class DashboardDetailsComponent implements OnInit, OnDestroy {
 		}
 	}
 	public getUser(): void {
-		this.emitSpinnerStartEvent();
+		this.emitter.emitSpinnerStartEvent();
 		this.scGetUserService.getData(this.scUserName.value).first().subscribe(
 			(data: any) => {
-				this.emitter.emitEvent({appInfo: 'hide'});
 				this.publicData.user = data;
 				this.dismissMessages();
 				const newValues: any = {
@@ -111,11 +109,11 @@ export class DashboardDetailsComponent implements OnInit, OnDestroy {
 			},
 			(error: any) => {
 				this.errorMessage = error;
-				this.emitSpinnerStopEvent();
+				this.emitter.emitSpinnerStopEvent();
 			},
 			() => {
 				console.log('getUserService done');
-				this.emitSpinnerStopEvent();
+				this.emitter.emitSpinnerStopEvent();
 				this.setTabChangeListener();
 			}
 		);
@@ -165,7 +163,7 @@ export class DashboardDetailsComponent implements OnInit, OnDestroy {
 			}
 		}
 		console.log('this.selectedEndpoint: ', this.selectedEndpoint);
-		this.emitSpinnerStartEvent();
+		this.emitter.emitSpinnerStartEvent();
 		this.scGetUserDetailsService.getData(this.userService.model.analyser_user_uri + '/' + this.selectedEndpoint).first().subscribe(
 			(data: any) => {
 				if (data.hasOwnProperty('collection')) {
@@ -184,11 +182,11 @@ export class DashboardDetailsComponent implements OnInit, OnDestroy {
 			},
 			(error: any) => {
 				this.errorMessage = error;
-				this.emitSpinnerStopEvent();
+				this.emitter.emitSpinnerStopEvent();
 			},
 			() => {
 				console.log('getUserDetailsService done');
-				this.emitSpinnerStopEvent();
+				this.emitter.emitSpinnerStopEvent();
 			}
 		);
 	}
@@ -233,23 +231,13 @@ export class DashboardDetailsComponent implements OnInit, OnDestroy {
 		}
 	}
 
-// Spinner
-	private emitSpinnerStartEvent(): void {
-		// console.log('root spinner start event emitted');
-		this.emitter.emitEvent({spinner: 'start'});
-	}
-	private emitSpinnerStopEvent(): void {
-		// console.log('root spinner stop event emitted');
-		this.emitter.emitEvent({spinner: 'stop'});
-	}
-
 // Data tabs controls: Tracks
 	public selectedTrackURI: string;
 	public audioPlayback: boolean = false;
 	public selectedTrack: string = undefined;
 	private resolvePreviewSource(uri): void {
 		this.selectedTrack = undefined;
-		this.emitSpinnerStartEvent();
+		this.emitter.emitSpinnerStartEvent();
 		this.scGetUserTrackStreamService.getData(uri).first().subscribe(
 			(data: any) => {
 				console.log('scGetUserTrackPlayService, data: ', data);
@@ -259,14 +247,14 @@ export class DashboardDetailsComponent implements OnInit, OnDestroy {
 			},
 			(error: any) => {
 				this.errorMessage = error;
-				this.emitSpinnerStopEvent();
+				this.emitter.emitSpinnerStopEvent();
 			},
 			() => {
 				console.log('scGetUserTrackPlayService done');
 				setTimeout(() => {
 					this.emitter.emitEvent({audio: 'play'});
 					this.audioPlayback = true;
-					this.emitSpinnerStopEvent();
+					this.emitter.emitSpinnerStopEvent();
 				}, 1000);
 			}
 		);
@@ -308,8 +296,7 @@ export class DashboardDetailsComponent implements OnInit, OnDestroy {
 // Lifecycle
 	public ngOnInit(): void {
 		console.log('ngOnInit: DashboardDetailsComponent initialized');
-		this.emitSpinnerStartEvent();
-		this.emitter.emitEvent({appInfo: 'hide'});
+		this.emitter.emitSpinnerStartEvent();
 		console.log('this.userService:', this.userService.model);
 		this.getQueries();
 		if (!this.userService.model.analyser_query) {
@@ -320,7 +307,6 @@ export class DashboardDetailsComponent implements OnInit, OnDestroy {
 					this.getUser();
 				} else {
 					console.log('restored user selection, user is not selected');
-					this.emitter.emitEvent({appInfo: 'show'});
 				}
 			});
 		} else {
@@ -333,14 +319,14 @@ export class DashboardDetailsComponent implements OnInit, OnDestroy {
 			*	help toggler events
 			*/
 			if (event.help === 'toggle') {
-				console.log('/data consuming event:', event, ' | toggling help labels visibility');
+				console.log('DashboardDetailsComponent emitter event:', event, ' | toggling help labels visibility');
 				this.showHelp = (this.showHelp) ? false : true;
 			}
 			/*
 			*	<audio> element playback event
 			*/
 			if (event.AudioPlayerDirective) {
-				console.log('/data consuming event from AudioPlayerDirective: ', event);
+				console.log('DashboardDetailsComponent emitter event from AudioPlayerDirective: ', event);
 				if (event.AudioPlayerDirective === 'play') { this.audioPlayback = true; }
 				if (event.AudioPlayerDirective === 'pause') { this.audioPlayback = false; }
 			}

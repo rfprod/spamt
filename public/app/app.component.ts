@@ -1,4 +1,5 @@
 import { Component, OnInit, OnDestroy, ElementRef } from '@angular/core';
+import { Router, ResolveEnd } from '@angular/router';
 import { EventEmitterService } from './services/event-emitter.service';
 
 import { MatIconRegistry } from '@angular/material';
@@ -26,6 +27,7 @@ export class AppComponent implements OnInit, OnDestroy {
 		private emitter: EventEmitterService,
 		private matIconRegistry: MatIconRegistry,
 		private serviceWorker: CustomServiceWorkerService,
+		private router: Router
 	) {
 		console.log('AppComponent element', this.el.nativeElement);
 	}
@@ -39,15 +41,15 @@ export class AppComponent implements OnInit, OnDestroy {
 		console.log('ngOnInit: AppComponent initialized');
 		$('#init-spinner').remove();
 
+		this.router.events.takeUntil(this.ngUnsubscribe).subscribe((event: any) => {
+			if (event instanceof ResolveEnd) {
+				console.log('router event, resolve end', event);
+				this.showAppInfo = (event.url === '/intro') ? true : false;
+			}
+		});
+
 		this.emitter.getEmitter().takeUntil(this.ngUnsubscribe).subscribe((event: any) => {
 			console.log('app consuming event:', event);
-			if (event.appInfo) {
-				if (event.appInfo === 'hide') {
-					this.showAppInfo = false;
-				} else if (event.appInfo === 'show') {
-					this.showAppInfo = true;
-				}
-			}
 			if (event.spinner) {
 				if (event.spinner === 'start') {
 					this.showSpinner = true;

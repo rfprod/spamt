@@ -84,34 +84,23 @@ export class DashboardUserComponent implements OnInit, OnDestroy {
 
 	public logout(): void {
 		console.log('logging out, resetting token');
-		this.emitSpinnerStartEvent();
+		this.emitter.emitSpinnerStartEvent();
 		this.dismissMessages();
 		this.userLogoutService.getData(this.userService.model.twitter_oauth_token, null).subscribe(
 			(data) => {
 				this.successMessage = 'Logout success';
 				this.userService.saveUser({ twitter_oauth_token: '' });
-				this.emitter.emitEvent({appInfo: 'show'});
 				this.router.navigateByUrl('/user');
 			},
 			(error) => {
 				this.errorMessage = error as any;
-				this.emitSpinnerStopEvent();
+				this.emitter.emitSpinnerStopEvent();
 			},
 			() => {
 				console.log('logout done');
-				this.emitSpinnerStopEvent();
+				this.emitter.emitSpinnerStopEvent();
 			}
 		);
-	}
-
-// Spinner
-	private emitSpinnerStartEvent(): void {
-		// console.log('root spinner start event emitted');
-		this.emitter.emitEvent({spinner: 'start'});
-	}
-	private emitSpinnerStopEvent(): void {
-		// console.log('root spinner stop event emitted');
-		this.emitter.emitEvent({spinner: 'stop'});
 	}
 
 // Modal
@@ -124,9 +113,8 @@ export class DashboardUserComponent implements OnInit, OnDestroy {
 	public showHelp: boolean = false; // controls help labells visibility, catches events from nav component
 
 	public ngOnInit(): void {
-		console.log('ngOnInit: UserComponent initialized');
-		this.emitSpinnerStartEvent();
-		this.emitter.emitEvent({appInfo: 'hide'});
+		console.log('ngOnInit: DashboardUserComponent initialized');
+		this.emitter.emitSpinnerStartEvent();
 
 		this.checkUrlParams();
 
@@ -139,7 +127,6 @@ export class DashboardUserComponent implements OnInit, OnDestroy {
 					this.router.navigateByUrl('/user');
 				} else {
 					console.log('restored user selection: user is not logged in');
-					this.emitter.emitEvent({appInfo: 'show'});
 				}
 			});
 		} else {
@@ -148,19 +135,19 @@ export class DashboardUserComponent implements OnInit, OnDestroy {
 		}
 
 		this.emitter.getEmitter().takeUntil(this.ngUnsubscribe).subscribe((event: any) => {
-			console.log('UserComponent consuming event:', event);
+			console.log('DashboardUserComponent consuming event:', event);
 			if (event.help === 'toggle') {
-				console.log('/controls consuming event:', event, ' | toggling help labels visibility', this.showHelp);
+				console.log('DashboardUserComponent emitter event:', event, ' | toggling help labels visibility', this.showHelp);
 				this.showHelp = (this.showHelp) ? false : true;
 			}
 		});
 		this.activatedRoute.params.takeUntil(this.ngUnsubscribe).subscribe((params: Params) => {
 			console.log('url params chaned:', params);
 		});
-		this.emitSpinnerStopEvent();
+		this.emitter.emitSpinnerStopEvent();
 	}
 	public ngOnDestroy(): void {
-		console.log('ngOnDestroy: UserComponent destroyed');
+		console.log('ngOnDestroy: DashboardUserComponent destroyed');
 		this.ngUnsubscribe.next();
 		this.ngUnsubscribe.complete();
 	}

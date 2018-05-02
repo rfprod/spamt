@@ -41,9 +41,6 @@ describe('AppInfoComponent', () => {
 		const c = this.component;
 		expect(c.el).toBeDefined();
 		expect(c.emitter).toBeDefined();
-		expect(c.hideInfo).toBeDefined();
-		expect(c.hideInfo).toEqual(jasmine.any(Boolean));
-		expect(c.hideInfo).toEqual(false);
 		expect(c.badges).toBeDefined();
 		expect(c.badges).toEqual(jasmine.any(Array));
 		expect(c.badges.length).toEqual(4);
@@ -71,16 +68,6 @@ describe('AppInfoComponent', () => {
 		expect(c.ngOnInit).toEqual(jasmine.any(Function));
 		expect(c.ngOnDestroy).toBeDefined();
 		expect(c.ngOnDestroy).toEqual(jasmine.any(Function));
-	});
-
-	it('should init on ngOnInit, listen to emitter messages and change hideInfo variable state on respective messages', () => {
-		const c = this.component;
-		c.ngOnInit();
-		expect(c.hideInfo).toEqual(false);
-		c.emitter.emitEvent({appInfo: 'show'});
-		expect(c.hideInfo).toEqual(false);
-		c.emitter.emitEvent({appInfo: 'hide'});
-		expect(c.hideInfo).toEqual(true);
 	});
 
 	it('should cleanup on ngOnDestroy', () => {

@@ -112,22 +112,22 @@ export class DashboardControlsComponent implements OnInit, OnDestroy {
 		this.successMessage = '';
 	}
 	private getServerStaticData(callback): void {
-		this.emitSpinnerStartEvent();
+		this.emitter.emitSpinnerStartEvent();
 		this.serverStaticDataService.getData().first().subscribe(
 			(data: any) => this.serverData.static = data,
 			(error: any) => {
 				this.errorMessage = error;
-				this.emitSpinnerStopEvent();
+				this.emitter.emitSpinnerStopEvent();
 			},
 			() => {
 				console.log('getServerStaticData done, data:', this.serverData.static);
-				this.emitSpinnerStopEvent();
+				this.emitter.emitSpinnerStopEvent();
 				if (callback) { callback(); }
 			}
 		);
 	}
 	private getPublicData(callback): void {
-		this.emitSpinnerStartEvent();
+		this.emitter.emitSpinnerStartEvent();
 		this.publicDataService.getData().first().subscribe(
 			(data: any) => {
 				this.nvd3usage.clearElement();
@@ -135,31 +135,31 @@ export class DashboardControlsComponent implements OnInit, OnDestroy {
 			},
 			(error: any) => {
 				this.errorMessage = error;
-				this.emitSpinnerStopEvent();
+				this.emitter.emitSpinnerStopEvent();
 			},
 			() => {
 				console.log('getPublicData done, data:', this.appUsageData);
-				this.emitSpinnerStopEvent();
+				this.emitter.emitSpinnerStopEvent();
 				if (callback) { callback(); }
 			}
 		);
 	}
 	private getUsersList(): void {
-		this.emitSpinnerStartEvent();
+		this.emitter.emitSpinnerStartEvent();
 		this.controlsUsersListService.getData().first().subscribe(
 			(data: any) => this.usersList = data,
 			(error: any) => {
 				this.errorMessage = error;
-				this.emitSpinnerStopEvent();
+				this.emitter.emitSpinnerStopEvent();
 			},
 			() => {
 				console.log('getUsersList done, data:', this.usersList);
-				this.emitSpinnerStopEvent();
+				this.emitter.emitSpinnerStopEvent();
 			}
 		);
 	}
 	private getQueriesList(): void {
-		this.emitSpinnerStartEvent();
+		this.emitter.emitSpinnerStartEvent();
 		this.controlsQueriesListService.getData(this.queries.page).first().subscribe(
 			(data: any) => {
 				this.nvd3queries.clearElement();
@@ -176,33 +176,33 @@ export class DashboardControlsComponent implements OnInit, OnDestroy {
 			},
 			(error: any) => {
 				this.errorMessage = error;
-				this.emitSpinnerStopEvent();
+				this.emitter.emitSpinnerStopEvent();
 			},
 			() => {
 				console.log('getQueriesList done, data:', this.queries.queriesList);
-				this.emitSpinnerStopEvent();
+				this.emitter.emitSpinnerStopEvent();
 			}
 		);
 	}
 
 	private requestControlsAccess(): void {
-		this.emitSpinnerStartEvent();
+		this.emitter.emitSpinnerStartEvent();
 		this.dismissMessages();
 		this.controlsLoginService.getData(this.userService.model.email).first().subscribe(
 			(data: any) => this.successMessage = data.message,
 			(error: any) => {
 				this.errorMessage = error;
-				this.emitSpinnerStopEvent();
+				this.emitter.emitSpinnerStopEvent();
 			},
 			() => {
 				console.log('requestControlsAccess done');
-				this.emitSpinnerStopEvent();
+				this.emitter.emitSpinnerStopEvent();
 			}
 		);
 	}
 
 	private getMe(): void {
-		this.emitSpinnerStartEvent();
+		this.emitter.emitSpinnerStartEvent();
 		this.dismissMessages();
 		this.controlsMeService.getData().first().subscribe(
 			(data: any) => {
@@ -219,13 +219,12 @@ export class DashboardControlsComponent implements OnInit, OnDestroy {
 			(error: any) => {
 				this.errorMessage = error;
 				this.userService.resetUser();
-				this.emitter.emitEvent({appInfo: 'show'});
-				this.emitSpinnerStopEvent();
+				this.emitter.emitSpinnerStopEvent();
 				this.router.navigateByUrl('/controls');
 			},
 			() => {
 				console.log('getMe done');
-				this.emitSpinnerStopEvent();
+				this.emitter.emitSpinnerStopEvent();
 			}
 		);
 	}
@@ -268,7 +267,7 @@ export class DashboardControlsComponent implements OnInit, OnDestroy {
 
 	public logout(): void {
 		console.log('logging out, resetting token');
-		this.emitSpinnerStartEvent();
+		this.emitter.emitSpinnerStartEvent();
 		this.dismissMessages();
 		this.controlsLogoutService.getData().subscribe(
 			(data) => {
@@ -276,27 +275,17 @@ export class DashboardControlsComponent implements OnInit, OnDestroy {
 				this.userService.resetUser();
 				this.resetForm();
 				this.activate.form = true;
-				this.emitter.emitEvent({appInfo: 'show'});
 				this.router.navigateByUrl('/controls');
 			},
 			(error) => {
 				this.errorMessage = error as any;
-				this.emitSpinnerStopEvent();
+				this.emitter.emitSpinnerStopEvent();
 			},
 			() => {
 				console.log('logout done');
-				this.emitSpinnerStopEvent();
+				this.emitter.emitSpinnerStopEvent();
 			}
 		);
-	}
-
-	private emitSpinnerStartEvent(): void {
-		// console.log('root spinner start event emitted');
-		this.emitter.emitEvent({spinner: 'start'});
-	}
-	private emitSpinnerStopEvent(): void {
-		// console.log('root spinner stop event emitted');
-		this.emitter.emitEvent({spinner: 'stop'});
 	}
 
 // Modal
@@ -318,7 +307,6 @@ export class DashboardControlsComponent implements OnInit, OnDestroy {
 
 	public ngOnInit(): void {
 		console.log('ngOnInit: DashboardControlsComponent initialized');
-		this.emitter.emitEvent({appInfo: 'show'});
 
 		const route = this.router.url;
 		const urlParams = route.substring(route.lastIndexOf('?') + 1, route.length);
@@ -331,7 +319,6 @@ export class DashboardControlsComponent implements OnInit, OnDestroy {
 
 		this.userService.restoreUser(() => {
 			if (this.userService.model.user_token) {
-				this.emitter.emitEvent({appInfo: 'hide'});
 				this.activate.form = false;
 				this.getMe();
 				this.getUsersList();
@@ -348,7 +335,7 @@ export class DashboardControlsComponent implements OnInit, OnDestroy {
 
 		this.emitter.getEmitter().takeUntil(this.ngUnsubscribe).subscribe((event: any) => {
 			if (event.help === 'toggle') {
-				console.log('/controls consuming event:', event, ' | toggling help labels visibility', this.showHelp);
+				console.log('DashboardControlsComponent emitter event:', event, ' | toggling help labels visibility', this.showHelp);
 				this.showHelp = (this.showHelp) ? false : true;
 			}
 		});
