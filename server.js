@@ -85,7 +85,7 @@ app.all('/*', function(req, res, next) {
 	// CORS headers
 	res.header('Access-Control-Allow-Origin', '*'); // restrict it to the required domain if needed
 	res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS');
-	res.header('Access-Control-Allow-Headers', 'Content-type,Accept,X-Access-Token,X-Key');
+	res.header('Access-Control-Allow-Headers', 'Content-type,Accept,X-Access-Token,X-Key,Authorization');
 	// add headers to be exposed
 	res.header('Access-Control-Expose-Headers', 'userTokenUpdate');
 	// cache control
@@ -97,17 +97,14 @@ app.all('/*', function(req, res, next) {
 	else next();
 });
 
-if (process.env.OPENSHIFT_MONGODB_DB_HOST) {
-	const store = new MongoStore({
-		uri: mongo_uri,
-		collection: 'clientSessions'
-	});
-	app.use(session({secret:'secretSPAMT', resave:false, saveUninitialized:true, store: store , cookie: {
-		maxAge: 1000 * 60 * 60 * 24 * 1 // 1 day 
-	} }));
-}else{
-	app.use(session({secret:'secretSPAMT', resave:false, saveUninitialized:true}));
-}
+const store = new MongoStore({
+	uri: mongo_uri,
+	collection: 'clientSessions'
+});
+app.use(session({secret:'secretSPAMT', resave:false, saveUninitialized:true, store: store , cookie: {
+	maxAge: 1000 * 60 * 60 * 24 * 1 // 1 day
+} }));
+
 app.use(passport.initialize());
 app.use(passport.session());
 app.use(bodyParser.urlencoded({ extended: true }));

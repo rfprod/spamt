@@ -88,7 +88,7 @@
 		"nodemailer": "4.6.4",
 		"nvd3": "^1.8.6",
 		"passport": "^0.4.0",
-		"passport-http-api-token-bearer": "^1.0.1",
+		"passport-http-bearer": "^1.0.1",
 		"passport-soundcloud": "^0.2.0",
 		"passport-twitter": "^1.0.4",
 		"reflect-metadata": "^0.1.12",

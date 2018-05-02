@@ -10,7 +10,7 @@ export class ControlsMeService {
 
 	constructor(private http: Http) {}
 
-	public appDataUrl: string = window.location.origin + '/api/controls/me?user_token=';
+	public appDataUrl: string = window.location.origin + '/api/controls/me';
 
 	public extractData(res: Response) {
 		const body = res.json();
@@ -26,7 +26,12 @@ export class ControlsMeService {
 	}
 
 	public getData(userToken: string): Observable<any> {
-		return this.http.get(this.appDataUrl + userToken)
+		const options: any = {
+			headers: {
+				'Authorization': 'Bearer ' + userToken
+			}
+		};
+		return this.http.get(this.appDataUrl, options)
 			.map(this.extractData)
 			.catch(this.handleError);
 	}

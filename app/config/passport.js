@@ -2,7 +2,7 @@
 
 const TwitterStrategy = require('passport-twitter').Strategy;
 const SoundcloudStrategy = require('passport-soundcloud').Strategy;
-const BearerStrategy = require('passport-http-api-token-bearer').Strategy;
+const BearerStrategy = require('passport-http-bearer').Strategy;
 const User = require('../models/users');
 const configAuthTwitter = require('./auth-twitter');
 const configAuthSoundcloud = require('./auth-soundcloud');
@@ -18,11 +18,13 @@ module.exports = function(passport) {
 	});
 
 	passport.use(new BearerStrategy({
-		access_token: 'user_token'
+		realm: 'Users',
+		scope: 'all'
 	}, (token, done) => {
+		// console.log('BearerStrategy token', token);
 		process.nextTick(() => {
 			User.findOne({jwToken: token}, (err, user) => {
-				if (err) return done(err);
+				if (err) return done(err, null, {statusCode: 500, scope: 'all'});
 				if (!user) return done(null, false, {statusCode: 401, error: true, message: 'Unknown user'});
 				return done(null, user, {statusCode: 200, scope: 'all'});
 			});

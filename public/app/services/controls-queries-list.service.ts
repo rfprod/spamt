@@ -26,7 +26,15 @@ export class ControlsQueriesListService {
 	}
 
 	public getData(userToken: string, page: number = 1): Observable<any> {
-		return this.http.get(this.appDataUrl + userToken + '&page=' + page)
+		if (page <= 0) {
+			page = 1;
+		}
+		const options: any = {
+			headers: {
+				'Authorization': 'Bearer ' + userToken
+			}
+		};
+		return this.http.get(this.appDataUrl + '?page=' + page, options)
 			.map(this.extractData)
 			.catch(this.handleError);
 	}

@@ -459,10 +459,12 @@ module.exports = function(cwd, app, passport, User, Query, SrvInfo, DataInit, th
 		 * /controls endpoint access restriction
 		 * based on bearer token
 		 */
-		passport.authenticate('token-bearer', { session: false }, function(err, user, info) {
+		// console.log('req.headers', req.headers);
+		passport.authenticate('bearer', { session: false }, function(err, user, info) {
 			console.log('passport info', info);
 			let userToken = req.query.user_token; // token from url var
 			if (typeof userToken == 'undefined') userToken = req.body.user_token; // token from request body
+			if (typeof userToken == 'undefined' && req.headers.authorization) userToken = req.headers.authorization.split(' ')[1]; // token from request body
 			if (userToken) {
 				JWT.checkJWTokenExpiration(userToken, (tokenStatus) => {
 					console.log('token status:', tokenStatus);
@@ -497,7 +499,7 @@ module.exports = function(cwd, app, passport, User, Query, SrvInfo, DataInit, th
 		/**
 		 * get authenticated user details
 		 */
-		let userToken = req.query.user_token;
+		let userToken = req.query.user_token || req.headers.authorization.split(' ')[1];
 		User.find({jwToken: userToken}, (err, docs) => {
 			if (err) throw err;
 			let output = {};
