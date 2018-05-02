@@ -135,11 +135,15 @@ let smtpConfig = {
 		accessToken: process.env.MAILER_ACCESS_TOKEN || 'empty'
 	}
 };
-// set proxy for smtp for development environment
+/**
+ * set proxy for smtp for development environment
+ *
 if (process.env.DEV_ENV) {
 	console.log('mail transporter >> development environment launch detected, setting proxy for smtpConfig');
 	smtpConfig.proxy = 'socks5://127.0.0.1:9050/';
 }
+ *
+ */
 
 const mailTransporter = nodemailer.createTransport(smtpConfig); // reusable transporter object using the default SMTP transport
 mailTransporter.verify((err, success) => {
@@ -149,11 +153,15 @@ mailTransporter.verify((err, success) => {
 		console.log('Mail transporter diag success >>', success);
 	}
 });
-// enable support for socks URLs for development environment
+/**
+ * enable support for socks URLs for development environment
+ *
 if (process.env.DEV_ENV) {
 	console.log('mail transporter >> development environment launch detected, enabling support for socks proxy urls');
 	mailTransporter.set('proxy_socks_module', require('socks'));
 }
+ *
+ */
 
 routes(cwd, app, passport, User, Query, SrvInfo, DataInit, thenReq, JWT, mailTransporter, crypto, SC, TWTR);
 

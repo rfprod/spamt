@@ -21,7 +21,7 @@ module.exports = function(passport) {
 		access_token: 'user_token'
 	}, (token, done) => {
 		process.nextTick(() => {
-			User.findOne({'jwToken': token}, (err, user) => {
+			User.findOne({jwToken: token}, (err, user) => {
 				if (err) return done(err);
 				if (!user) return done(null, false, {statusCode: 401, error: true, message: 'Unknown user'});
 				return done(null, user, {statusCode: 200, scope: 'all'});

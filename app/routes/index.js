@@ -23,8 +23,8 @@ module.exports = function(cwd, app, passport, User, Query, SrvInfo, DataInit, th
 				from: '"SPAMT 👥" <'+process.env.MAILER_EMAIL+'>',
 				to: recipientEmail,
 				subject: 'SPAMT: controls access ✔',
-				text: 'SPAMT: Controls access was requested using your email address.\nIf you did not request it, ignore this message.\nIf you requested access, follow the link: '+accessLink+'.', // plaintext body
-				html: '<h3>SPAMT: Controls access was requested using your email address.</h3><p>If you did not request it, ignore this message.</p><p>If you requested access, follow the link: '+accessLink+'.</p>' // html body
+				text: 'SPAMT: Controls access was requested using your email address.\nIf you did not request it, ignore this message.\nIf you requested access, follow the link: '+accessLink+' .', // plaintext body
+				html: '<h3>SPAMT: Controls access was requested using your email address.</h3><p>If you did not request it, ignore this message.</p><p>If you requested access, follow the link: '+accessLink+' .</p>' // html body
 			};
 			mailTransporter.sendMail(mailOptions, (err, info) => {
 				if (err) {
@@ -35,7 +35,7 @@ module.exports = function(cwd, app, passport, User, Query, SrvInfo, DataInit, th
 					}
 				} else {
 					console.log('Message sent: ' + info.response);
-					if (callback) { callback(); }
+					if (callback) { callback(err); }
 				}
 			});
 		}
@@ -434,9 +434,9 @@ module.exports = function(cwd, app, passport, User, Query, SrvInfo, DataInit, th
 					// console.log(payload, tokenObj);
 					JWT.setUserJWToken(user._id, tokenObj, () => {
 						let accessLink = process.env.APP_URL + 'controls?user_token=' + tokenObj.token;
-						sendAccessLink(userEmail, accessLink, (error) => {
-							if (error) {
-								res.status(500).json({message: 'mail transporter error'});
+						sendAccessLink(userEmail, accessLink, (err) => {
+							if (err) {
+								res.status(500).json({message: 'mail transporter error', error: err});
 							} else {
 								res.status(200).json({message: 'access link was sent to provided email address'});
 							}
@@ -460,24 +460,30 @@ module.exports = function(cwd, app, passport, User, Query, SrvInfo, DataInit, th
 		 * based on bearer token
 		 */
 		passport.authenticate('token-bearer', { session: false }, function(err, user, info) {
+			console.log('passport info', info);
 			let userToken = req.query.user_token; // token from url var
 			if (typeof userToken == 'undefined') userToken = req.body.user_token; // token from request body
 			if (userToken) {
 				JWT.checkJWTokenExpiration(userToken, (tokenStatus) => {
-					req.renewedToken = false;
 					console.log('token status:', tokenStatus);
-					if (tokenStatus.expired) return res.status(401).json({ message: 'token expired' });
-					//if (tokenStatus.renew) return res.status(200).json({ to_be_configured: 'this event should regenerate user token' });
 					if (tokenStatus.renew) {
 						JWT.renewUserToken(req, (tokenObj) => {
 							console.log('new token:', tokenObj);
+							/*
+							*	TODO: set renewed token response header
+							*/
 							req.renewedTokenObj = tokenObj;
 							return next();
 						});
+					} else if (tokenStatus.expired) {
+						return res.status(401).json({ message: 'token expired' });
+					} else if (info.statusCode == 200) {
+						return next();
+					} else if (!info.statusCode) {
+						return res.status(401).json({ message: info });
+					} else {
+						return res.status(info.statusCode).json({ message: info.message });
 					}
-					else if (info.statusCode == 200) return next();
-					else if (!info.statusCode) return res.status(401).json({ message: info });
-					else return res.status(info.statusCode).json({ message: info.message });
 				});
 			} else {
 				const responseMessage = {message: 'Token missing \'user_token\''};
@@ -554,7 +560,7 @@ module.exports = function(cwd, app, passport, User, Query, SrvInfo, DataInit, th
 		const page = (req.query.page) ? req.query.page : 1;
 		const limit = 20;
 		const offset = (page > 1) ? limit * page : 0;
-		Query.aggregate({$skip: offset}, {$limit: limit}, (err, docs) => {
+		Query.aggregate([{$skip: offset}, {$limit: limit}], (err, docs) => {
 			if (err) { throw err; }
 			let resData = [],
 				dataUnit = {};
