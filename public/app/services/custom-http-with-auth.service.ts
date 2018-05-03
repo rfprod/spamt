@@ -1,4 +1,4 @@
-import { Injectable} from '@angular/core';
+import { Injectable } from '@angular/core';
 import { Http, Response, Headers, ResponseContentType } from '@angular/http';
 
 import { CustomDeferredService } from './custom-deferred.service';

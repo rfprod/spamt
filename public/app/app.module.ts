@@ -35,6 +35,8 @@ import { CustomServiceWorkerService } from './services/custom-service-worker.ser
 import { CustomDeferredService } from './services/custom-deferred.service';
 
 import { CustomHttpWithAuthService } from './services/custom-http-with-auth.service';
+import { CustomHttpHandlersService } from './services/custom-http-handlers.service';
+import { CustomHttpUtilsService } from './services/custom-http-utils.service';
 
 import { EventEmitterService } from './services/event-emitter.service';
 import { WebsocketService } from './services/websocket.service';
@@ -62,7 +64,7 @@ import { NvD3Component } from 'ng2-nvd3';
 									{provide: APP_BASE_HREF, useValue: '/'},
 									{ provide: LocationStrategy, useClass: PathLocationStrategy },
 									{ provide: 'Window', useValue: window },
-									EventEmitterService, WebsocketService, CustomServiceWorkerService, CustomDeferredService, CustomHttpWithAuthService, UserService, UserLogoutService,
+									EventEmitterService, WebsocketService, CustomServiceWorkerService, CustomDeferredService, CustomHttpWithAuthService, CustomHttpHandlersService, CustomHttpUtilsService, UserService, UserLogoutService,
 									ServerStaticDataService, PublicDataService, SCgetQueriesService, SCgetUserService, SCgetUserDetailsService,
 									SCgetUserTrackDownloadService, SCgetUserTrackStreamService, ControlsLoginService, ControlsLogoutService, ControlsMeService,
 									ControlsUsersListService, ControlsQueriesListService

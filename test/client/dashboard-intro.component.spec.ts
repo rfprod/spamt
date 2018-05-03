@@ -9,6 +9,9 @@ import { FlexLayoutModule } from '@angular/flex-layout';
 import '../../node_modules/hammerjs/hammer.js';
 import { CustomMaterialModule } from '../../public/app/custom-material.module';
 
+import { CustomHttpHandlersService } from '../../public/app/services/custom-http-handlers.service';
+import { CustomHttpUtilsService } from '../../public/app/services/custom-http-utils.service';
+
 import { NvD3Component } from 'ng2-nvd3';
 import { EventEmitterService } from '../../public/app/services/event-emitter.service';
 
@@ -29,7 +32,7 @@ describe('DashboardIntroComponent', () => {
 			imports: [ NoopAnimationsModule, CustomMaterialModule, FlexLayoutModule ],
 			providers: [
 				{ provide: APP_BASE_HREF, useValue: '/' },
-				{ provide: Window, useValue: { location: { host: 'localhost', protocol: 'http' } } },
+				{ provide: 'Window', useValue: window },
 				EventEmitterService,
 				BaseRequestOptions,
 				MockBackend,
@@ -37,20 +40,26 @@ describe('DashboardIntroComponent', () => {
 					useFactory: (mockedBackend, requestOptions) => new Http(mockedBackend, requestOptions),
 					deps: [MockBackend, BaseRequestOptions]
 				},
+				CustomHttpHandlersService,
+				{
+					provide: CustomHttpUtilsService,
+					useFactory: (win) => new CustomHttpUtilsService(win),
+					deps: ['Window']
+				},
 				{
 					provide: PublicDataService,
-					useFactory: (http) => new PublicDataService(http),
-					deps: [Http]
+					useFactory: (http, handlers, utils) => new PublicDataService(http, handlers, utils),
+					deps: [Http, CustomHttpHandlersService, CustomHttpUtilsService]
 				},
 				{
 					provide: ServerStaticDataService,
-					useFactory: (http) => new ServerStaticDataService(http),
-					deps: [Http]
+					useFactory: (http, handlers, utils) => new ServerStaticDataService(http, handlers, utils),
+					deps: [Http, CustomHttpHandlersService, CustomHttpUtilsService]
 				},
 				{
 					provide: WebsocketService,
-					useFactory: (window) => new WebsocketService(window),
-					deps: [Window]
+					useFactory: (win) => new WebsocketService(win),
+					deps: ['Window']
 				}
 			],
 			schemas: [ CUSTOM_ELEMENTS_SCHEMA ]
@@ -67,6 +76,18 @@ describe('DashboardIntroComponent', () => {
 			this.publicDataSrv = TestBed.get(PublicDataService) as PublicDataService;
 			this.websocket = TestBed.get(WebsocketService) as WebsocketService;
 			this.backend = TestBed.get(MockBackend) as MockBackend;
+			/*
+			*	TODO
+			*
+			*	this.backend.connections.subscribe((connection: MockConnection) => {
+			*		connection.mockRespond(new Response(new ResponseOptions({ body: { data: {} }, status: 200, headers: new Headers({}) })));
+			*	});
+			*
+			*	this.backend.connections.subscribe((connection: MockConnection) => {
+			*		connection.mockError(new Error('{ status: 400 }'));
+			*	});
+			*
+			*/
 			done();
 		});
 	});
@@ -170,17 +191,5 @@ describe('DashboardIntroComponent', () => {
 		expect(c.ngUnsubscribe.complete).toHaveBeenCalled();
 	});
 
-	/*
-	*	TODO
-	*
-	*	this.backend.connections.subscribe((connection: MockConnection) => {
-	*		connection.mockRespond(new Response(new ResponseOptions({ body: { data: {} }, status: 200, headers: new Headers({}) })));
-	*	});
-	*
-	*	this.backend.connections.subscribe((connection: MockConnection) => {
-	*		connection.mockError(new Error('{ status: 400 }'));
-	*	});
-	*
-	*/
 });
 
