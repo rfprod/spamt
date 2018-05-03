@@ -20,15 +20,15 @@ import { PublicDataService } from '../../public/app/services/public-data.service
 import { WebsocketService } from '../../public/app/services/websocket.service';
 import { Observable } from 'rxjs/Rx';
 
-import { DashboardIntroComponent } from '../../public/app/components/dashboard-intro.component';
+import { AppIntroComponent } from '../../public/app/components/app-intro.component';
 
-describe('DashboardIntroComponent', () => {
+describe('AppIntroComponent', () => {
 
 	const mockedResponse = [ { name: 'one', value: 1 }, { name: 'two', value: 2 } ];
 
 	beforeEach((done) => {
 		TestBed.configureTestingModule({
-			declarations: [ NvD3Component, DashboardIntroComponent ],
+			declarations: [ NvD3Component, AppIntroComponent ],
 			imports: [ NoopAnimationsModule, CustomMaterialModule, FlexLayoutModule ],
 			providers: [
 				{ provide: APP_BASE_HREF, useValue: '/' },
@@ -64,7 +64,7 @@ describe('DashboardIntroComponent', () => {
 			],
 			schemas: [ CUSTOM_ELEMENTS_SCHEMA ]
 		}).compileComponents().then(() => {
-			this.fixture = TestBed.createComponent(DashboardIntroComponent);
+			this.fixture = TestBed.createComponent(AppIntroComponent);
 			this.component = this.fixture.componentInstance;
 			spyOn(this.component.serverStaticDataService, 'getData').and.returnValue(Observable.of(mockedResponse));
 			spyOn(this.component.publicDataService, 'getData').and.returnValue(Observable.of(mockedResponse));
@@ -129,6 +129,28 @@ describe('DashboardIntroComponent', () => {
 		expect(c.showHelp).toBeDefined();
 		expect(c.showHelp).toEqual(jasmine.any(Boolean));
 		expect(c.showHelp).toBeFalsy();
+		expect(c.badges).toEqual([
+			{
+				title: 'Node.js - an open-source, cross-platform runtime environment for developing server-side Web applications.',
+				link: 'https://en.wikipedia.org/wiki/Node.js',
+				img: '/public/img/Node.js_logo.svg',
+			},
+			{
+				title: 'MongoDB - a free and open-source cross-platform document-oriented database.',
+				link: 'https://en.wikipedia.org/wiki/MongoDB',
+				img: '/public/img/MongoDB_logo.svg',
+			},
+			{
+				title: 'Angular - (commonly referred to as "Angular 2+" or "Angular 2") is a TypeScript-based open-source front-end web application platform led by the Angular Team at Google and by a community of individuals and corporations to address all of the parts of the developer\'s workflow while building complex web applications. Angular is a complete rewrite from the same team that built AngularJS.',
+				link: 'https://en.wikipedia.org/wiki/Angular_(application_platform)',
+				img: '/public/img/Angular_logo.svg',
+			},
+			{
+				title: 'Soundcloud - a global online audio distribution platform based in Berlin, Germany, that enables its users to upload, record, promote, and share their originally-created sounds.',
+				link: 'https://en.wikipedia.org/wiki/SoundCloud',
+				img: '/public/img/SoundCloud_logo.svg',
+			}
+		]);
 		expect(c.ngOnInit).toBeDefined();
 		expect(c.ngOnInit).toEqual(jasmine.any(Function));
 		expect(c.ngOnDestroy).toBeDefined();

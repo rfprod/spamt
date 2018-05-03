@@ -327,7 +327,7 @@ body {
 /*
 *	genera styling for view containers
 */
-	dashboard-intro, dashboard-details, dashboard-controls, dashboard-user {
+	app-intro, app-analyser-soundcloud, app-controls, app-user {
 		flex: 1 1 auto;
 		align-self: stretch;
 		display: flex;
@@ -375,35 +375,30 @@ body {
 /*
 *	specific styling for view containers
 */
-	app-info {
-		flex: 0 1 auto;
-		max-height: 10vh;
+	.app-info {
+		height: 100%;
 		width: 100%;
-		.app-info {
-			height: 100%;
-			width: 100%;
-			display: flex;
-			justify-content: space-around;
-			align-items: center;
-			.flex-item {
-				flex: 1;
-				text-align: center;
-				text-decoration: none;
-				&:hover{
-					background: $lightgrey;
-				}
-				img {
-					min-height: 5vh;
-					height: 10vh;
-					max-height: 8vh;
-					width: auto !important;
-					max-width: 24vw;
-				}
+		display: flex;
+		justify-content: space-around;
+		align-items: center;
+		.flex-item {
+			flex: 1;
+			text-align: center;
+			text-decoration: none;
+			&:hover{
+				background: $lightgrey;
+			}
+			img {
+				min-height: 5vh;
+				height: 10vh;
+				max-height: 8vh;
+				width: auto !important;
+				max-width: 24vw;
 			}
 		}
 	}
 
-	dashboard-details {
+	app-analyser-soundcloud {
 		#labels {
 			border: 1px solid $grey;
 			span {

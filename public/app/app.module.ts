@@ -21,11 +21,10 @@ import { CustomMaterialModule } from './custom-material.module';
 
 import { AppComponent } from './app.component';
 import { AppNavComponent } from './components/app-nav.component';
-import { AppInfoComponent } from './components/app-info.component';
-import { DashboardIntroComponent } from './components/dashboard-intro.component';
-import { DashboardDetailsComponent } from './components/dashboard-details.component';
-import { DashboardControlsComponent } from './components/dashboard-controls.component';
-import { DashboardUserComponent } from './components/dashboard-user.component';
+import { AppIntroComponent } from './components/app-intro.component';
+import { AppAnalyserSoundcloudComponent } from './components/app-analyser-soundcloud.component';
+import { AppControlsComponent } from './components/app-controls.component';
+import { AppUserComponent } from './components/app-user.component';
 
 import { AudioPlayerDirective } from './directives/audio-player.directive';
 
@@ -58,7 +57,7 @@ import { ControlsQueriesListService } from './services/controls-queries-list.ser
 import { NvD3Component } from 'ng2-nvd3';
 
 @NgModule({
-	declarations: [ AppComponent, AppNavComponent, AppInfoComponent, DashboardIntroComponent, DashboardDetailsComponent, DashboardControlsComponent, DashboardUserComponent, /*nvD3,*/NvD3Component, AudioPlayerDirective, ConvertDuration ],
+	declarations: [ AppComponent, AppNavComponent, AppIntroComponent, AppAnalyserSoundcloudComponent, AppControlsComponent, AppUserComponent, /*nvD3,*/NvD3Component, AudioPlayerDirective, ConvertDuration ],
 	imports 		: [ BrowserModule, BrowserAnimationsModule, FormsModule, FlexLayoutModule, CustomMaterialModule, ReactiveFormsModule, HttpModule, RouterModule.forRoot(APP_ROUTES) ],
 	providers 	: [
 									{provide: APP_BASE_HREF, useValue: '/'},

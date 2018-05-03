@@ -8,7 +8,7 @@ import 'rxjs/add/operator/takeUntil';
 
 @Component({
 	selector: 'app-nav',
-	templateUrl: '/public/app/views/dashboard-nav.html',
+	templateUrl: '/public/app/views/app-nav.html',
 })
 export class AppNavComponent implements OnInit, OnDestroy {
 
@@ -37,7 +37,7 @@ export class AppNavComponent implements OnInit, OnDestroy {
 		}
 		if (path.indexOf('intro') !== -1) {
 			index = '1';
-		} else if (path.indexOf('data') !== -1) {
+		} else if (path.indexOf('analyser') !== -1) {
 			index = '2';
 		} else if (path.indexOf('controls') !== -1) {
 			index = '3';

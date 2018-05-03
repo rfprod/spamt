@@ -14,13 +14,13 @@ import 'rxjs/add/operator/takeUntil';
 import 'rxjs/add/operator/first';
 
 @Component({
-	selector: 'dashboard-details',
-	templateUrl: '/public/app/views/dashboard-details.html',
+	selector: 'app-analyser-soundcloud',
+	templateUrl: '/public/app/views/app-analyser-soundcloud.html',
 	host: {
 		class: 'mat-body-1'
 	}
 })
-export class DashboardDetailsComponent implements OnInit, OnDestroy {
+export class AppAnalyserSoundcloudComponent implements OnInit, OnDestroy {
 
 	constructor(
 		private el: ElementRef,
@@ -32,7 +32,7 @@ export class DashboardDetailsComponent implements OnInit, OnDestroy {
 		private scGetUserTrackStreamService: SCgetUserTrackStreamService,
 		private userService: UserService
 	) {
-		console.log('DashboardDetailsComponent element:', this.el.nativeElement);
+		console.log('AppAnalyserSoundcloudComponent element:', this.el.nativeElement);
 	}
 
 	private ngUnsubscribe: Subject<void> = new Subject();
@@ -295,7 +295,7 @@ export class DashboardDetailsComponent implements OnInit, OnDestroy {
 
 // Lifecycle
 	public ngOnInit(): void {
-		console.log('ngOnInit: DashboardDetailsComponent initialized');
+		console.log('ngOnInit: AppAnalyserSoundcloudComponent initialized');
 		this.emitter.emitSpinnerStartEvent();
 		console.log('this.userService:', this.userService.model);
 		this.getQueries();
@@ -319,21 +319,21 @@ export class DashboardDetailsComponent implements OnInit, OnDestroy {
 			*	help toggler events
 			*/
 			if (event.help === 'toggle') {
-				console.log('DashboardDetailsComponent emitter event:', event, ' | toggling help labels visibility');
+				console.log('AppAnalyserSoundcloudComponent emitter event:', event, ' | toggling help labels visibility');
 				this.showHelp = (this.showHelp) ? false : true;
 			}
 			/*
 			*	<audio> element playback event
 			*/
 			if (event.AudioPlayerDirective) {
-				console.log('DashboardDetailsComponent emitter event from AudioPlayerDirective: ', event);
+				console.log('AppAnalyserSoundcloudComponent emitter event from AudioPlayerDirective: ', event);
 				if (event.AudioPlayerDirective === 'play') { this.audioPlayback = true; }
 				if (event.AudioPlayerDirective === 'pause') { this.audioPlayback = false; }
 			}
 		});
 	}
 	public ngOnDestroy(): void {
-		console.log('ngOnDestroy: DashboardDetailsComponent destroyed');
+		console.log('ngOnDestroy: AppAnalyserSoundcloudComponent destroyed');
 		this.ngUnsubscribe.next();
 		this.ngUnsubscribe.complete();
 	}

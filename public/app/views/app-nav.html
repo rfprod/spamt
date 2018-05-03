@@ -8,11 +8,11 @@
 		<button mat-button [ngClass]="{selected: navButtonsState[1], inactive: !navButtonsState[1]}" [fxHide.xs]="true" [fxHide.sm]="true" matTooltip="App intro" [routerLink]="['intro']" (click)="switchNavButtons($event, 'intro')">
 			<mat-icon class="material-icons-fas" fontSet="fas" fontIcon="fa-tachometer-alt" title="app intro" [ngClass]="{'help-highlight': showHelp}"></mat-icon> Intro
 		</button>
-		<button mat-button [ngClass]="{selected: navButtonsState[2], inactive: !navButtonsState[2]}" [fxHide.xs]="true" [fxHide.sm]="true" matTooltip="Soundcloud data" [routerLink]="['data']" (click)="switchNavButtons($event, 'data')">
-			<mat-icon class="material-icons-fas" fontSet="fas" fontIcon="fa-database" title="soundcloud data" [ngClass]="{'help-highlight': showHelp}"></mat-icon> Data
+		<button mat-button [ngClass]="{selected: navButtonsState[2], inactive: !navButtonsState[2]}" [fxHide.xs]="true" [fxHide.sm]="true" matTooltip="Soundcloud analyser" [routerLink]="['analyser']" (click)="switchNavButtons($event, 'analyser')">
+			<mat-icon class="material-icons-fas" fontSet="fas" fontIcon="fa-database" title="soundcloud analyser" [ngClass]="{'help-highlight': showHelp}"></mat-icon> Analyser
 		</button>
 		<button mat-button [ngClass]="{selected: navButtonsState[3], inactive: !navButtonsState[3]}" [fxHide.xs]="true" [fxHide.sm]="true" matTooltip="App controls" [routerLink]="['controls']" (click)="switchNavButtons($event, 'controls')">
-			<mat-icon class="material-icons-fas" fontSet="fas" fontIcon="fa-cogs" title="soundcloud data" [ngClass]="{'help-highlight': showHelp}"></mat-icon> Controls
+			<mat-icon class="material-icons-fas" fontSet="fas" fontIcon="fa-cogs" title="app controls" [ngClass]="{'help-highlight': showHelp}"></mat-icon> Controls
 		</button>
 		<button mat-button [ngClass]="{selected: navButtonsState[4], inactive: !navButtonsState[4]}" [fxHide.xs]="true" [fxHide.sm]="true" matTooltip="User login" [routerLink]="['user']" (click)="switchNavButtons($event, 'user')">
 			<mat-icon class="material-icons-fas" fontSet="fas" fontIcon="fa-user" title="user login" [ngClass]="{'help-highlight': showHelp}"></mat-icon> User
@@ -28,8 +28,8 @@
 			<button mat-menu-item [ngClass]="{selected: navButtonsState[1], inactive: !navButtonsState[1]}" matTooltip="App intro" [routerLink]="['intro']" (click)="switchNavButtons($event, 'intro')">
 				<mat-icon class="material-icons-fas" fontSet="fas" fontIcon="fa-tachometer-alt" title="app intro" [ngClass]="{'help-highlight': showHelp}"></mat-icon> Intro
 			</button>
-			<button mat-menu-item [ngClass]="{selected: navButtonsState[2], inactive: !navButtonsState[2]}" matTooltip="Soundcloud data" [routerLink]="['data']" (click)="switchNavButtons($event, 'data')">
-				<mat-icon class="material-icons-fas" fontSet="fas" fontIcon="fa-database" title="soundcloud data" [ngClass]="{'help-highlight': showHelp}"></mat-icon> Data
+			<button mat-menu-item [ngClass]="{selected: navButtonsState[2], inactive: !navButtonsState[2]}" matTooltip="Soundcloud analyser" [routerLink]="['analyser']" (click)="switchNavButtons($event, 'analyser')">
+				<mat-icon class="material-icons-fas" fontSet="fas" fontIcon="fa-database" title="soundcloud analyser" [ngClass]="{'help-highlight': showHelp}"></mat-icon> Analyser
 			</button>
 			<button mat-menu-item [ngClass]="{selected: navButtonsState[3], inactive: !navButtonsState[3]}" matTooltip="App controls" [routerLink]="['controls']" (click)="switchNavButtons($event, 'controls')">
 				<mat-icon class="material-icons-fas" fontSet="fas" fontIcon="fa-cogs" title="soundcloud data" [ngClass]="{'help-highlight': showHelp}"></mat-icon> Controls

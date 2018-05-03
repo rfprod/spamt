@@ -20,13 +20,13 @@ import 'rxjs/add/operator/first';
 // declare let d3: any;
 
 @Component({
-	selector: 'dashboard-controls',
-	templateUrl: '/public/app/views/dashboard-controls.html',
+	selector: 'app-controls',
+	templateUrl: '/public/app/views/app-controls.html',
 	host: {
 		class: 'mat-body-1'
 	}
 })
-export class DashboardControlsComponent implements OnInit, OnDestroy {
+export class AppControlsComponent implements OnInit, OnDestroy {
 
 	constructor(
 		private el: ElementRef,
@@ -43,7 +43,7 @@ export class DashboardControlsComponent implements OnInit, OnDestroy {
 		private router: Router,
 		private location: Location
 	) {
-		console.log('DashboardControlsComponent element:', this.el.nativeElement);
+		console.log('AppControlsComponent element:', this.el.nativeElement);
 		this.resetForm();
 	}
 
@@ -306,7 +306,7 @@ export class DashboardControlsComponent implements OnInit, OnDestroy {
 	@ViewChild('queriesDataChart') private nvd3queries: any;
 
 	public ngOnInit(): void {
-		console.log('ngOnInit: DashboardControlsComponent initialized');
+		console.log('ngOnInit: AppControlsComponent initialized');
 
 		const route = this.router.url;
 		const urlParams = route.substring(route.lastIndexOf('?') + 1, route.length);
@@ -335,13 +335,13 @@ export class DashboardControlsComponent implements OnInit, OnDestroy {
 
 		this.emitter.getEmitter().takeUntil(this.ngUnsubscribe).subscribe((event: any) => {
 			if (event.help === 'toggle') {
-				console.log('DashboardControlsComponent emitter event:', event, ' | toggling help labels visibility', this.showHelp);
+				console.log('AppControlsComponent emitter event:', event, ' | toggling help labels visibility', this.showHelp);
 				this.showHelp = (this.showHelp) ? false : true;
 			}
 		});
 	}
 	public ngOnDestroy(): void {
-		console.log('ngOnDestroy: DashboardControlsComponent destroyed');
+		console.log('ngOnDestroy: AppControlsComponent destroyed');
 		this.ngUnsubscribe.next();
 		this.ngUnsubscribe.complete();
 	}

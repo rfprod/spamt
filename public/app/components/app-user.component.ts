@@ -9,13 +9,13 @@ import 'rxjs/add/operator/takeUntil';
 import 'rxjs/add/operator/first';
 
 @Component({
-	selector: 'dashboard-user',
-	templateUrl: '/public/app/views/dashboard-user.html',
+	selector: 'app-user',
+	templateUrl: '/public/app/views/app-user.html',
 	host: {
 		class: 'mat-body-1'
 	}
 })
-export class DashboardUserComponent implements OnInit, OnDestroy {
+export class AppUserComponent implements OnInit, OnDestroy {
 
 	constructor(
 		private el: ElementRef,
@@ -25,7 +25,7 @@ export class DashboardUserComponent implements OnInit, OnDestroy {
 		private userService: UserService,
 		private userLogoutService: UserLogoutService
 	) {
-		console.log('DashboardUserComponent element:', this.el.nativeElement);
+		console.log('AppUserComponent element:', this.el.nativeElement);
 	}
 
 	private ngUnsubscribe: Subject<void> = new Subject();
@@ -113,7 +113,7 @@ export class DashboardUserComponent implements OnInit, OnDestroy {
 	public showHelp: boolean = false; // controls help labells visibility, catches events from nav component
 
 	public ngOnInit(): void {
-		console.log('ngOnInit: DashboardUserComponent initialized');
+		console.log('ngOnInit: AppUserComponent initialized');
 		this.emitter.emitSpinnerStartEvent();
 
 		this.checkUrlParams();
@@ -135,9 +135,9 @@ export class DashboardUserComponent implements OnInit, OnDestroy {
 		}
 
 		this.emitter.getEmitter().takeUntil(this.ngUnsubscribe).subscribe((event: any) => {
-			console.log('DashboardUserComponent consuming event:', event);
+			console.log('AppUserComponent consuming event:', event);
 			if (event.help === 'toggle') {
-				console.log('DashboardUserComponent emitter event:', event, ' | toggling help labels visibility', this.showHelp);
+				console.log('AppUserComponent emitter event:', event, ' | toggling help labels visibility', this.showHelp);
 				this.showHelp = (this.showHelp) ? false : true;
 			}
 		});
@@ -147,7 +147,7 @@ export class DashboardUserComponent implements OnInit, OnDestroy {
 		this.emitter.emitSpinnerStopEvent();
 	}
 	public ngOnDestroy(): void {
-		console.log('ngOnDestroy: DashboardUserComponent destroyed');
+		console.log('ngOnDestroy: AppUserComponent destroyed');
 		this.ngUnsubscribe.next();
 		this.ngUnsubscribe.complete();
 	}

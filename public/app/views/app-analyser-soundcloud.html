@@ -123,7 +123,7 @@
 
 		<span id="instructions-container" *ngIf="!userSelected()">
 			<div id="instructions">
-				input <a href="https://soundcloud.com" target=_blank><mat-icon class="material-icons">link</mat-icon> soundcloud</a> user name to be able to request data, or select one from the following list
+				input <a href="https://soundcloud.com" target=_blank>soundcloud</a> user name to be able to request data, or select one from the following list
 			</div>
 			<div id="queries-flex" *ngIf="queries">
 				<a fxFlex mat-button class="mat-primary" *ngFor="let q of queries.data" (click)="analyseThisUser(q.name)" matTooltip="Analyze this user">{{q.name}}</a>
