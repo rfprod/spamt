@@ -39,6 +39,10 @@ export class UserService {
 		return this.model;
 	}
 
+	public isLoggedIn(): boolean {
+		return (this.model.user_token) ? true : false;
+	}
+
 	public modelKeys(): string[] {
 		return Object.keys(this.model);
 	}

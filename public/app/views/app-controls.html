@@ -1,15 +1,15 @@
 <div fxLayout="column" fxLayoutFill>
-	<span *ngIf="!userService.model.user_token" fxFlex>
+	<span *ngIf="!userService.isLoggedIn()" fxFlex>
 		<h3>{{title}}</h3>
 		<p>{{description.welcome}}</p>
 	</span>
-	<span *ngIf="userService.model.user_token" fxFlex>
+	<span *ngIf="userService.isLoggedIn()" fxFlex>
 		<h3 fxLayout="row" fxLayoutAlign="start center">
 			{{title}}
-			<a mat-button (click)="toggleModal()" matTooltip="Application stats">
+			<a mat-icon-button (click)="toggleModal()" matTooltip="Application stats">
 				<mat-icon class="material-icons-fas" fontSet="fas" fontIcon="fa-chart-bar" [ngClass]="{ 'help-highlight': showHelp }"></mat-icon>
 			</a>
-			<a mat-button (click)="logout()" matTooltip="Log out of SPAMT Controls">
+			<a mat-icon-button (click)="logout()" matTooltip="Log out of SPAMT Controls">
 				<mat-icon class="material-icons-fas" fontSet="fas" fontIcon="fa-sign-out-alt" [ngClass]="{ 'help-highlight': showHelp }"></mat-icon>
 			</a>
 		</h3>
@@ -31,7 +31,7 @@
 		</div>
 	</div>
 
-	<form id="auth-form" fxFlex fxLayout="column" fxLayoutAlign="start stretch" [formGroup]="authForm" (ngSubmit)="login()" *ngIf="!userService.model.user_token && activate.form" novalidate>
+	<form id="auth-form" fxFlex fxLayout="column" fxLayoutAlign="start stretch" [formGroup]="authForm" (ngSubmit)="login()" *ngIf="!userService.isLoggedIn() && activate.form" novalidate>
 		<mat-form-field class="full-width">
 			<input matInput type="email" id="email" name="email" [formControl]="authForm.controls.email" pattern="^[\w%+-]+@[\w.-]+" title="email" placeholder="email" required />
 			<mat-icon matSuffix class="material-icons">email</mat-icon>
@@ -50,7 +50,8 @@
 		</div>
 	</form>
 
-	<span *ngIf="userService.model.user_token" fxFlex>
+	<span *ngIf="userService.isLoggedIn()" fxFlex>
+
 		<div fxLayout="row" fxLayoutAlign="start center">
 			<p fxFlex>Logged in as:</p>
 			<p fxFlex matTooltip="Login">{{userService.model.login}}</p>
@@ -60,7 +61,6 @@
 
 		<mat-tab-group #tabGroup>
 			<mat-tab label="{{dataTabs[0]}}">
-				<nvd3 #appUsageChart *ngIf="tabGroup.selectedIndex === 0" [options]="chartOptions" [data]="appUsageData"></nvd3>
 				<table>
 					<thead>
 						<tr>
@@ -85,7 +85,6 @@
 				</table>
 			</mat-tab>
 			<mat-tab label="{{dataTabs[1]}}">
-				<nvd3 #queriesDataChart *ngIf="tabGroup.selectedIndex === 1" [options]="chartOptions" [data]="queriesData"></nvd3>
 				<table>
 					<thead>
 						<tr>
@@ -104,6 +103,15 @@
 				</table>
 			</mat-tab>
 		</mat-tab-group>
+
+		<div fxLayout="row" fxLayoutAlign="center center" *ngIf="tabGroup.selectedIndex === 0">
+			<nvd3 fxFlex #appUsageChart [options]="chartOptions" [data]="appUsageData"></nvd3>
+		</div>
+
+		<div fxLayout="row" fxLayoutAlign="center center" *ngIf="tabGroup.selectedIndex === 1">
+			<nvd3 fxFlex #queriesDataChart [options]="chartOptions" [data]="queriesData"></nvd3>
+		</div>
+
 	</span>
 
 	<span id="modal" *ngIf="showModal">

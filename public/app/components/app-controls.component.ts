@@ -1,12 +1,16 @@
-import { Component, OnInit, OnDestroy, ElementRef, ViewChild } from '@angular/core';
+import { Component, OnInit, AfterViewInit, OnDestroy, ElementRef, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, FormControl, Validators } from '@angular/forms';
 import { Location } from '@angular/common';
 import { Router } from '@angular/router';
+
 import { MatTabGroup } from '@angular/material';
+
 import { EventEmitterService } from '../services/event-emitter.service';
+import { UserService } from '../services/user.service';
+
 import { ServerStaticDataService } from '../services/server-static-data.service';
 import { PublicDataService } from '../services/public-data.service';
-import { UserService } from '../services/user.service';
+
 import { ControlsLoginService } from '../services/controls-login.service';
 import { ControlsLogoutService } from '../services/controls-logout.service';
 import { ControlsMeService } from '../services/controls-me.service';
@@ -17,8 +21,6 @@ import { Subject } from 'rxjs/Subject';
 import 'rxjs/add/operator/takeUntil';
 import 'rxjs/add/operator/first';
 
-// declare let d3: any;
-
 @Component({
 	selector: 'app-controls',
 	templateUrl: '/public/app/views/app-controls.html',
@@ -26,7 +28,7 @@ import 'rxjs/add/operator/first';
 		class: 'mat-body-1'
 	}
 })
-export class AppControlsComponent implements OnInit, OnDestroy {
+export class AppControlsComponent implements OnInit, AfterViewInit, OnDestroy {
 
 	constructor(
 		private el: ElementRef,
@@ -47,13 +49,26 @@ export class AppControlsComponent implements OnInit, OnDestroy {
 		this.resetForm();
 	}
 
+	/**
+	 * Controls infinite subscriptions unsubscribe.
+	 */
 	private ngUnsubscribe: Subject<void> = new Subject();
 
+	/**
+	 * View title.
+	 */
 	public title: string = 'SPAMT Controls';
+	/**
+	 * View description.
+	 */
 	public description: object = {
 		welcome: 'In order to gain access to Social Profile Analysis and Management Tool Controls you should have an account associated with an email address. Provide this email address to get an authentication link.',
 		authenticated: 'Social Profile Analysis and Management Tool Controls',
 	};
+
+	/**
+	 * NVD3 chart options.
+	 */
 	public chartOptions: object = {
 		chart: {
 			type: 'pieChart',
@@ -77,6 +92,9 @@ export class AppControlsComponent implements OnInit, OnDestroy {
 			},
 		},
 	};
+	/**
+	 * Application usage chart data.
+	 */
 	public appUsageData: any[] = [
 		{
 			key: 'Default',
@@ -87,6 +105,9 @@ export class AppControlsComponent implements OnInit, OnDestroy {
 			y: 1,
 		},
 	];
+	/**
+	 * Queries chart data.
+	 */
 	public queriesData: any[] = [
 		{
 			key: 'Default',
@@ -95,22 +116,44 @@ export class AppControlsComponent implements OnInit, OnDestroy {
 		{
 			key: 'Default',
 			y: 1,
-		},
+		}
 	];
+	/**
+	 * Server data.
+	 */
 	public serverData: any = {
-		static: [],
+		static: []
 	};
+	/**
+	 * Users array.
+	 */
 	public usersList: any[] = [];
+	/**
+	 * Queries array.
+	 */
 	public queries: any = {
-		qieriesList: 0,
+		queriesList: [],
 		page: 0,
 	};
+	/**
+	 * UI error message.
+	 */
 	public errorMessage: string;
+	/**
+	 * UI success message.
+	 */
 	public successMessage: string;
+	/**
+	 * Dismisses UI messages - user actions feedback.
+	 */
 	public dismissMessages(): void {
 		this.errorMessage = '';
 		this.successMessage = '';
 	}
+
+	/**
+	 * Gets static server data.
+	 */
 	private getServerStaticData(callback): void {
 		this.emitter.emitSpinnerStartEvent();
 		this.serverStaticDataService.getData().first().subscribe(
@@ -126,11 +169,16 @@ export class AppControlsComponent implements OnInit, OnDestroy {
 			}
 		);
 	}
+	/**
+	 * Gets public data.
+	 */
 	private getPublicData(callback): void {
 		this.emitter.emitSpinnerStartEvent();
 		this.publicDataService.getData().first().subscribe(
 			(data: any) => {
-				this.nvd3usage.clearElement();
+				if (this.nvd3usage) {
+					this.nvd3usage.clearElement();
+				}
 				this.appUsageData = data;
 			},
 			(error: any) => {
@@ -144,6 +192,9 @@ export class AppControlsComponent implements OnInit, OnDestroy {
 			}
 		);
 	}
+	/**
+	 * Gets users list.
+	 */
 	private getUsersList(): void {
 		this.emitter.emitSpinnerStartEvent();
 		this.controlsUsersListService.getData().first().subscribe(
@@ -158,11 +209,16 @@ export class AppControlsComponent implements OnInit, OnDestroy {
 			}
 		);
 	}
+	/**
+	 * Gets queries list.
+	 */
 	private getQueriesList(): void {
 		this.emitter.emitSpinnerStartEvent();
 		this.controlsQueriesListService.getData(this.queries.page).first().subscribe(
 			(data: any) => {
-				this.nvd3queries.clearElement();
+				if (this.nvd3queries) {
+					this.nvd3queries.clearElement();
+				}
 				this.queries.queriesList = data;
 				this.queriesData = [];
 				for (const query of this.queries.queriesList) {
@@ -185,6 +241,9 @@ export class AppControlsComponent implements OnInit, OnDestroy {
 		);
 	}
 
+	/**
+	 * Requests controls acces using provided user credentials.
+	 */
 	private requestControlsAccess(): void {
 		this.emitter.emitSpinnerStartEvent();
 		this.dismissMessages();
@@ -201,6 +260,9 @@ export class AppControlsComponent implements OnInit, OnDestroy {
 		);
 	}
 
+	/**
+	 * Gets authenticated user details.
+	 */
 	private getMe(): void {
 		this.emitter.emitSpinnerStartEvent();
 		this.dismissMessages();
@@ -229,10 +291,19 @@ export class AppControlsComponent implements OnInit, OnDestroy {
 		);
 	}
 
+	/**
+	 * Authentication form.
+	 */
 	public authForm: FormGroup;
+	/**
+	 * Authentication form state.
+	 */
 	public activate: any = {
 		form: true as boolean
 	};
+	/**
+	 * Resets authentication form.
+	 */
 	public resetForm(reinitForm?: boolean): void {
 		/*
 		*	resets user local storage and register form
@@ -259,12 +330,18 @@ export class AppControlsComponent implements OnInit, OnDestroy {
 		});
 	}
 
+	/**
+	 * Loggs user in.
+	 */
 	public login(): void {
 		console.log('login attempt with email', this.authForm.controls.email.value);
 		this.userService.saveUser({ email: this.authForm.controls.email.value });
 		this.requestControlsAccess();
 	}
 
+	/**
+	 * Loggs user out.
+	 */
 	public logout(): void {
 		console.log('logging out, resetting token');
 		this.emitter.emitSpinnerStartEvent();
@@ -288,23 +365,63 @@ export class AppControlsComponent implements OnInit, OnDestroy {
 		);
 	}
 
-// Modal
+	/**
+	 * If modal custom should be shown or not.
+	 */
 	public showModal: boolean = false;
+	/**
+	 * Toggles custom modal visibility.
+	 */
 	public toggleModal(): void {
 		this.showModal = (!this.showModal) ? true : false;
 	}
 
-// Tabs
-	public dataTabs: string[] = ['Users', 'Queries']; // tslint:disable-line
+	/**
+	 * Basic controls view tabs names.
+	 */
+	public dataTabs: string[] = ['Users', 'Queries'];
+	/**
+	 * Basic controls view tab group.
+	 */
 	@ViewChild('tabGroup') private tabGroup: MatTabGroup;
 
-// Help
-	public showHelp: boolean = false; // controls help labells visibility, catches events from nav component
+	/**
+	 * Subscribes to Tab Group change events.
+	 */
+	private tabGroupChangeSubscribe(): void {
+		this.tabGroup.selectChange.takeUntil(this.ngUnsubscribe).subscribe((event: any) => {
+			console.log('tabs chage event:', event, '| active tab index', event.index, '| tab name', this.dataTabs[event.index]);
+			if (this.dataTabs[event.index] === 'Users') {
+				/*
+				* TODO:client do something on users selection
+				*/
+			}
+			if (this.dataTabs[event.index] === 'Queries') {
+				/*
+				* TODO:client do something on queries selection
+				*/
+			}
+		});
+	}
 
-// Charts
+	/**
+	 * If controls should be highlighted or not.
+	 * Controls help labells visibility, is controlled by events from nav component.
+	 */
+	public showHelp: boolean = false;
+
+	/**
+	 * Application usage chart.
+	 */
 	@ViewChild('appUsageChart') private nvd3usage: any;
+	/**
+	 * Queries data chart.
+	 */
 	@ViewChild('queriesDataChart') private nvd3queries: any;
 
+	/**
+	 * Lifecycle hook called after component view is destroyed.
+	 */
 	public ngOnInit(): void {
 		console.log('ngOnInit: AppControlsComponent initialized');
 
@@ -317,6 +434,19 @@ export class AppControlsComponent implements OnInit, OnDestroy {
 			this.location.replaceState('controls');
 		}
 
+		/**
+		 * Subscribe to Event Emitter Service events.
+		 */
+		this.emitter.getEmitter().takeUntil(this.ngUnsubscribe).subscribe((event: any) => {
+			if (event.help === 'toggle') {
+				console.log('AppControlsComponent emitter event:', event, ' | toggling help labels visibility', this.showHelp);
+				this.showHelp = (this.showHelp) ? false : true;
+			}
+		});
+
+		/**
+		 * Load data.
+		 */
 		this.userService.restoreUser(() => {
 			if (this.userService.model.user_token) {
 				this.activate.form = false;
@@ -332,14 +462,20 @@ export class AppControlsComponent implements OnInit, OnDestroy {
 				console.log('local storage is empty');
 			}
 		});
-
-		this.emitter.getEmitter().takeUntil(this.ngUnsubscribe).subscribe((event: any) => {
-			if (event.help === 'toggle') {
-				console.log('AppControlsComponent emitter event:', event, ' | toggling help labels visibility', this.showHelp);
-				this.showHelp = (this.showHelp) ? false : true;
-			}
-		});
 	}
+	/**
+	 * Lifecycle hook called after component view is initialized.
+	 */
+	public ngAfterViewInit(): void {
+		if (this.userService.isLoggedIn()) {
+			this.tabGroupChangeSubscribe();
+			// this.nvd3usage.updateSize();
+			// this.nvd3queries.updateSize();
+		}
+	}
+	/**
+	 * Lifecycle hook called after component view is destroyed.
+	 */
 	public ngOnDestroy(): void {
 		console.log('ngOnDestroy: AppControlsComponent destroyed');
 		this.ngUnsubscribe.next();

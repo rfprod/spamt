@@ -10,7 +10,7 @@ export class CustomHttpUtilsService {
 	/**
 	 * Default timeout value for http requests.
 	 */
-	public timeoutValue: number = 7000;
+	public timeoutValue: number = 10000;
 
 	/**
 	 * Returns api url.
