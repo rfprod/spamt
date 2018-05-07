@@ -60,10 +60,18 @@ app.use(compression({
 	level: -1
 }));
 
+/*
+*	serve directories
+*/
 app.use('/public', express.static(cwd + '/public'));
-app.use('/node_modules', express.static(cwd + '/node_modules'));
-app.use('/systemjs.config.js', express.static(cwd + '/systemjs.config.js'));
-app.use('/systemjs.config.extras.js', express.static(cwd + '/systemjs.config.extras.js'));
+let pathsToPassThrough = /(api|css|fonts|img|js)/;
+if (process.env.DEV_ENV) {
+	app.use('/node_modules', express.static(cwd + '/node_modules'));
+	app.use('/logs', express.static(cwd + '/logs'));
+	app.use('/systemjs.config.js', express.static(cwd + '/systemjs.config.js'));
+	app.use('/systemjs.config.extras.js', express.static(cwd + '/systemjs.config.extras.js'));
+	pathsToPassThrough = /(api|css|fonts|img|js|node_modules|logs)/;
+}
 app.use((req, res, next) => {
 	/*
 	*	this is required for angular to load urls properly when user requests url directly, e.g.
@@ -74,13 +82,16 @@ app.use((req, res, next) => {
 	* css, fonts, img, js - are directories containing client files
 	*/
 	// console.log('req.path:', req.path);
-	if (/(api|css|fonts|img|js|node_modules)/.test(req.path)) {
+	if (pathsToPassThrough.test(req.path)) {
 		return next();
 	} else {
 		res.sendFile(cwd + '/public/index.html');
 	}
 });
-// headers config for all Express routes
+
+/*
+*	headers config for all Express routes
+*/
 app.all('/*', function(req, res, next) {
 	// CORS headers
 	res.header('Access-Control-Allow-Origin', '*'); // restrict it to the required domain if needed

@@ -184,10 +184,147 @@ gulp.task('tsc', (done) => {
 	});
 });
 
+const logsIndexHTML = `
+<!DOCTYPE html>
+<html>
+	<head>
+		<style>
+			body {
+				height: 100%;
+				margin: 0;
+				padding: 0 1em;
+				display: flex;
+				flex-direction: row;
+				flex-wrap: wrap;
+				align-items: flex-start;
+				align-content: flex-start;
+				justify-content: stretch;
+			}
+			.flex-100 {
+				flex: 100%;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+			}
+			.flex-item {
+				flex: 1 1 auto;
+				display: flex;
+				flex-direction: row;
+				flex-wrap: wrap;
+				align-items: center;
+				justify-content: center;
+				border: 1px rgba(0, 0, 0, 0.3) dotted;
+			}
+		</style>
+	</head>
+	<body>
+			<h1 class="flex-100">SPAMT Reports and Documentation Index</h1>
+
+			<h2 class="flex-100">Reports</h2>
+
+			<span class="flex-item">
+				<h3 class="flex-100">Server Unit</h3>
+				<a class="flex-item" href="unit/server/index.html" target=_blank>Spec</a>
+			</span>
+
+			<span class="flex-item">
+				<h3 class="flex-100">Client Unit</h3>
+				<a class="flex-item" href="unit/client/index.html" target=_blank>Spec</a>
+				<a class="flex-item" href="coverage/html-report/index.html" target=_blank>Coverage</a>
+			</span>
+
+			<span class="flex-item">
+				<h3 class="flex-100">Client E2E</h3>
+				<a class="flex-item" href="e2e/report/index.html" target=_blank>Spec</a>
+			</span>
+
+			<h2 class="flex-100">Documentation</h2>
+
+			<span class="flex-item">
+				<h3 class="flex-100">Server</h3>
+				<a class="flex-item" href="jsdoc/index.html" target=_blank>JSDoc</a>
+			</span>
+
+			<span class="flex-item">
+				<h3 class="flex-100">Client</h3>
+				<a class="flex-item" href="typedoc/index.html" target=_blank>TypeDoc</a>
+			</span>
+	</body>
+</html>
+`;
+gulp.task('generate-logs-index', (done) => {
+	fs.writeFile('./logs/index.html', logsIndexHTML, (err) => {
+		if (err) throw err;
+		console.log('# > LOGS index.html > was created');
+		done();
+	});
+});
+
+gulp.task('jsdoc-server', () => {
+	const jsdoc = require('gulp-jsdoc3');
+	const config = require('./jsdoc.json');
+	const source = ['./server.js', './app/**/*.js'];
+	return gulp.src(['README.md'].concat(source), {read: false})
+		.pipe(jsdoc(config));
+});
+
+gulp.task('typedoc-client', () => {
+	const typedoc = require('gulp-typedoc');
+	const config = {
+		// typescript options (see typescript docs)
+		allowSyntheticDefaultImports: true,
+		alwaysStrict: true,
+		importHelpers: true,
+		baseUrl: '.',
+		paths: {
+			'tslib': ['node_modules/tslib/tslib.d.ts'],
+			'*': ['*']
+		},
+		emitDecoratorMetadata: true,
+		esModuleInterop: true,
+		experimentalDecorators: true,
+		forceConsistentCasingInFileNames: true,
+		module: 'commonjs',
+		moduleResolution: 'node',
+		noImplicitAny: false,
+		removeComments: true,
+		sourceMap: true,
+		suppressImplicitAnyIndexErrors: true,
+		target: 'es2017',
+		typeRoots: ['./node_modules/@types'],
+		types: ['node', 'jasmine', 'hammerjs', 'core-js', 'jquery'],
+		// output options (see typedoc docs: http://typedoc.org/api/index.html)
+		readme: './README.md',
+		out: './logs/typedoc',
+		json: './logs/typedoc/typedoc-output.json',
+		// typedoc options (see typedoc docs: http://typedoc.org/api/index.html)
+		name: 'SPAMT Client',
+		theme: 'default',
+		//plugins: [], // set to none to use no plugins, omit to use all
+		includeDeclarations: false,
+		ignoreCompilerErrors: true,
+		version: true
+	};
+	return gulp.src(['public/app/**/*.ts'], {read: false})
+		.pipe(typedoc(config));
+});
+
 gulp.task('server-test', () => {
 	return gulp.src(['./test/server/*.js'], { read: false })
-		.pipe(mocha({ reporter: 'spec' }))
-		.on('error', util.log);
+		.pipe(mocha({ reporter: 'good-mocha-html-reporter' })) // also spec reporter in terminal
+		.on('error', util.log)
+		.once('end', () => {
+			if (fs.existsSync('./report.html')) {
+				if (!fs.existsSync('./logs/unit/server')) {
+					if (!fs.existsSync('./logs/unit')) {
+						fs.mkdirSync('./logs/unit');
+					}
+					fs.mkdirSync('./logs/unit/server');
+				}
+				fs.copyFileSync('./report.html', './logs/unit/server/index.html');
+				fs.unlinkSync('./report.html');
+			}
+		});
 });
 
 gulp.task('client-unit-test', (done) => {
@@ -398,7 +535,11 @@ gulp.task('start-prebuilt', (done) => {
 	runSequence('database', 'server', 'watch', done);
 });
 
+gulp.task('kill', (done) => {
+	killProcessByName('gulp');
+	done();
+});
+
 process.on('exit', (code) => {
 	console.log(`PROCESS EXIT CODE ${code}`);
-	// killProcessByName('gulp');
 });

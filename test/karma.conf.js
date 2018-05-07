@@ -39,14 +39,27 @@ module.exports = function(config){
 			'test/karma.test-shim.js',
 			{ pattern: 'test/client/**', included: false, watched: false },
 
-			{ pattern: 'public/app/**', included: false, watched: false }
+			{ pattern: 'public/app/**', included: false, watched: false },
+
+			{ pattern: 'public/service-worker.js', included: false, watched: false },
+
+			{ pattern: 'public/webfonts/**', included: false, watched: false },
+
+			{ pattern: 'public/img/**', included: false, watched: false }
 		],
+
+		proxies: {
+			'/service-worker.js': '/base/public/service-worker.js',
+			'/public/webfonts/': '/base/public/webfonts/',
+			'/public/img/': '/base/public/img/'
+		},
 
 		// exclude: [],
 
 		frameworks: ['jasmine'],
 
 		browserNoActivityTimeout: 20000,
+		browserDisconnectTimeout: 20000,
 		customLaunchers: {
 			/*
 			*	this custom launcher requires setting env var CHROME_BIN=chromium-browser
@@ -68,6 +81,7 @@ module.exports = function(config){
 		plugins : [
 			'karma-redirect-preprocessor',
 			'karma-chrome-launcher',
+			'karma-html-reporter',
 			'karma-sourcemap-loader',
 			'karma-coverage',
 			'karma-jasmine'
@@ -79,21 +93,29 @@ module.exports = function(config){
 			'public/app/**/*.js': ['sourcemap']
 		},
 
-		browserNoActivityTimeout: 20000,
-		browserDisconnectTimeout: 20000,
-
 		redirectPreprocessor: {
 			// stripPrefix: '',
 			// stripSuffix: '',
 			// prependPrefix: ''
 		},
 
-		reporters: ['progress', 'coverage'],
+		reporters: ['progress', 'coverage', 'html'],
+
 		coverageReporter: {
 			dir: 'logs/',
 			reporters: [
 				{ type: 'json', subdir: 'coverage'}
 			]
+		},
+
+		htmlReporter: {
+			outputDir: 'logs/unit',
+			templatePath: null,
+			focusOnFailures: true,
+			namedFiles: false,
+			pageTitle: 'Ng2NWTN Client Unit Tests',
+			urlFriendlyName: true,
+			reportName: 'client'
 		},
 
 		failOnEmptyTestSuite: false,
