@@ -3,9 +3,6 @@ import { EventEmitterService } from '../services/event-emitter.service';
 
 import { Router, NavigationEnd } from '@angular/router';
 
-import { Subject } from 'rxjs/Subject';
-import 'rxjs/add/operator/takeUntil';
-
 @Component({
 	selector: 'app-nav',
 	templateUrl: '/public/app/views/app-nav.html',
@@ -20,7 +17,10 @@ export class AppNavComponent implements OnInit, OnDestroy {
 		console.log('AppNavComponent element:', this.el.nativeElement);
 	}
 
-	private ngUnsubscribe: Subject<void> = new Subject();
+	/**
+	 * Component subscriptions.
+	 */
+	private subscriptions: any[] = [];
 
 	public navButtonsState: boolean[] = [false, false, false, false, false];
 	public showHelp: boolean = false;
@@ -65,7 +65,7 @@ export class AppNavComponent implements OnInit, OnDestroy {
 	public ngOnInit(): void {
 		console.log('ngOnInit: AppNavComponent initialized');
 		// check active route on app init - app-nav loads once on app init
-		this.router.events.takeUntil(this.ngUnsubscribe).subscribe((event: any) => {
+		const sub = this.router.events.subscribe((event: any) => {
 			// console.log(' > ROUTER EVENT:', event);
 			if (event instanceof NavigationEnd) {
 				if (!event.hasOwnProperty('reason')) {
@@ -80,10 +80,14 @@ export class AppNavComponent implements OnInit, OnDestroy {
 				this.showHelp = false;
 			}
 		});
+		this.subscriptions.push(sub);
 	}
 	public ngOnDestroy(): void {
 		console.log('ngOnDestroy: AppNavComponent destroyed');
-		this.ngUnsubscribe.next();
-		this.ngUnsubscribe.complete();
+		if (this.subscriptions.length) {
+			for (const sub of this.subscriptions) {
+				sub.unsubscribe();
+			}
+		}
 	}
 }

@@ -1,19 +1,17 @@
 import { Injectable } from '@angular/core';
-import { Http, Response } from '@angular/http';
+import { HttpClient } from '@angular/common/http';
 
 import { CustomHttpHandlersService } from '../services/custom-http-handlers.service';
 import { CustomHttpUtilsService } from '../services/custom-http-utils.service';
 
-import { Observable } from 'rxjs/Rx';
-import 'rxjs/add/operator/timeout';
-import 'rxjs/add/operator/map';
-import 'rxjs/add/operator/catch';
+import { Observable } from 'rxjs';
+import { timeout, take, map, catchError } from 'rxjs/operators';
 
 @Injectable()
 export class UserLogoutService {
 
 	constructor(
-		private http: Http,
+		private http: HttpClient,
 		private handlers: CustomHttpHandlersService,
 		private utils: CustomHttpUtilsService
 	) {}
@@ -22,9 +20,10 @@ export class UserLogoutService {
 
 	public getData(twitterToken: string, soundcloudToken: string): Observable<any> {
 		const query = (twitterToken) ? '?twitter_token=' + twitterToken : (soundcloudToken) ? '?soundcloud_token=' + soundcloudToken : '';
-		return this.http.get(this.appDataUrl + query)
-			.timeout(this.utils.timeoutValue)
-			.map(this.handlers.extractObject)
-			.catch(this.handlers.handleError);
+		return this.http.get(this.appDataUrl + query).pipe(
+			timeout(this.utils.timeoutValue),
+			map(this.handlers.extractObject),
+			catchError(this.handlers.handleError)
+		);
 	}
 }

@@ -17,10 +17,6 @@ import { ControlsMeService } from '../services/controls-me.service';
 import { ControlsUsersListService } from '../services/controls-users-list.service';
 import { ControlsQueriesListService } from '../services/controls-queries-list.service';
 
-import { Subject } from 'rxjs/Subject';
-import 'rxjs/add/operator/takeUntil';
-import 'rxjs/add/operator/first';
-
 @Component({
 	selector: 'app-controls',
 	templateUrl: '/public/app/views/app-controls.html',
@@ -50,9 +46,9 @@ export class AppControlsComponent implements OnInit, AfterViewInit, OnDestroy {
 	}
 
 	/**
-	 * Controls infinite subscriptions unsubscribe.
+	 * Component subscriptions.
 	 */
-	private ngUnsubscribe: Subject<void> = new Subject();
+	private subscriptions: any[] = [];
 
 	/**
 	 * View title.
@@ -156,7 +152,7 @@ export class AppControlsComponent implements OnInit, AfterViewInit, OnDestroy {
 	 */
 	private getServerStaticData(callback): void {
 		this.emitter.emitSpinnerStartEvent();
-		this.serverStaticDataService.getData().first().subscribe(
+		this.serverStaticDataService.getData().subscribe(
 			(data: any) => this.serverData.static = data,
 			(error: any) => {
 				this.errorMessage = error;
@@ -174,7 +170,7 @@ export class AppControlsComponent implements OnInit, AfterViewInit, OnDestroy {
 	 */
 	private getPublicData(callback): void {
 		this.emitter.emitSpinnerStartEvent();
-		this.publicDataService.getData().first().subscribe(
+		this.publicDataService.getData().subscribe(
 			(data: any) => {
 				if (this.nvd3usage) {
 					this.nvd3usage.clearElement();
@@ -197,7 +193,7 @@ export class AppControlsComponent implements OnInit, AfterViewInit, OnDestroy {
 	 */
 	private getUsersList(): void {
 		this.emitter.emitSpinnerStartEvent();
-		this.controlsUsersListService.getData().first().subscribe(
+		this.controlsUsersListService.getData().subscribe(
 			(data: any) => this.usersList = data,
 			(error: any) => {
 				this.errorMessage = error;
@@ -214,7 +210,7 @@ export class AppControlsComponent implements OnInit, AfterViewInit, OnDestroy {
 	 */
 	private getQueriesList(): void {
 		this.emitter.emitSpinnerStartEvent();
-		this.controlsQueriesListService.getData(this.queries.page).first().subscribe(
+		this.controlsQueriesListService.getData(this.queries.page).subscribe(
 			(data: any) => {
 				if (this.nvd3queries) {
 					this.nvd3queries.clearElement();
@@ -247,7 +243,7 @@ export class AppControlsComponent implements OnInit, AfterViewInit, OnDestroy {
 	private requestControlsAccess(): void {
 		this.emitter.emitSpinnerStartEvent();
 		this.dismissMessages();
-		this.controlsLoginService.getData(this.userService.model.email).first().subscribe(
+		this.controlsLoginService.getData(this.userService.model.email).subscribe(
 			(data: any) => this.successMessage = data.message,
 			(error: any) => {
 				this.errorMessage = error;
@@ -266,7 +262,7 @@ export class AppControlsComponent implements OnInit, AfterViewInit, OnDestroy {
 	private getMe(): void {
 		this.emitter.emitSpinnerStartEvent();
 		this.dismissMessages();
-		this.controlsMeService.getData().first().subscribe(
+		this.controlsMeService.getData().subscribe(
 			(data: any) => {
 				this.successMessage = 'Successful login';
 				const newValues: any = {
@@ -389,7 +385,7 @@ export class AppControlsComponent implements OnInit, AfterViewInit, OnDestroy {
 	 * Subscribes to Tab Group change events.
 	 */
 	private tabGroupChangeSubscribe(): void {
-		this.tabGroup.selectChange.takeUntil(this.ngUnsubscribe).subscribe((event: any) => {
+		const sub = this.tabGroup.selectedTabChange.subscribe((event: any) => {
 			console.log('tabs chage event:', event, '| active tab index', event.index, '| tab name', this.dataTabs[event.index]);
 			if (this.dataTabs[event.index] === 'Users') {
 				/*
@@ -402,6 +398,7 @@ export class AppControlsComponent implements OnInit, AfterViewInit, OnDestroy {
 				*/
 			}
 		});
+		this.subscriptions.push(sub);
 	}
 
 	/**
@@ -437,12 +434,13 @@ export class AppControlsComponent implements OnInit, AfterViewInit, OnDestroy {
 		/**
 		 * Subscribe to Event Emitter Service events.
 		 */
-		this.emitter.getEmitter().takeUntil(this.ngUnsubscribe).subscribe((event: any) => {
+		const sub = this.emitter.getEmitter().subscribe((event: any) => {
 			if (event.help === 'toggle') {
 				console.log('AppControlsComponent emitter event:', event, ' | toggling help labels visibility', this.showHelp);
 				this.showHelp = (this.showHelp) ? false : true;
 			}
 		});
+		this.subscriptions.push(sub);
 
 		/**
 		 * Load data.
@@ -478,7 +476,10 @@ export class AppControlsComponent implements OnInit, AfterViewInit, OnDestroy {
 	 */
 	public ngOnDestroy(): void {
 		console.log('ngOnDestroy: AppControlsComponent destroyed');
-		this.ngUnsubscribe.next();
-		this.ngUnsubscribe.complete();
+		if (this.subscriptions.length) {
+			for (const sub of this.subscriptions) {
+				sub.unsubscribe();
+			}
+		}
 	}
 }

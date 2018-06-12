@@ -8,7 +8,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { FlexLayoutModule } from '@angular/flex-layout';
 
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { HttpModule } from '@angular/http';
+import { HttpClientModule } from '@angular/common/http';
 import { RouterModule } from '@angular/router';
 import { APP_ROUTES } from './app.routes';
 
@@ -17,7 +17,7 @@ import { APP_ROUTES } from './app.routes';
 *	CustomMaterialModule loads exact material modules
 */
 import '../../node_modules/hammerjs/hammer.js';
-import { CustomMaterialModule } from './custom-material.module';
+import { CustomMaterialModule } from './modules/custom-material.module';
 
 import { AppComponent } from './app.component';
 import { AppNavComponent } from './components/app-nav.component';
@@ -57,8 +57,8 @@ import { ControlsQueriesListService } from './services/controls-queries-list.ser
 import { NvD3Component } from 'ng2-nvd3';
 
 @NgModule({
-	declarations: [ AppComponent, AppNavComponent, AppIntroComponent, AppAnalyserSoundcloudComponent, AppControlsComponent, AppUserComponent, /*nvD3,*/NvD3Component, AudioPlayerDirective, ConvertDuration ],
-	imports 		: [ BrowserModule, BrowserAnimationsModule, FormsModule, FlexLayoutModule, CustomMaterialModule, ReactiveFormsModule, HttpModule, RouterModule.forRoot(APP_ROUTES) ],
+	declarations: [ AppComponent, AppNavComponent, AppIntroComponent, AppAnalyserSoundcloudComponent, AppControlsComponent, AppUserComponent, NvD3Component, AudioPlayerDirective, ConvertDuration ],
+	imports 		: [ BrowserModule, BrowserAnimationsModule, FormsModule, FlexLayoutModule, CustomMaterialModule, ReactiveFormsModule, HttpClientModule, RouterModule.forRoot(APP_ROUTES) ],
 	providers 	: [
 									{provide: APP_BASE_HREF, useValue: '/'},
 									{ provide: LocationStrategy, useClass: PathLocationStrategy },

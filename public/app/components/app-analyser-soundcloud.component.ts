@@ -1,17 +1,16 @@
 import { Component, ElementRef, ViewChild, OnInit, OnDestroy } from '@angular/core';
 import { FormControl, Validators } from '@angular/forms';
 import { MatTabGroup } from '@angular/material';
+
 import { EventEmitterService } from '../services/event-emitter.service';
+
 import { SCgetQueriesService } from '../services/sc-get-queries.service';
 import { SCgetUserService } from '../services/sc-get-user.service';
 import { SCgetUserDetailsService } from '../services/sc-get-user-details.service';
 import { SCgetUserTrackDownloadService } from '../services/sc-get-user-track-download.service';
 import { SCgetUserTrackStreamService } from '../services/sc-get-user-track-stream.service';
-import { UserService } from '../services/user.service';
 
-import { Subject } from 'rxjs/Subject';
-import 'rxjs/add/operator/takeUntil';
-import 'rxjs/add/operator/first';
+import { UserService } from '../services/user.service';
 
 @Component({
 	selector: 'app-analyser-soundcloud',
@@ -35,7 +34,10 @@ export class AppAnalyserSoundcloudComponent implements OnInit, OnDestroy {
 		console.log('AppAnalyserSoundcloudComponent element:', this.el.nativeElement);
 	}
 
-	private ngUnsubscribe: Subject<void> = new Subject();
+	/**
+	 * Component subscriptions.
+	 */
+	private subscriptions: any[] = [];
 
 	public publicData: any = {
 		user: null,
@@ -57,7 +59,7 @@ export class AppAnalyserSoundcloudComponent implements OnInit, OnDestroy {
 	public queries: any;
 	private getQueries(): void {
 		this.emitter.emitSpinnerStartEvent();
-		this.scGetQueriesService.getData().first().subscribe(
+		this.scGetQueriesService.getData().subscribe(
 			(data: any) => {
 				this.queries = data;
 				console.log('this.queries: ', this.queries);
@@ -96,7 +98,7 @@ export class AppAnalyserSoundcloudComponent implements OnInit, OnDestroy {
 	}
 	public getUser(): void {
 		this.emitter.emitSpinnerStartEvent();
-		this.scGetUserService.getData(this.scUserName.value).first().subscribe(
+		this.scGetUserService.getData(this.scUserName.value).subscribe(
 			(data: any) => {
 				this.publicData.user = data;
 				this.dismissMessages();
@@ -131,13 +133,14 @@ export class AppAnalyserSoundcloudComponent implements OnInit, OnDestroy {
 	@ViewChild('tabGroup') private tabGroup: MatTabGroup;
 	private setTabChangeListener(): void {
 		this.tabGroup.selectedIndex = 0;
-		this.tabGroup.selectChange.takeUntil(this.ngUnsubscribe).subscribe((event: any) => {
+		const sub = this.tabGroup.selectedTabChange.subscribe((event: any) => {
 			/*
 			*	tab change events
 			*/
 			console.log('tabs chage event:', event, '| active tab index', event.index, '| tab name', this.dataTabs[event.index]);
 			this.selectTab(this.dataTabs[event.index]);
 		});
+		this.subscriptions.push(sub);
 		this.selectTab(this.dataTabs[this.tabGroup.selectedIndex]);
 	}
 	public dataTabs: string[] = ['Tracks', 'Playlists', 'Favorites', 'Followers', 'Followings'];
@@ -164,7 +167,7 @@ export class AppAnalyserSoundcloudComponent implements OnInit, OnDestroy {
 		}
 		console.log('this.selectedEndpoint: ', this.selectedEndpoint);
 		this.emitter.emitSpinnerStartEvent();
-		this.scGetUserDetailsService.getData(this.userService.model.analyser_user_uri + '/' + this.selectedEndpoint).first().subscribe(
+		this.scGetUserDetailsService.getData(this.userService.model.analyser_user_uri + '/' + this.selectedEndpoint).subscribe(
 			(data: any) => {
 				if (data.hasOwnProperty('collection')) {
 					/*
@@ -238,7 +241,7 @@ export class AppAnalyserSoundcloudComponent implements OnInit, OnDestroy {
 	private resolvePreviewSource(uri): void {
 		this.selectedTrack = undefined;
 		this.emitter.emitSpinnerStartEvent();
-		this.scGetUserTrackStreamService.getData(uri).first().subscribe(
+		this.scGetUserTrackStreamService.getData(uri).subscribe(
 			(data: any) => {
 				console.log('scGetUserTrackPlayService, data: ', data);
 				this.selectedTrack = data.location;
@@ -314,7 +317,8 @@ export class AppAnalyserSoundcloudComponent implements OnInit, OnDestroy {
 			console.log('user is selected, this.scUserName.value:', this.scUserName.value);
 			this.getUser();
 		}
-		this.emitter.getEmitter().takeUntil(this.ngUnsubscribe).subscribe((event: any) => {
+
+		const sub = this.emitter.getEmitter().subscribe((event: any) => {
 			/*
 			*	help toggler events
 			*/
@@ -331,10 +335,14 @@ export class AppAnalyserSoundcloudComponent implements OnInit, OnDestroy {
 				if (event.AudioPlayerDirective === 'pause') { this.audioPlayback = false; }
 			}
 		});
+		this.subscriptions.push(sub);
 	}
 	public ngOnDestroy(): void {
 		console.log('ngOnDestroy: AppAnalyserSoundcloudComponent destroyed');
-		this.ngUnsubscribe.next();
-		this.ngUnsubscribe.complete();
+		if (this.subscriptions.length) {
+			for (const sub of this.subscriptions) {
+				sub.unsubscribe();
+			}
+		}
 	}
 }

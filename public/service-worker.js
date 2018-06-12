@@ -100,17 +100,17 @@ function updateCache() {
 }
 
 self.addEventListener('fetch', function(event) {
-	console.log('>> serviceWorker, fetch event', event);
+	// console.log('>> serviceWorker, fetch event', event);
 	var request = event.request;
 	if (/service-worker\.js$/.test(request.url)) {
-		console.log('>> serviceWorker, should check cache update, this happens on initial page load when worker is already installed');
+		// console.log('>> serviceWorker, should check cache update, this happens on initial page load when worker is already installed');
 		event.waitUntil(updateCache());
 		event.respondWith(fetch(request));
 	} else {
 		event.respondWith(caches.open(cacheName).then(function(cache) {
 			return cache.match(request).then(function(response) {
 				if (response) {
-					console.log('>> serviceWorker returns cached respose on request', request);
+					// console.log('>> serviceWorker returns cached respose on request', request);
 					return response;
 				} else {
 					return fetch(request);

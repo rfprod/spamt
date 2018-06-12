@@ -1,19 +1,17 @@
 import { Injectable } from '@angular/core';
-import { Http, Response } from '@angular/http';
+import { HttpClient } from '@angular/common/http';
 
 import { CustomHttpHandlersService } from '../services/custom-http-handlers.service';
 import { CustomHttpUtilsService } from '../services/custom-http-utils.service';
 
-import { Observable } from 'rxjs/Rx';
-import 'rxjs/add/operator/timeout';
-import 'rxjs/add/operator/map';
-import 'rxjs/add/operator/catch';
+import { Observable } from 'rxjs';
+import { timeout, take, map, catchError } from 'rxjs/operators';
 
 @Injectable()
 export class ServerStaticDataService {
 
 	constructor(
-		private http: Http,
+		private http: HttpClient,
 		private handlers: CustomHttpHandlersService,
 		private utils: CustomHttpUtilsService
 	) {}
@@ -21,9 +19,10 @@ export class ServerStaticDataService {
 	public appDataUrl: string = this.utils.apiUrl('/api/app-diag/static');
 
 	public getData(): Observable<any[]> {
-		return this.http.get(this.appDataUrl)
-			.timeout(this.utils.timeoutValue)
-			.map(this.handlers.extractArray)
-			.catch(this.handlers.handleError);
+		return this.http.get(this.appDataUrl).pipe(
+			timeout(this.utils.timeoutValue),
+			map(this.handlers.extractArray),
+			catchError(this.handlers.handleError)
+		);
 	}
 }

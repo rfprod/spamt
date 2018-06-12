@@ -4,10 +4,6 @@ import { EventEmitterService } from '../services/event-emitter.service';
 import { UserService } from '../services/user.service';
 import { UserLogoutService } from '../services/user-logout.service';
 
-import { Subject } from 'rxjs/Subject';
-import 'rxjs/add/operator/takeUntil';
-import 'rxjs/add/operator/first';
-
 @Component({
 	selector: 'app-user',
 	templateUrl: '/public/app/views/app-user.html',
@@ -28,7 +24,7 @@ export class AppUserComponent implements OnInit, OnDestroy {
 		console.log('AppUserComponent element:', this.el.nativeElement);
 	}
 
-	private ngUnsubscribe: Subject<void> = new Subject();
+	private subscriptions: any[] = [];
 
 	public title: string = 'User Panel';
 	public description: object = {
@@ -134,21 +130,28 @@ export class AppUserComponent implements OnInit, OnDestroy {
 			this.router.navigateByUrl('/user');
 		}
 
-		this.emitter.getEmitter().takeUntil(this.ngUnsubscribe).subscribe((event: any) => {
+		let sub = this.emitter.getEmitter().subscribe((event: any) => {
 			console.log('AppUserComponent consuming event:', event);
 			if (event.help === 'toggle') {
 				console.log('AppUserComponent emitter event:', event, ' | toggling help labels visibility', this.showHelp);
 				this.showHelp = (this.showHelp) ? false : true;
 			}
 		});
-		this.activatedRoute.params.takeUntil(this.ngUnsubscribe).subscribe((params: Params) => {
+		this.subscriptions.push(sub);
+
+		sub = this.activatedRoute.params.subscribe((params: Params) => {
 			console.log('url params chaned:', params);
 		});
+		this.subscriptions.push(sub);
+
 		this.emitter.emitSpinnerStopEvent();
 	}
 	public ngOnDestroy(): void {
 		console.log('ngOnDestroy: AppUserComponent destroyed');
-		this.ngUnsubscribe.next();
-		this.ngUnsubscribe.complete();
+		if (this.subscriptions.length) {
+			for (const sub of this.subscriptions) {
+				sub.unsubscribe();
+			}
+		}
 	}
 }

@@ -6,9 +6,6 @@ import { MatIconRegistry } from '@angular/material';
 
 import { CustomServiceWorkerService } from './services/custom-service-worker.service';
 
-import { Subject } from 'rxjs/Subject';
-import 'rxjs/add/operator/takeUntil';
-
 declare let $: JQueryStatic;
 
 @Component({
@@ -32,7 +29,7 @@ export class AppComponent implements OnInit, OnDestroy {
 		console.log('AppComponent element', this.el.nativeElement);
 	}
 
-	private ngUnsubscribe: Subject<void> = new Subject();
+	private subscriptions: any[] = [];
 
 	public showAppInfo: boolean = true;
 	public showSpinner: boolean = false;
@@ -41,14 +38,15 @@ export class AppComponent implements OnInit, OnDestroy {
 		console.log('ngOnInit: AppComponent initialized');
 		$('#init-spinner').remove();
 
-		this.router.events.takeUntil(this.ngUnsubscribe).subscribe((event: any) => {
+		let sub = this.router.events.subscribe((event: any) => {
 			if (event instanceof ResolveEnd) {
 				console.log('router event, resolve end', event);
 				this.showAppInfo = (event.url === '/intro') ? true : false;
 			}
 		});
+		this.subscriptions.push(sub);
 
-		this.emitter.getEmitter().takeUntil(this.ngUnsubscribe).subscribe((event: any) => {
+		sub = this.emitter.getEmitter().subscribe((event: any) => {
 			console.log('app consuming event:', event);
 			if (event.spinner) {
 				if (event.spinner === 'start') {
@@ -59,6 +57,7 @@ export class AppComponent implements OnInit, OnDestroy {
 				}
 			}
 		});
+		this.subscriptions.push(sub);
 
 		/*
 		*	register fontawesome for usage in mat-icon by adding directives
@@ -74,7 +73,10 @@ export class AppComponent implements OnInit, OnDestroy {
 	public ngOnDestroy() {
 		console.log('ngOnDestroy: AppComponent destroyed');
 		this.serviceWorker.disableServiceWorker();
-		this.ngUnsubscribe.next();
-		this.ngUnsubscribe.complete();
+		if (this.subscriptions.length) {
+			for (const sub of this.subscriptions) {
+				sub.unsubscribe();
+			}
+		}
 	}
 }

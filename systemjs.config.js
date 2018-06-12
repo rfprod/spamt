@@ -1,5 +1,5 @@
 /*
-*	SystemJS configuration for Angular 4+
+*	SystemJS configuration for Angular 6+
 */
 (function (global) { // eslint-disable-line no-unused-vars
 
@@ -10,10 +10,16 @@
 	var map = {
 		'app': 																	'./public/app',
 		'ng2-nvd3': 														'npm:ng2-nvd3/build',
-		'rxjs/Rx': 															'npm:rxjs/bundles/Rx.js',
+
+		'rxjs': 																'npm:rxjs/bundles/rxjs.umd.js',
+		'rxjs/ajax': 														'npm:rxjs/ajax',
 		'rxjs/operators': 											'npm:rxjs/operators',
+		'rxjs/testing': 												'npm:rxjs/testing',
+		'rxjs/util': 														'npm:rxjs/util',
+		'rxjs/webSocket': 											'npm:rxjs/webSocket',
+		'rxjs/internal': 												'npm:rxjs/internal',
+
 		'tslib': 																'npm:tslib/tslib.js',
-		'rxjs': 																'npm:rxjs',
 		'traceur': 															'npm:traceur/bin',
 		'@angular/animations': 									'npm:@angular/animations/bundles/animations.umd.js',
 		'@angular/animations/browser': 					'npm:@angular/animations/bundles/animations-browser.umd.js',
@@ -32,6 +38,7 @@
 		'@angular/flex-layout/extended': 				'npm:@angular/flex-layout/bundles/flex-layout-extended.umd.js',
 		'@angular/flex-layout/flex': 						'npm:@angular/flex-layout/bundles/flex-layout-flex.umd.js',
 		'@angular/flex-layout/server': 					'npm:@angular/flex-layout/bundles/flex-layout-server.umd.js',
+		'@angular/flex-layout/grid': 						'npm:@angular/flex-layout/bundles/flex-layout-grid.umd.js',
 		'@angular/material': 										'npm:@angular/material/bundles/material.umd.js',
 		'@angular/cdk': 												'npm:@angular/cdk/bundles/cdk.umd.js',
 		'@angular/cdk/a11y': 										'npm:@angular/cdk/bundles/cdk-a11y.umd.js',
@@ -50,15 +57,22 @@
 		'@angular/cdk/stepper': 								'npm:@angular/cdk/bundles/cdk-stepper.umd.js',
 		'@angular/cdk/table': 									'npm:@angular/cdk/bundles/cdk-table.umd.js',
 		'@angular/material-moment-adapter': 		'npm:@angular/material-moment-adapter/bundles/material-moment-adapter.umd.js',
+		'@angular/cdk/text-field': 							'npm:@angular/cdk/bundles/cdk-text-field.umd.js',
+		'@angular/cdk/tree': 										'npm:@angular/cdk/bundles/cdk-tree.umd.js',
 		'moment': 															'npm:moment/min/moment-with-locales.min.js' // reconfig reference: https://github.com/angular/material2/commit/9545427c73627f0cf91b5086efd5d727459fc44f
 	};
 	// how to load packages
 	var packages = {
-		'app':                        { main: 'app', defaultExtension: 'js' },
-		'ng2-nvd3':                   { main: 'index', defaultExtension: 'js' },
-		'rxjs':                       { defaultExtension: 'js' },
-		'rxjs/operators': 						{ main: '../operators', defaultExtension: 'js' },
-		'traceur':                    { main: 'traceur', defaultExtension: 'js' }
+		'app': 													{ main: 'app', defaultExtension: 'js' },
+		'ng2-nvd3': 										{ main: 'index', defaultExtension: 'js' },
+		'traceur': 											{ main: 'traceur', defaultExtension: 'js' },
+
+		'rxjs/ajax': 										{ main: 'index', defaultExtension: 'js' },
+		'rxjs/operators': 							{ main: 'index', defaultExtension: 'js' },
+		'rxjs/testing': 								{ main: 'index', defaultExtension: 'js' },
+		'rxjs/util': 										{ main: 'index', defaultExtension: 'js' },
+		'rxjs/webSocket': 							{ main: 'index', defaultExtension: 'js' },
+		'rxjs/internal': 								{ main: 'Rx', defaultExtension: 'js' }
 	};
 
 	var config = {

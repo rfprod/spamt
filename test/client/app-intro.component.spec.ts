@@ -7,7 +7,7 @@ import { MockBackend, MockConnection } from '@angular/http/testing';
 
 import { FlexLayoutModule } from '@angular/flex-layout';
 import '../../node_modules/hammerjs/hammer.js';
-import { CustomMaterialModule } from '../../public/app/custom-material.module';
+import { CustomMaterialModule } from '../../public/app/modules/custom-material.module';
 
 import { CustomHttpHandlersService } from '../../public/app/services/custom-http-handlers.service';
 import { CustomHttpUtilsService } from '../../public/app/services/custom-http-utils.service';
@@ -18,7 +18,7 @@ import { EventEmitterService } from '../../public/app/services/event-emitter.ser
 import { ServerStaticDataService } from '../../public/app/services/server-static-data.service';
 import { PublicDataService } from '../../public/app/services/public-data.service';
 import { WebsocketService } from '../../public/app/services/websocket.service';
-import { Observable } from 'rxjs/Rx';
+import { Observable, concat, of } from 'rxjs';
 
 import { AppIntroComponent } from '../../public/app/components/app-intro.component';
 
@@ -66,8 +66,8 @@ describe('AppIntroComponent', () => {
 		}).compileComponents().then(() => {
 			this.fixture = TestBed.createComponent(AppIntroComponent);
 			this.component = this.fixture.componentInstance;
-			spyOn(this.component.serverStaticDataService, 'getData').and.returnValue(Observable.of(mockedResponse));
-			spyOn(this.component.publicDataService, 'getData').and.returnValue(Observable.of(mockedResponse));
+			spyOn(this.component.serverStaticDataService, 'getData').and.returnValue(concat(of(mockedResponse)));
+			spyOn(this.component.publicDataService, 'getData').and.returnValue(concat(of(mockedResponse)));
 			this.eventEmitterSrv = TestBed.get(EventEmitterService) as EventEmitterService;
 			spyOn(this.eventEmitterSrv, 'emitSpinnerStartEvent').and.callThrough();
 			spyOn(this.eventEmitterSrv, 'emitSpinnerStopEvent').and.callThrough();
@@ -205,13 +205,15 @@ describe('AppIntroComponent', () => {
 		const c = this.component;
 		c.ngOnInit();
 		spyOn(c.ws, 'close');
-		spyOn(c.ngUnsubscribe, 'next').and.callThrough();
-		spyOn(c.ngUnsubscribe, 'complete').and.callThrough();
+		for (const sub of c.subscriptions) {
+			spyOn(sub, 'unsubscribe').and.callThrough();
+		}
 		c.ngOnDestroy();
 		expect(c.ws.close).toHaveBeenCalled();
-		expect(c.ngUnsubscribe.next).toHaveBeenCalled();
-		expect(c.ngUnsubscribe.complete).toHaveBeenCalled();
+		this.component.ngOnDestroy();
+		for (const sub of c.subscriptions) {
+			expect(sub.unsubscribe).toHaveBeenCalled();
+		}
 	});
 
 });
-

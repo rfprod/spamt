@@ -4,10 +4,6 @@ import { ServerStaticDataService } from '../services/server-static-data.service'
 import { PublicDataService } from '../services/public-data.service';
 import { WebsocketService } from '../services/websocket.service';
 
-import { Subject } from 'rxjs/Subject';
-import 'rxjs/add/operator/takeUntil';
-import 'rxjs/add/operator/first';
-
 // declare let d3: any;
 
 @Component({
@@ -29,7 +25,10 @@ export class AppIntroComponent implements OnInit, OnDestroy {
 		console.log('AppIntroComponent element:', this.el.nativeElement);
 	}
 
-	private ngUnsubscribe: Subject<void> = new Subject();
+	/**
+	 * Component subscriptions.
+	 */
+	private subscriptions: any[] = [];
 
 	public title: string = 'SPAMT';
 	public description: string = 'Social Profile Analysis and Management Tool';
@@ -86,7 +85,7 @@ export class AppIntroComponent implements OnInit, OnDestroy {
 	public errorMessage: string;
 
 	private getServerStaticData(callback): void {
-		this.serverStaticDataService.getData().first().subscribe(
+		this.serverStaticDataService.getData().subscribe(
 			(data: any) => this.serverData.static = data,
 			(error: any) => this.errorMessage = error,
 			() => {
@@ -96,7 +95,7 @@ export class AppIntroComponent implements OnInit, OnDestroy {
 		);
 	}
 	private getPublicData(callback): void {
-		this.publicDataService.getData().first().subscribe(
+		this.publicDataService.getData().subscribe(
 			(data: any) => {
 				this.nvd3.clearElement();
 				this.appUsageData = data;
@@ -176,7 +175,7 @@ export class AppIntroComponent implements OnInit, OnDestroy {
 			console.log('websocket closed:', evt);
 		};
 
-		this.emitter.getEmitter().takeUntil(this.ngUnsubscribe).subscribe((event: any) => {
+		const sub = this.emitter.getEmitter().subscribe((event: any) => {
 			if (event.sys === 'close websocket') {
 				console.log('AppIntroComponent emitter event:', event);
 				console.log('closing webcosket');
@@ -188,6 +187,7 @@ export class AppIntroComponent implements OnInit, OnDestroy {
 				this.showHelp = (this.showHelp) ? false : true;
 			}
 		});
+		this.subscriptions.push(sub);
 
 		this.getPublicData(() => {
 			this.getServerStaticData(() => {
@@ -198,7 +198,10 @@ export class AppIntroComponent implements OnInit, OnDestroy {
 	public ngOnDestroy(): void {
 		console.log('ngOnDestroy: AppIntroComponent destroyed');
 		this.ws.close();
-		this.ngUnsubscribe.next();
-		this.ngUnsubscribe.complete();
+		if (this.subscriptions.length) {
+			for (const sub of this.subscriptions) {
+				sub.unsubscribe();
+			}
+		}
 	}
 }

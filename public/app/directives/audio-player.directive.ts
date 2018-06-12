@@ -1,9 +1,6 @@
 import { Directive, ElementRef, Renderer, OnInit, OnDestroy } from '@angular/core';
 import { EventEmitterService } from '../services/event-emitter.service';
 
-import { Subject } from 'rxjs/Subject';
-import 'rxjs/add/operator/takeUntil';
-
 @Directive({ selector: '[audioPlayer]' })
 export class AudioPlayerDirective implements OnInit, OnDestroy {
 
@@ -15,7 +12,7 @@ export class AudioPlayerDirective implements OnInit, OnDestroy {
 		console.log('AudioPlayerDirective element: ', this.el.nativeElement);
 	}
 
-	private ngUnsubscribe: Subject<void> = new Subject();
+	private subscriptions: any[] = [];
 
 	private interval: any;
 
@@ -29,7 +26,7 @@ export class AudioPlayerDirective implements OnInit, OnDestroy {
 
 	public ngOnInit() {
 		console.log('ngOnInit: AudioPlayerDirective initialized');
-		this.emitter.getEmitter().takeUntil(this.ngUnsubscribe).subscribe((event: any) => {
+		const sub = this.emitter.getEmitter().subscribe((event: any) => {
 			if (event.audio) {
 				console.log('AudioPlayerDirective control event: ', event.audio);
 				if (event.audio === 'play') {
@@ -61,6 +58,8 @@ export class AudioPlayerDirective implements OnInit, OnDestroy {
 				}
 			}
 		});
+		this.subscriptions.push(sub);
+
 		this.progressInterval = setInterval(() => {
 			if (this.el.nativeElement.readyState === 4) {
 				// console.log('reporting progress: ', this.el.nativeElement.readyState);
@@ -81,8 +80,11 @@ export class AudioPlayerDirective implements OnInit, OnDestroy {
 	}
 	public ngOnDestroy() {
 		console.log('ngOnDestroy: AudioPlayerDirective destroyed');
-		this.ngUnsubscribe.next();
-		this.ngUnsubscribe.complete();
+		if (this.subscriptions.length) {
+			for (const sub of this.subscriptions) {
+				sub.unsubscribe();
+			}
+		}
 		clearInterval(this.interval);
 		clearInterval(this.progressInterval);
 	}

@@ -4,10 +4,8 @@ import { CustomHttpWithAuthService } from '../services/custom-http-with-auth.ser
 import { CustomHttpHandlersService } from '../services/custom-http-handlers.service';
 import { CustomHttpUtilsService } from '../services/custom-http-utils.service';
 
-import { Observable } from 'rxjs/Rx';
-import 'rxjs/add/operator/timeout';
-import 'rxjs/add/operator/map';
-import 'rxjs/add/operator/catch';
+import { Observable } from 'rxjs';
+import { timeout, take, map, catchError } from 'rxjs/operators';
 
 @Injectable()
 export class ControlsQueriesListService {
@@ -24,9 +22,10 @@ export class ControlsQueriesListService {
 		if (page <= 0) {
 			page = 1;
 		}
-		return this.http.get(this.appDataUrl + '?page=' + page, false)
-			.timeout(this.utils.timeoutValue)
-			.map(this.handlers.extractArray)
-			.catch(this.handlers.handleError);
+		return this.http.get(this.appDataUrl + '?page=' + page, false).pipe(
+			timeout(this.utils.timeoutValue),
+			map(this.handlers.extractArray),
+			catchError(this.handlers.handleError)
+		);
 	}
 }

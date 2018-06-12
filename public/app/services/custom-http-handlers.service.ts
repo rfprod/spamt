@@ -1,25 +1,30 @@
 import { Injectable } from '@angular/core';
-import { Http, Response } from '@angular/http';
+import { HttpResponse } from '@angular/common/http';
 
-import { Observable } from 'rxjs/Rx';
+import { Observable, concat, throwError } from 'rxjs';
 
 @Injectable()
 export class CustomHttpHandlersService {
 
 	/**
 	 * Extracts response in format { a: {}, b: '' }.
-	 * @param res http response
 	 */
-	public extractObject(res: Response): object {
-		return (res) ? res.json() : {};
+	public extractObject(res: any): object {
+		return (!res) ? {} : res;
 	}
 
 	/**
 	 * Extracts response in format [ {}, {}, {} ].
-	 * @param res http response
 	 */
-	public extractArray(res: Response): any[] {
-		return (res) ? res.json() : [];
+	public extractArray(res: any): any[] {
+		return (!res) ? [] : res;
+	}
+
+	/**
+	 * Extracts HttpResponse.
+	 */
+	public extractHttpResponse(res: HttpResponse<any>): any {
+		return res.body;
 	}
 
 	/**
@@ -33,7 +38,7 @@ export class CustomHttpHandlersService {
 		const errMsg = (error.status && msg) ? `${error.status} - ${error.statusText}: ${msg}` :
 			(error.status && error.statusText) ? `${error.status} - ${error.statusText}` :
 			(error.status) ? `${error.status} - Server error` : 'Server error';
-		return Observable.throw(errMsg);
+		return concat(throwError(errMsg));
 	}
 
 }
