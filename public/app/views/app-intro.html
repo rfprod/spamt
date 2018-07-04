@@ -1,12 +1,14 @@
-<div fxLayout="column" fxLayoutFill>
-	<h3>{{title}}
+<div fxLayout="row wrap">
+	<h3 fxFlex="100">{{title}}
 		<a (click)="toggleModal()" matTooltip="App diagnostics">
 			<mat-icon class="material-icons-fas" fontSet="fas" fontIcon="fa-heartbeat" title="show help" [ngClass]="{'help-highlight': showHelp}"></mat-icon>
 		</a>
 	</h3>
-	<p>{{description}}</p>
+	<p fxFlex="100">{{description}}</p>
 
-	<nvd3 #chart [options]="chartOptions" [data]="appUsageData"></nvd3>
+	<span fxFlex="100">
+		<nvd3 #chart [options]="chartOptions" [data]="appUsageData"></nvd3>
+	</span>
 
 	<span id="modal" *ngIf="showModal">
 		<button type="button" class="close" (click)="toggleModal()"><span>&times;</span></button>
@@ -27,8 +29,8 @@
 		</table>
 	</span>
 
-	<span fxFlex class="app-info">
-		<a class="flex-item" *ngFor="let badge of badges" href="{{badge.link}}" target=_blank title="{{badge.title}}">
+	<span fxFlex="100" fxLayout="row">
+		<a fxFlex *ngFor="let badge of badges" href="{{badge.link}}" target=_blank title="{{badge.title}}" class="badge">
 			<img src="{{badge.img}}"/>
 		</a>
 	</span>

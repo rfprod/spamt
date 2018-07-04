@@ -130,21 +130,18 @@
 			</div>
 		</span>
 
-		<div id="filters" *ngIf="selectedTab !== ''">
-			<span class="flex-item">
-				<mat-form-field>
-					<input matInput [(ngModel)]="filterSearchQuery">
-					<mat-icon matSuffix class="material-icons">search</mat-icon>
-				</mat-form-field>
-			</span>
-			<span class="flex-item">
-				<mat-form-field>
-					<mat-select [(ngModel)]="sortByCriterion" floatPlaceholder="auto" placeholder="Sorting">
-						<mat-option value="name">Alphabetical</mat-option>
-						<mat-option value="timestamp">Timestamp</mat-option>
-					</mat-select>
-				</mat-form-field>
-			</span>
+		<div fxLayout="row wrap" fxLayoutGap="10px" *ngIf="selectedTab !== ''">
+			<mat-form-field fxFlex>
+				<input matInput [(ngModel)]="filterSearchQuery">
+				<mat-icon matSuffix class="material-icons">search</mat-icon>
+			</mat-form-field>
+
+			<mat-form-field fxFlex>
+				<mat-select [(ngModel)]="sortByCriterion" floatPlaceholder="auto" placeholder="Sorting">
+					<mat-option value="name">Alphabetical</mat-option>
+					<mat-option value="timestamp">Timestamp</mat-option>
+				</mat-select>
+			</mat-form-field>
 		</div>
 
 		<audio controls="controls" *ngIf="selectedTrack" audioPlayer>

@@ -324,6 +324,19 @@ body {
 
 	h3:hover, h4:hover, p:hover {cursor: default;}
 
+	.badge {
+		&:hover{
+			background: $lightgrey;
+		}
+		img {
+			min-height: 5vh;
+			height: 10vh;
+			max-height: 8vh;
+			width: auto !important;
+			max-width: 24vw;
+		}
+	}
+
 /*
 *	genera styling for view containers
 */
@@ -375,29 +388,6 @@ body {
 /*
 *	specific styling for view containers
 */
-	.app-info {
-		height: 100%;
-		width: 100%;
-		display: flex;
-		justify-content: space-around;
-		align-items: center;
-		.flex-item {
-			flex: 1;
-			text-align: center;
-			text-decoration: none;
-			&:hover{
-				background: $lightgrey;
-			}
-			img {
-				min-height: 5vh;
-				height: 10vh;
-				max-height: 8vh;
-				width: auto !important;
-				max-width: 24vw;
-			}
-		}
-	}
-
 	app-analyser-soundcloud {
 		#labels {
 			border: 1px solid $grey;
