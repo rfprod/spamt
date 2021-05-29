@@ -85,7 +85,7 @@
 		"moment": "^2.22.2",
 		"mongoose": "^5.2.1",
 		"ng2-nvd3": "^2.0.0",
-		"nodemailer": "4.6.7",
+		"nodemailer": "6.4.16",
 		"nvd3": "^1.8.6",
 		"passport": "^0.4.0",
 		"passport-http-bearer": "^1.0.1",
